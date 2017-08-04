@@ -378,7 +378,7 @@ function sessionProcessor(isAcceptor, options) {
         
         //||||||||||UTILITY||||||||||UTILITY||||||||||UTILITY||||||||||UTILITY||||||||||UTILITY||||||||||UTIILTY||||||||||
         this.sendMsg = function(senderFunc, msg){
-            var outmsg = fixutil.convertToFIX(msg, self.fixVersion,  fixutil.getUTCTimeStamp(new Date()),
+            var outmsg = fixutil.getUTCTimeStamp(new Date()).substr(0,17) + ': ' + fixutil.convertToFIX(msg, self.fixVersion,  fixutil.getUTCTimeStamp(new Date()),
                 self.senderCompID,  self.targetCompID,  self.outgoingSeqNum);
 
             self.outgoingSeqNum = self.outgoingSeqNum + 1;
@@ -386,7 +386,7 @@ function sessionProcessor(isAcceptor, options) {
         
             //==Record message--TODO duplicate logic (n incoming as well)
             if (self.file === null) {
-                var filename = './traffic/' + self.senderCompID + '->' + self.targetCompID + '.log';
+                var filename = './traffic/' + self.senderCompID + '-' + self.targetCompID + '.log';
                 self.file = fs.createWriteStream(filename, { 'flags': 'a+' });
                 self.file.on('error', function(err){ console.log(err); });//todo print good log, end session
             }

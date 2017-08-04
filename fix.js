@@ -73,7 +73,7 @@ function Server(opt, func) {
      this.write = function(targetCompID, data) { self.sessions[targetCompID].write({data:data, type:'data'}); };
      this.logoff = function(targetCompID, logoffReason) { self.sessions[targetCompID].write({data:{35:5, 58:logoffReason}, type:'data'}); };
      this.kill = function(targetCompID, reason){ self.sessions[targetCompID].end(); };
-     /*this.getMessages = function(callback){
+     this.getMessages = function(callback){
         var fileName = './traffic/' + session.fixVersion + '-' + session.senderCompID + '-' + session.targetCompID + '.log';
         fs.readFile(fileName, encoding='ascii', function(err,data){
             if(err){
@@ -84,7 +84,7 @@ function Server(opt, func) {
                 callback(null,transactions);
             }
         });
-    };*/
+    };
 
 
 }
@@ -130,7 +130,8 @@ function Client(fixVersion, senderCompID, targetCompID, opt) {
         self.stream.on('error', function(err){ self.emit('error',err);});
     }
     this.logon = function(logonmsg){
-        logonmsg = _.isUndefined(logonmsg)? {'8':fixVersion, '49':senderCompID, '56': targetCompID, '35': 'A', '90': '0', '108': '10'} : logonmsg;
+        logonmsg = _.isUndefined(logonmsg)? {'8':fixVersion, '49':senderCompID, '56': targetCompID, '35': 'A', '98': '0', '108': '60', '141': 'Y'} : logonmsg;
+		//logonmsg = _.isUndefined(logonmsg)? {'8':fixVersion, '49':senderCompID, '56': targetCompID, '35': 'A', '90': '0', '108': '10'} : logonmsg;
         self.p.pushOutgoing({data:logonmsg, type:'data'});
     }
     this.connectAndLogon = function(port, host){
@@ -140,7 +141,7 @@ function Client(fixVersion, senderCompID, targetCompID, opt) {
         self.on('connect', function(){ self.logon(); });
     }
     this.logoff = function(logoffReason){ self.p.pushOutgoing({data:{35:5, 58:logoffReason}, type:'data'}) };
-    /*this.getMessages = function(callback){
+    this.getMessages = function(callback){
         var fileName = './traffic/' + self.fixVersion + '-' + self.senderCompID + '-' + self.targetCompID + '.log';
         fs.readFile(fileName, encoding='ascii', function(err,data){
             if(err){
@@ -151,7 +152,7 @@ function Client(fixVersion, senderCompID, targetCompID, opt) {
                 callback(null,transactions);
             }
         });
-    };*/
+    };
 }
 util.inherits(Client, events.EventEmitter);
 
