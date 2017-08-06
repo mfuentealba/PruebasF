@@ -21,7 +21,8 @@ ee.on('9', fnExecRpt);
 
 
 process.on('message', (msg) => {
-		
+	console.log('inicio Proceso');
+	process.send({ cmd: 'inicio Proceso', data: process.pid });
 	console.log(msg + ' ' + process.pid);
 	fs.readFile("FIX.4.4-OMS-ORDERROUTER.messages_20170721.log", 'utf8', function(err, data) {
 		arr = data.split("\n");
@@ -41,7 +42,7 @@ process.on('message', (msg) => {
 			
 			//break;
 		}
-		
+		process.send({ cmd: 'fin proceso', data: process.pid });
 		
 	});
 
