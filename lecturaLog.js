@@ -4,6 +4,7 @@ var arr;
 const tagsFixs = require('./resources/fixtagnums.js');
 const utilFix = require('./fixutils.js');
 var EventEmitter = require('events').EventEmitter;
+//var cache = require('memory-cache');
 
 
 function fnExecRpt(data){
@@ -20,10 +21,14 @@ ee.on('3', fnExecRpt);
 ee.on('9', fnExecRpt);
 
 
+
+
+
 process.on('message', (msg) => {
 	console.log('inicio Proceso');
 	process.send({ cmd: 'inicio Proceso', data: process.pid });
 	console.log(msg + ' ' + process.pid);
+	console.log("houdini: " + cache.get('houdini'));
 	fs.readFile("FIX.4.4-OMS-ORDERROUTER.messages_20170721.log", 'utf8', function(err, data) {
 		arr = data.split("\n");
 		for(let i in arr){
@@ -40,7 +45,7 @@ process.on('message', (msg) => {
 			/*console.log(h);
 			console.log('DATO: ' + fix[1]);*/
 			
-			//break;
+			break;
 		}
 		process.send({ cmd: 'fin proceso', data: process.pid });
 		

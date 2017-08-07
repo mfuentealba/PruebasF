@@ -3,6 +3,7 @@ var app = express();
 var server = require('http').Server(app);  
 var io = require('socket.io')(server);
 const cluster = require('cluster');
+
 var objLecturaLog = {};
 var objLecturaLogPersistente = {};
 var wk;
@@ -21,11 +22,21 @@ function fnMaster(msg){
           console.log(msg.data);
         break;
         default:
+			console.log("NUEVO VALOR");
+			/*memored.store('key1', {firstname: 'Han', lastname: 'Solo'}, function() {
+				console.log('Value stored!');
+			});*/
+			
             this.send('MASTER: Listo el proceso {' + process.pid + '}');	
         break;
     }
 	
 }
+
+
+
+
+
 
 if (cluster.isMaster) {
 	console.log(`Master ${process.pid} is running`);
@@ -103,6 +114,8 @@ io.on('connection', function(socket) {
       wk = cluster.fork();
       objLecturaLogPersistente[wk.process.pid] = wk;
       wk.on('message', fnMaster);
+	  
+	  
     } else {
       console.log("Fork Existente: " + str);
       objLecturaLog[str].process.send('Listo el proceso ' + process.pid);

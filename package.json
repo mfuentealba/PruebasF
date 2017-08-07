@@ -27,6 +27,8 @@
     "eventemitter": "^0.3.3",
     "express": "^4.15.3",
     "http": "0.0.0",
+    "memored": "^1.1.1",
+    "memory-cache": "^0.2.0",
     "rtmp-server": "^0.2.0",
     "socket.io": "^2.0.3",
     "websocket": "^1.0.24",
