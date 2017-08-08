@@ -28,7 +28,7 @@ process.on('message', (msg) => {
 	console.log('inicio Proceso');
 	process.send({ cmd: 'inicio Proceso', data: process.pid });
 	console.log(msg + ' ' + process.pid);
-	console.log("houdini: " + cache.get('houdini'));
+	
 	fs.readFile("FIX.4.4-OMS-ORDERROUTER.messages_20170721.log", 'utf8', function(err, data) {
 		arr = data.split("\n");
 		for(let i in arr){
@@ -45,7 +45,7 @@ process.on('message', (msg) => {
 			/*console.log(h);
 			console.log('DATO: ' + fix[1]);*/
 			
-			break;
+			//break;
 		}
 		process.send({ cmd: 'fin proceso', data: process.pid });
 		
