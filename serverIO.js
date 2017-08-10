@@ -1,9 +1,17 @@
 var express = require('express');  
+const Shared = require('mmap-object');
+ 
+const shared_object = new Shared.Create('filename');
+
+
 var app = express();  
 var server = require('http').Server(app);  
 var io = require('socket.io')(server);
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
+
+
+
 
 var objLecturaLog = {};
 var objLecturaLogPersistente = {};
