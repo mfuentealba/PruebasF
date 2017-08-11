@@ -1,7 +1,6 @@
 var express = require('express');  
-const Shared = require('mmap-object');
- 
-const shared_object = new Shared.Create('filename');
+/*const Shared = require('mmap-object'); 
+const shared_object = new Shared.Create('filename');*/
 
 
 var app = express();  
@@ -57,7 +56,8 @@ if (cluster.isMaster) {
   
 
   cluster.setupMaster({
-	  exec: 'lecturaLog.js',
+	  //exec: 'lecturaLog.js',
+	  exec: 'lecturaMarketData.js',
 	  args: [],
 	  silent: false
   });
