@@ -1,23 +1,7 @@
 var express = require('express');  
-const Shared = require('mmap-object');
- 
+/*const Shared = require('mmap-object'); 
+const shared_object = new Shared.Create('filename');*/
 
-
-const shared_object = new Shared.Create('filename')
-
-shared_object['new_key'] = 'some value'
-shared_object.new_property = 'some other value'
-
-// Erase a key
-delete shared_object['new_key']
-
-shared_object.close();
-
-// Read a file
-/*const read_only_shared_object = new Shared.Open('filename')
-
-console.log(`My value is ${read_only_shared_object.new_property}`)
-*/
 
 var app = express();  
 var server = require('http').Server(app);  
@@ -47,9 +31,6 @@ function fnMaster(msg){
         break;
         default:
             this.send('MASTER: Listo el proceso {' + process.pid + '}');	
-            var read_only_shared_object = new Shared.Open('filename');
-
-            console.log(`MASTER: My value is ${read_only_shared_object.new_property}`)
         break;
     }
 	
@@ -75,7 +56,8 @@ if (cluster.isMaster) {
   
 
   cluster.setupMaster({
-	  exec: 'lecturaLog.js',
+	  //exec: 'lecturaLog.js',
+	  exec: 'lecturaMarketData.js',
 	  args: [],
 	  silent: false
   });
