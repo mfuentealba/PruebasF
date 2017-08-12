@@ -5,11 +5,14 @@ var arr;
 const tagsFixs = require('./resources/fixtagnums.js');
 const utilFix = require('./fixutils.js');
 var EventEmitter = require('events').EventEmitter;
-//var cache = require('memory-cache');
+const Shared = require('mmap-object');
+var read_only_shared_object = new Shared.Open('filename');
+//read_only_shared_object.new_property = 'XXX';
 
+console.log(`WORKER: My value is ${read_only_shared_object.new_property}`)
 
 function fnExecRpt(data){
-	console.log(data);
+	//console.log(data);
 	//utilFix.convertToMap(data)
 	h2 = {};
 			
@@ -64,7 +67,7 @@ function fnExecRpt(data){
 			break;
 		}
 		
-		console.log("'" + str + "'");
+		//console.log("'" + str + "'");
 		//tagsFixs['keyvals'][str];
 		//h2[tagsFixs['keyvals'][str]] = h[str];
 	}
@@ -96,7 +99,7 @@ process.on('message', (msg) => {
 	process.send({ cmd: 'inicio Proceso', data: process.pid });
 	console.log(msg + ' ' + process.pid);
 	
-	fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
+	fs.readFile("FIX.4.4-OMS-ORDERROUTER.messages_20170721.log", 'utf8', function(err, data) {
 		arr = data.split("\n");
 		for(let i in arr){
 			/*var h = arr[i][arr[i].length - 1];//[arr[i].length - 1] + '';//arr[i].substring(arr[i].length - 1, 1);
