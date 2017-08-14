@@ -102,6 +102,11 @@ app.get('/hello', function(req, res) {
   res.status(200).send("Hello World!");
 });
 
+
+app.get('/chart', function(req, res) {  
+  res.status(200).send("Hello World!");
+});
+
 io.on('connection', function(socket) {  
   console.log('Alguien se ha conectado con Sockets');
   socket.emit('messages', messages);
