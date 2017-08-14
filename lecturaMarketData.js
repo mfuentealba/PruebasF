@@ -33,21 +33,24 @@ var arrOrdenes = [];
 function fnAbrirOrden(vela2, close){
 	
 	if(vela2.open == vela2.min && (vela2.max - vela2.close) / (vela2.close - vela2.open) < 1 / 4){
-		orden = {open: close, tipo: 'C'};
+	orden = {open: close[3], tipo: 'C', fecIni: close[1]};
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnCerrarOrdenCompra);
+		arrOrdenes.push(orden);
 	} else if(vela2.open == vela2.max && (vela2.close - vela2.min) / (vela2.open - vela2.close) < 1 / 4){
-		orden = {open: close, tipo: 'V'};
+		orden = {open: close[3], tipo: 'V', fecIni: close[1]};
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnCerrarOrdenVenta);
+		arrOrdenes.push(orden);
 	}
-	arrOrdenes.push(orden);
+	
 }
 
 function fnCerrarOrdenCompra(vela2, close){
 	if(vela2.close - vela2.open < 0){
-		orden.close = close;
-		orden.total = (close - orden.open) * 10000;
+		orden.close = close[3];
+		orden.fecFin = close[1];
+		orden.total = ((close[3] - orden.open) * 100000) - 16;
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnAbrirOrden);
 	}
@@ -55,8 +58,9 @@ function fnCerrarOrdenCompra(vela2, close){
 
 function fnCerrarOrdenVenta(vela2, close){
 	if(vela2.close - vela2.open > 0){
-		orden.close = close;
-		orden.total = (close - orden.open) * -10000;
+		orden.close = close[3];
+		orden.fecFin = close[1];
+		orden.total = ((close[3] - orden.open) * -100000) - 16;
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnAbrirOrden);
 	}
@@ -79,7 +83,7 @@ function fnInicial(dato){
 function fnVelaNueva(dato){
 	//console.log("fnVelaNueva");
 
-	ee.emit('orden', vela2, dato[3]);
+	ee.emit('orden', vela2, dato);
 
 	dato[3] = Number(dato[3]);
 
@@ -254,19 +258,27 @@ process.on('message', (msg) => {
 			
 		}
 		var total = 0;
+		var totalPos = 0;
+		var totalNeg = 0;
 		for(let i in arrOrdenes){
 			fs2.appendFileSync('./querysReconstruccion/ordenes.txt', JSON.stringify(arrOrdenes[i]) + "\n", (err) => {
 				if (err) throw err;
 					console.log('The "data to append" was appended to file!');
 				});
 			try{
+				//total += Math.abs(arrOrdenes[i]['total']) > 1 ? arrOrdenes[i]['total'] : 0;
 				total += arrOrdenes[i]['total'];
+				if(arrOrdenes[i]['total'] > 0){
+					totalPos += arrOrdenes[i]['total'];
+				} else {
+					totalNeg += arrOrdenes[i]['total'];
+				}
 			} catch(e){
 				
 			}	
 			
 		}
-		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "TOTAL: " + total +  "\n", (err) => {
+		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "TOTAL: " + total +  "\n" +  "TOTAL: " + totalPos +  "\n" +  "TOTAL: " + totalNeg +  "\n", (err) => {
 				if (err) throw err;
 					console.log('The "data to append" was appended to file!');
 				});

@@ -23,6 +23,7 @@
     "url": "git://github.com/falconair/nodefix.git"
   },
   "devDependencies": {
+    "candlejs": "^0.1.6",
     "cluster": "^0.7.7",
     "emitter-listener": "^1.0.1",
     "event": "^1.0.0",
