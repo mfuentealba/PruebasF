@@ -142,10 +142,10 @@ var chart3 = AmCharts.makeChart( "chartdiv3", {
   }
 } );
 */
-chart.addListener( "rendered", zoomChart );
+//chart.addListener( "rendered", zoomChart );
 /*chart2.addListener( "rendered", zoomChart );
 chart3.addListener( "rendered", zoomChart );*/
-zoomChart(chart);
+//zoomChart(chart);
 });
 
   

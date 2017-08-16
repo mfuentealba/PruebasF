@@ -35,13 +35,147 @@
 <link rel="stylesheet" href="https://www.amcharts.com/lib/3/plugins/export/export.css" type="text/css" media="all" />
 <script src="https://www.amcharts.com/lib/3/themes/light.js"></script>
 
+<script src="./EJSChart.min.js"></script>
+<link rel="stylesheet" href="./css/ejscharts.css" type="text/css" />
+<link rel="stylesheet" href="./ejschart/EJSChart.css" type="text/css" />
 <!-- Chart code -->
 
 <!-- HTML -->
 <div id="chartdiv3"></div>  
 <div id="chartdiv2"></div> 
 <div id="chartdiv"></div>  
- 
+<div class="example candle">
+		<span id="examplesShownHeader">Candlestick Chart</span>
+		<!--a href="purchase.php" class="ejscharts-button" id="blueBuyNow">Buy Now</a-->
+
+		
+
+		<span id="exampleDetails">
+			<div class="propertiesDemod">
+				<span class="exampleDetailsHeader">Properties Demonstrated</span>
+				<ul>
+					<li>gain</li>
+					<li>loss</li>
+				</ul>	
+			</div>
+			<p class="exampleDescription">This chart will change the gain (+) points to green, and the loss (-) points to orange.</p>	
+		</span>			
+
+		<div id="examplesChart">
+			<div id="myChart3b" class="chart" style="width: 685px; height: 400px;"></div>
+		</div>		
+
+		<a class="interactFAQButton">How to Interact</a>
+		<span class="sourceCodeContainer">	
+			<span class="exampleDetailsHeader">Source Code:</span>
+			<div><ol id="code3b"><span>Rendering Source Code...</span></ol></div>
+		</span>	
+		
+		<script type="text/javascript" id="script3b">
+
+/*C*/		//Convert string type date to a Javascript date		
+
+		function getDate( d ) {
+				d = d.split(' ');
+				var t = d[1];
+				d = d[0];
+				d = d.split('-');
+				if( t == undefined )	t = [0,0,0,0];
+				else					t = t.split(':');
+				while( t.length < 4 )	t.push(0);
+				var d = new Date( Date.UTC( d[0] , d[1]-1 , d[2] , t[0] , t[1] , t[2] , t[3] ) );
+				return d.getTime();
+		};		
+
+		var stock_data = [
+
+  				[getDate('2010-1-4'),136.61,133.14,136.25,133.9],
+				[getDate('2010-1-5'),135.48,131.81,133.43,134.69],
+				[getDate('2010-1-6'),134.73,131.65,134.6,132.25],
+				[getDate('2010-1-7'),132.32,128.8,132.01,130],
+				[getDate('2010-1-8'),133.68,129.03,130.56,133.52],
+				[getDate('2010-1-11'),132.8,129.21,132.62,130.31],
+				[getDate('2010-1-12'),129.82,126.55,128.99,127.35],
+				[getDate('2010-1-13'),129.71,125.75,127.9,129.11],
+				[getDate('2010-1-14'),130.38,126.4,129.14,127.35],
+				[getDate('2010-1-15'),129.65,127.06,129.18,127.14],
+				[getDate('2010-1-19'),128,124.33,126.31,127.61],
+				[getDate('2010-1-20'),129.2,125.08,127.13,125.78],
+				[getDate('2010-1-21'),128.15,125,127.26,126.62],
+				[getDate('2010-1-22'),127.67,120.76,125.6,121.43],
+				[getDate('2010-1-25'),122.28,118.12,122.1,120.31],
+				[getDate('2010-1-26'),122.98,119.06,120.56,119.48],
+				[getDate('2010-1-27'),123.33,118.8,121.03,122.75],
+				[getDate('2010-1-28'),127.2,122.8,124.43,126.03],
+				[getDate('2010-1-29'),131.85,124.14,129.77,125.41],
+				[getDate('2010-2-1'),124.86,113.82,123.18,118.87],
+				[getDate('2010-2-2'),118.98,114.4,118.79,118.12],
+				[getDate('2010-2-3'),119.61,116.56,117.12,119.1],
+				[getDate('2010-2-4'),120.33,115.74,118.64,115.94],
+				[getDate('2010-2-5'),117.65,114.1,115.88,117.39],
+				[getDate('2010-2-8'),121,116.56,119.38,116.83],
+				[getDate('2010-2-9'),119.09,117,118.2,118.03],
+				[getDate('2010-2-10'),118.61,116,118,117.36],
+				[getDate('2010-2-11'),120.42,116.5,117.21,120.09],
+				[getDate('2010-2-12'),119.94,117.5,118.99,119.66],
+				[getDate('2010-2-16'),120.5,117.18,120.06,117.53],
+				[getDate('2010-2-17'),117.13,115.55,117.07,116.31],
+				[getDate('2010-2-18'),118.51,114.82,115.84,118.08],
+				[getDate('2010-2-19'),119.09,117,117.91,117.52],
+				[getDate('2010-2-22'),118.97,116.18,117.37,118.01],
+				[getDate('2010-2-23'),119.25,116.51,118.01,117.24],
+				[getDate('2010-2-24'),119.8,117.15,117.96,119.72],
+				[getDate('2010-2-25'),118.34,115.85,118.17,118.2],
+				[getDate('2010-2-26'),119.43,117,117.88,118.4]
+		];		
+
+		
+
+		var chart = new EJSC.Chart("myChart3b", { 
+				show_legend: false,
+				title: 'Candlestick Series' ,
+				axis_bottom: new EJSC.DateAxis( {
+					caption: 'Date' ,
+					major_ticks: { increment: '1W' } ,
+					formatter: new EJSC.DateFormatter( {
+						format_string: "MMM DD"
+					} )
+				} ) ,
+
+				axis_left: {
+					caption: 'Price' ,
+					size: 60,
+					formatter: new EJSC.NumberFormatter( {
+						currency_symbol: "$",
+					    currency_position: "inner",
+						forced_decimals: 2
+					} )
+				}
+		} );
+
+		
+
+		chart.addSeries(new EJSC.CandlestickSeries(
+				new EJSC.ArrayDataHandler( stock_data.slice() ) , {
+							intervalOffset : .7,
+/*H*/						gain : {
+/*H*/								color : '#009900' ,
+/*H*/								lineColor : '#006600' ,
+/*H*/								lineOpacity : 80 ,
+/*H*/								opacity : 20
+/*H*/						} ,
+/*H*/						loss : {
+/*H*/								color : '#fbbb91' ,
+/*H*/								lineColor : '#faa872' ,
+/*H*/								lineOpacity : 80 ,
+/*H*/								opacity : 20
+/*H*/						}
+				}
+		) );		
+
+		</script>
+
+	</div>	
 
 
 </body>  

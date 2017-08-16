@@ -70,7 +70,7 @@ if (cluster.isMaster) {
     /*const wk = cluster.fork();
     //objLecturaLog[wk.process.pid] = wk;
     console.log(wk.process.pid);
-	wk.on('message', fnMaster);
+	wk.on('message', fnMaster);//106933421
   */
   
   
