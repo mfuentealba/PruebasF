@@ -16,8 +16,8 @@ var objLecturaLog = {};
 var objLecturaLogPersistente = {};
 var wk;
 function fnMaster(msg){
-	  console.log(msg);
-    console.log(process.pid);
+	 // console.log(msg);
+    //console.log(process.pid);
     switch(msg.cmd){
         case 'inicio Proceso':
           delete objLecturaLog[msg.data];
@@ -28,6 +28,12 @@ function fnMaster(msg){
         case 'fix':
           console.log("***************************");
           console.log(msg.data);
+        break;
+        case 'enviarMkdt':
+          console.log("*********--enviarMkdt--***********");
+          //console.log(this.socket);
+          //this.socket.emit('fnAdd', msg.data);
+          io.sockets.emit('fnAdd', msg.data);
         break;
         default:
             this.send('MASTER: Listo el proceso {' + process.pid + '}');	
@@ -104,7 +110,7 @@ app.get('/hello', function(req, res) {
 
 
 app.get('/chart', function(req, res) {  
-  res.status(200).send("Hello World!");
+  res.status(200).send("Hello!");
 });
 
 io.on('connection', function(socket) {  
@@ -131,6 +137,7 @@ io.on('connection', function(socket) {
     if(i == 0){
       console.log("Creando Fork");
       wk = cluster.fork();
+      wk.socket = this;
       objLecturaLogPersistente[wk.process.pid] = wk;
       wk.on('message', fnMaster);
 	  

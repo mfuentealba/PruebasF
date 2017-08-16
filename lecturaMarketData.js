@@ -32,13 +32,13 @@ var arrOrdenes = [];
 
 function fnAbrirOrden(vela2, close){
 	
-	if(vela2.open == vela2.min && (vela2.max - vela2.close) / (vela2.close - vela2.open) < 1 / 4){
-	orden = {open: close[3], tipo: 'C', fecIni: close[1]};
+	if(vela2.open == vela2.low && (vela2.high - vela2.close) / (vela2.close - vela2.open) < 1 / 4){
+	orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela2.date};
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnCerrarOrdenCompra);
 		arrOrdenes.push(orden);
-	} else if(vela2.open == vela2.max && (vela2.close - vela2.min) / (vela2.open - vela2.close) < 1 / 4){
-		orden = {open: close[3], tipo: 'V', fecIni: close[1]};
+	} else if(vela2.open == vela2.high && (vela2.close - vela2.low) / (vela2.open - vela2.close) < 1 / 4){
+		orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela2.date};
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnCerrarOrdenVenta);
 		arrOrdenes.push(orden);
@@ -50,6 +50,7 @@ function fnCerrarOrdenCompra(vela2, close){
 	if(vela2.close - vela2.open < 0){
 		orden.close = close[3];
 		orden.fecFin = close[1];
+		orden.fin = vela2.date;
 		orden.total = ((close[3] - orden.open) * 100000) - 16;
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnAbrirOrden);
@@ -60,6 +61,7 @@ function fnCerrarOrdenVenta(vela2, close){
 	if(vela2.close - vela2.open > 0){
 		orden.close = close[3];
 		orden.fecFin = close[1];
+		orden.fin = vela2.date;
 		orden.total = ((close[3] - orden.open) * -100000) - 16;
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnAbrirOrden);
@@ -69,9 +71,9 @@ function fnCerrarOrdenVenta(vela2, close){
 
 function fnInicial(dato){
 	dato[3] = Number(dato[3]);
-	vela = {open: dato[3], close: dato[3], min: dato[3], max: dato[3]};
-	vela2 = {open: dato[3], close: dato[3], min: dato[3], max: dato[3]};
-	vela3 = {open: dato[3], close: dato[3], min: dato[3], max: dato[3]};
+	vela = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
+	vela2 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
+	vela3 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 	
 	arrVelaOperativa.push(vela);
 	arrVelaFuerza.push(vela2);
@@ -87,18 +89,21 @@ function fnVelaNueva(dato){
 
 	dato[3] = Number(dato[3]);
 
-	vela = {open: dato[3], close: dato[3], min: dato[3], max: dato[3]};
+	vela = {open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 
-	vela2 = {open: (vela2.open + vela2.close) / 2, close: (vela2.open + vela2.close) / 2, min: (vela2.open + vela2.close) / 2, max: (vela2.open + vela2.close) / 2};
+	vela2 = {open: (vela2.open + vela2.close) / 2, close: (vela2.open + vela2.close) / 2, low: (vela2.open + vela2.close) / 2, high: (vela2.open + vela2.close) / 2};
 	//console.log(vela);
 	console.log(vela2);
 	arrVelaFuerza.push(vela2)
 	arrVelaOperativa.push(vela);
+	vela.date = arrVelaFuerza.length;
+	vela2.date = arrVelaOperativa.length;
 	cont++;
 	if(cont == 4){
 		cont = 0;
-		vela3 = {open: dato[3], close: dato[3], min: dato[3], max: dato[3]};
+		vela3 = {open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 		arrVelaReferencia.push(vela3);
+		vela3.date = arrVelaReferencia.length;
 		//break;
 	}
 	ee.removeListener('0', fnVelaNueva);
@@ -110,31 +115,31 @@ function fnVelaNormal2(dato){
 	dato[3] = Number(dato[3]);
 	vela.close = dato[3];
 	vela3.close = dato[3];
-	vela2.close = (dato[3] + vela2.open + vela2.min + vela2.max) / 4;
-	if(dato[3] > vela.max){
-		vela.max = dato[3];
+	vela2.close = (dato[3] + vela2.open + vela2.low + vela2.high) / 4;
+	if(dato[3] > vela.high){
+		vela.high = dato[3];
 		
 	} else {
-		if(dato[3] < vela.min){
-			vela.min = dato[3];
+		if(dato[3] < vela.low){
+			vela.low = dato[3];
 			
 		}
 	}
-	if(vela2.close > vela2.max){
+	if(vela2.close > vela2.high){
 		
-		vela2.max = vela2.close;
+		vela2.high = vela2.close;
 	} else {
-		if(vela2.close < vela2.min){
+		if(vela2.close < vela2.low){
 			
-			vela2.min = vela2.close;
+			vela2.low = vela2.close;
 		}
 	}
-	if(dato[3] > vela3.max){
+	if(dato[3] > vela3.high){
 		
-		vela3.max = dato[3];
+		vela3.high = dato[3];
 	} else {
-		if(dato[3] < vela3.min){
-			vela3.min = dato[3];
+		if(dato[3] < vela3.low){
+			vela3.low = dato[3];
 			
 		}
 	}
@@ -147,31 +152,31 @@ function fnVelaNormal(dato){
 	dato[3] = Number(dato[3]);
 	vela.close = dato[3];
 	vela3.close = dato[3];
-	vela2.close = (dato[3] + vela2.open + vela2.min + vela2.max) / 4;
-	if(dato[3] > vela.max){
-		vela.max = dato[3];
+	vela2.close = (dato[3] + vela2.open + vela2.low + vela2.high) / 4;
+	if(dato[3] > vela.high){
+		vela.high = dato[3];
 		
 	} else {
-		if(dato[3] < vela.min){
-			vela.min = dato[3];
+		if(dato[3] < vela.low){
+			vela.low = dato[3];
 			
 		}
 	}
-	if(vela2.close > vela2.max){
+	if(vela2.close > vela2.high){
 		
-		vela2.max = vela2.close;
+		vela2.high = vela2.close;
 	} else {
-		if(vela2.close < vela2.min){
+		if(vela2.close < vela2.low){
 			
-			vela2.min = vela2.close;
+			vela2.low = vela2.close;
 		}
 	}
-	if(dato[3] > vela3.max){
+	if(dato[3] > vela3.high){
 		
-		vela3.max = dato[3];
+		vela3.high = dato[3];
 	} else {
-		if(dato[3] < vela3.min){
-			vela3.min = dato[3];
+		if(dato[3] < vela3.low){
+			vela3.low = dato[3];
 			
 		}
 	}
@@ -195,7 +200,7 @@ process.on('message', (msg) => {
 		var cont = 0;
 		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
-		for(let i = 0; i < arr.length - 1; i++){	
+		for(let i = 0; i < /*100000*/arr.length/4 - 1; i++){	
 			
 			//console.log(JSON.stringify(arr[i].split(',')));
 			var dato = arr[i].split(',');
@@ -203,59 +208,10 @@ process.on('message', (msg) => {
 				ee.emit(dato[1][13] % 5, dato);
 			} catch(e){
 				console.log(JSON.stringify(arr[i].split(',')));
-				break;
+				//break;
 			}
-			
-			//console.log(ee);
-
-			/*if(dato[1][13] % 5 == 0){
-				console.log(dato[1]);
-				vela = {open: dato[3], close: dato[3], min: dato[3], max: dato[3]};
-				vela2 = {open: (vela2.open + vela2.close) / 2, close: (vela2.open + vela2.close) / 2, min: (vela2.open + vela2.close) / 2, max: (vela2.open + vela2.close) / 2};
-				
-				arrVelaFuerza.push(vela2)
-				arrVelaOperativa.push(vela);
-				cont++;
-				if(cont == 4){
-					cont = 0;
-					vela3 = {open: dato[3], close: dato[3], min: dato[3], max: dato[3]};
-					arrVelaReferencia.push(vela3);
-					break;
-				}
-				
-			} else {
-				vela.close = dato[3];
-				vela3.close = dato[3];
-				vela2.close = (dato[3] + vela2.open + vela2.min + vela2.max) / 4;
-				if(dato[3] > vela.max){
-					vela.max = dato[3];
-					
-				} else {
-					if(dato[3] < vela.min){
-						vela.min = dato[3];
+			//break;
 						
-					}
-				}
-				if(vela2.close > vela2.max){
-					
-					vela2.max = vela2.close;
-				} else {
-					if(vela2.close < vela2.min){
-						
-						vela2.min = vela2.close;
-					}
-				}
-				if(dato[3] > vela3.max){
-					
-					vela3.max = dato[3];
-				} else {
-					if(dato[3] < vela3.min){
-						vela3.min = dato[3];
-						
-					}
-				}
-			}*/
-			
 		}
 		var total = 0;
 		var totalPos = 0;
@@ -282,8 +238,9 @@ process.on('message', (msg) => {
 				if (err) throw err;
 					console.log('The "data to append" was appended to file!');
 				});
-
+		
 		process.send({ cmd: 'fin proceso', data: process.pid });
+		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza, arrVelaOperativa, arrVelaReferencia] });
 		
 	});
 
