@@ -6,11 +6,65 @@ socket.on('messages', function(data) {
 })
 
 socket.on('fnAdd', function(arrMini){
-  google.charts.load('current', {'packages':['corechart']});
+  /*google.charts.load('current', {'packages':['corechart']});
   google.charts.setOnLoadCallback(function(){
     drawChart(arrMini);
-  });
-  
+  });*/
+  /*var chart = new CanvasJS.Chart("chartContainer",
+	{
+		title:{
+			text: "Candle Stick chart using risingColor property"
+		},
+		zoomEnabled: true,
+		axisY: {
+			includeZero:false,
+			title: "Prices",
+			prefix: "$ "
+		},
+		axisX: {
+			interval:2,
+			intervalType: "month",
+			//valueFormatString: "MMM-YY",
+			labelAngle: -45
+		},
+		data: [
+		{
+			type: "candlestick",
+			risingColor: "#F79B8E",
+			dataPoints: arrMini[0]
+			
+		}
+		]
+	});
+	chart.render();
+	*/
+	var chart2 = new CanvasJS.Chart("chartContainer2",
+	{
+		title:{
+			text: "Candle Stick chart using risingColor property"
+		},
+		zoomEnabled: true,
+		axisY: {
+			includeZero:false,
+			title: "Prices",
+			prefix: "$ "
+		},
+		axisX: {
+			interval:2,
+			intervalType: "month",
+			//valueFormatString: "MMM-YY",
+			labelAngle: -45
+		},
+		data: [
+		{
+			type: "candlestick",
+			risingColor: "#F79B8E",
+			dataPoints: arrMini[1]
+			
+		}
+		]
+	});
+	chart2.render();
  
 });
 
@@ -68,38 +122,18 @@ function fnContarFolk(event){
 
 
 function drawChart(arr) {
-var data = google.visualization.arrayToDataTable(/*[
-['Mon', 20, 28, 38, 45],
-['Tue', 31, 38, 55, 66],
-['Wed', 50, 55, 77, 80],
-['Thu', 77, 77, 66, 50],
-['Fri', 68, 66, 22, 15]]*/
-arr[1]
-, true);
+	var data = google.visualization.arrayToDataTable(arr[1], true);
 
 
 
-var options = /*{
-legend:'none'
-};*/
-{
-  // Allow multiple
-  // simultaneous selections.
-  selectionMode: 'multiple',
-  // Trigger tooltips
-  // on selections.
-  tooltip: {trigger: 'selection'},
-  // Group selections
-  // by x-value.
-  aggregationTarget: 'category',
-};
+	var options = {
+	legend:'none'
+	};
 
 
+	var chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
 
-
-var chart = new google.visualization.CandlestickChart(document.getElementById('chart_div'));
-
-chart.draw(data, options);
+	chart.draw(data, options);
 }
 
 

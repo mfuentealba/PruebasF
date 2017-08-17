@@ -12,6 +12,11 @@ var arrVelaFuerza = [];
 var arrVelaOperativa2 = [];
 var arrVelaReferencia2 = [];
 var arrVelaFuerza2 = [];
+//var arrMedia14 = [];
+var arrCalculoMedia14 = [];
+var calculoMedia14 = 0;
+var contadorMedia14 = 1;
+
 
 
 var vela;
@@ -21,6 +26,9 @@ var orden;
 var cont = 0;
 
 var ee = new EventEmitter();
+var eMedia = new EventEmitter();
+
+
 
 ee.once('ini', fnInicial);
 ee.on('0', fnVelaNueva);
@@ -28,11 +36,44 @@ ee.on('1', fnVelaNormal);
 ee.on('2', fnVelaNormal);
 ee.on('3', fnVelaNormal);
 ee.on('4', fnVelaNormal);
+eMedia.on('14', fnCalculaMedia);
 ee.on('orden', fnAbrirOrden);
+ee.on('ordenMedia', fnAbrirOrdenMedia);
 //ee.on('reset', fnRestarNuevaVela);
 
 
+function fnCalculaMedia(dato){
+	
+	
+	
+	contadorMedia14--;
+	calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 14]['close'] / 14;
+	ee.emit('ordenMedia', dato);
+	console.log(calculoMedia14);
+	
+}
+
+
 var arrOrdenes = [];
+
+
+function fnAbrirOrdenMedia(){
+	
+	if(vela.close > calculoMedia14 && vela.open < calculoMedia14){
+		orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela2.date};
+		ee.removeAllListeners('orden');
+		ee.on('orden', fnCerrarOrdenCompraMedia);
+		arrOrdenes.push(orden);
+	} else if(vela.close < calculoMedia14 && vela.open > calculoMedia14){
+		orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela2.date};
+		ee.removeAllListeners('orden');
+		ee.on('orden', fnCerrarOrdenVentaMedia);
+		arrOrdenes.push(orden);
+	}
+	
+}
+
+
 
 function fnAbrirOrden(vela2, close){
 	
@@ -78,7 +119,7 @@ function fnInicial(dato){
 	vela = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 	vela2 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 	vela3 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
-	
+	calculoMedia14 = dato[3] / 14;
 	arrVelaOperativa.push(vela);
 	arrVelaFuerza.push(vela2);
 	arrVelaReferencia.push(vela3);
@@ -88,19 +129,31 @@ function fnInicial(dato){
 
 function fnVelaNueva(dato){
 	//console.log("fnVelaNueva");
-
+	contadorMedia14++;
+	//console.log(contadorMedia14);
+	calculoMedia14 += dato[3] / 14;
 	ee.emit('orden', vela2, dato);
-
+	/*console.log(calculoMedia14);
+	console.log(contadorMedia14);*/
+	
+	
+	//eMedia.emit(contadorMedia14 + '', dato);
+	
+	//calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 15]['close'] / 14;
+	
+	
 	dato[3] = Number(dato[3]);
-	arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
-	arrVelaFuerza2.push([vela2.date, vela2.low, vela2.open, vela2.close, vela2.high]);
+	//arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
+	arrVelaOperativa2.push({x: vela.date, y:[vela.open, vela.high, vela.low, vela.close]});
+	//arrVelaFuerza2.push([vela2.date, vela2.low, vela2.open, vela2.close, vela2.high]);
+	arrVelaFuerza2.push({x: vela2.date, y: [vela2.open, vela2.high, vela2.low, vela2.close]});
 	
 	vela = {open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 	
 	vela2 = {open: (vela2.open + vela2.close) / 2, close: (vela2.open + vela2.close) / 2, low: (vela2.open + vela2.close) / 2, high: (vela2.open + vela2.close) / 2};
 	
 	//console.log(vela);
-	console.log(vela2);
+	//console.log(vela2);
 	arrVelaFuerza.push(vela2)
 	arrVelaOperativa.push(vela);
 	vela.date = arrVelaFuerza.length;
@@ -150,7 +203,7 @@ function fnVelaNormal2(dato){
 			
 		}
 	}
-}
+}//2134068
 
 function fnVelaNormal(dato){
 	//console.log("fnVelaNormal");
@@ -203,18 +256,28 @@ process.on('message', (msg) => {
 	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
 		//console.log(err);
 		arr = data.split("\n");
-		
+		arrVelaFuerza = [];
+		arrVelaFuerza2 = [];
+		arrVelaOperativa = [];
+		arrVelaOperativa2 = [];
+		arrVelaReferencia = [];
+		arrVelaReferencia2 = [];
 		var cont = 0;
 		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
-		for(let i = 0; i < /*100000*/arr.length/64 - 1; i++){	
-			
+		for(let i = 0; i < arr.length - 1; i++){	
+		/*var i = -1;
+		while(arrVelaOperativa.length < 15){
+			console.log(arrVelaOperativa.length);
+			i++;*/
 			//console.log(JSON.stringify(arr[i].split(',')));
+
+
 			var dato = arr[i].split(',');
 			try{
 				ee.emit(dato[1][13] % 5, dato);
 			} catch(e){
-				console.log(JSON.stringify(arr[i].split(',')));
+				//console.log(JSON.stringify(arr[i].split(',')));
 				//break;
 			}
 			//break;
@@ -223,14 +286,14 @@ process.on('message', (msg) => {
 		var total = 0;
 		var totalPos = 0;
 		var totalNeg = 0;
-		for(let i in arrOrdenes){
+		for(let i in arrOrdenes){//8624190
 			fs2.appendFileSync('./querysReconstruccion/ordenes.txt', JSON.stringify(arrOrdenes[i]) + "\n", (err) => {
 				if (err) throw err;
 					console.log('The "data to append" was appended to file!');
 				});
 			try{
 				//total += Math.abs(arrOrdenes[i]['total']) > 1 ? arrOrdenes[i]['total'] : 0;
-				total += arrOrdenes[i]['total'];
+				total += arrOrdenes[i]['total'] < -50 ? -50 : arrOrdenes[i]['total'];
 				if(arrOrdenes[i]['total'] > 0){
 					totalPos += arrOrdenes[i]['total'];
 				} else {
