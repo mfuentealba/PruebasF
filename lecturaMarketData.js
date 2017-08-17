@@ -9,6 +9,10 @@ var arr;
 var arrVelaOperativa = [];
 var arrVelaReferencia = [];
 var arrVelaFuerza = [];
+var arrVelaOperativa2 = [];
+var arrVelaReferencia2 = [];
+var arrVelaFuerza2 = [];
+
 
 var vela;
 var vela2;
@@ -88,10 +92,13 @@ function fnVelaNueva(dato){
 	ee.emit('orden', vela2, dato);
 
 	dato[3] = Number(dato[3]);
-
+	arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
+	arrVelaFuerza2.push([vela2.date, vela2.low, vela2.open, vela2.close, vela2.high]);
+	
 	vela = {open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
-
+	
 	vela2 = {open: (vela2.open + vela2.close) / 2, close: (vela2.open + vela2.close) / 2, low: (vela2.open + vela2.close) / 2, high: (vela2.open + vela2.close) / 2};
+	
 	//console.log(vela);
 	console.log(vela2);
 	arrVelaFuerza.push(vela2)
@@ -200,7 +207,7 @@ process.on('message', (msg) => {
 		var cont = 0;
 		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
-		for(let i = 0; i < /*100000*/arr.length/4 - 1; i++){	
+		for(let i = 0; i < /*100000*/arr.length/64 - 1; i++){	
 			
 			//console.log(JSON.stringify(arr[i].split(',')));
 			var dato = arr[i].split(',');
@@ -240,7 +247,7 @@ process.on('message', (msg) => {
 				});
 		
 		process.send({ cmd: 'fin proceso', data: process.pid });
-		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza, arrVelaOperativa, arrVelaReferencia] });
+		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia] });
 		
 	});
 
