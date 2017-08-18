@@ -12,7 +12,7 @@ var arrVelaFuerza = [];
 var arrVelaOperativa2 = [];
 var arrVelaReferencia2 = [];
 var arrVelaFuerza2 = [];
-//var arrMedia14 = [];
+var arrMedia14 = [{x: 1, y:1.08522}, {x: 2, y:1.08522}, {x: 3, y:1.08522}, {x: 4, y:1.08522}, {x: 5, y:1.08522}, {x: 6, y:1.08522}, {x: 7, y:1.08522}, {x: 8, y:1.08522}, {x: 9, y:1.08522}, {x: 11.08522, y:1.08522}, {x: 11, y:1.08522}, {x: 12, y:1.08522}, {x: 13, y:1.08522}];
 var arrCalculoMedia14 = [];
 var calculoMedia14 = 0;
 var contadorMedia14 = 1;
@@ -45,11 +45,12 @@ ee.on('ordenMedia', fnAbrirOrdenMedia);
 function fnCalculaMedia(dato){
 	
 	
-	
+	//console.log('fnCalculaMedia :' + arrVelaOperativa[arrVelaOperativa.length - 13]['close']);
 	contadorMedia14--;
-	calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 14]['close'] / 14;
+	calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 13]['close'] / 14;
+	arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
 	ee.emit('ordenMedia', dato);
-	console.log(calculoMedia14);
+	//console.log(calculoMedia14);
 	
 }
 
@@ -57,22 +58,45 @@ function fnCalculaMedia(dato){
 var arrOrdenes = [];
 
 
-function fnAbrirOrdenMedia(){
-	
+function fnAbrirOrdenMedia(close){
+	console.log(vela.close + ' - ' + calculoMedia14  + ' - ' +  vela.open);
 	if(vela.close > calculoMedia14 && vela.open < calculoMedia14){
-		orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela2.date};
-		ee.removeAllListeners('orden');
-		ee.on('orden', fnCerrarOrdenCompraMedia);
-		arrOrdenes.push(orden);
+		console.log('OPCION COMPRA');
+		if(orden != null){
+			if(orden.date - close[1] > 5){
+				orden.close = close[3];
+				orden.fecFin = close[1];
+				orden.fin = vela.date;
+				orden.total = ((close[3] - orden.open) * -100000) - 16;	
+				orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
+				arrOrdenes.push(orden);
+			}
+			
+		} else {
+			orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
+			arrOrdenes.push(orden);
+		}
+		
 	} else if(vela.close < calculoMedia14 && vela.open > calculoMedia14){
-		orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela2.date};
-		ee.removeAllListeners('orden');
-		ee.on('orden', fnCerrarOrdenVentaMedia);
-		arrOrdenes.push(orden);
+		console.log('OPCION VENTA');
+		if(orden != null){
+			if(orden.date - close[1] > 5){
+				orden.close = close[3];
+				orden.fecFin = close[1];
+				orden.fin = vela.date;
+				orden.total = ((close[3] - orden.open) * 100000) - 16;	
+				orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
+				arrOrdenes.push(orden);
+			}
+			
+		} else {
+			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
+			arrOrdenes.push(orden);
+		}
+		
 	}
 	
 }
-
 
 
 function fnAbrirOrden(vela2, close){
@@ -132,12 +156,18 @@ function fnVelaNueva(dato){
 	contadorMedia14++;
 	//console.log(contadorMedia14);
 	calculoMedia14 += dato[3] / 14;
-	ee.emit('orden', vela2, dato);
+	//ee.emit('orden', vela2, dato);
 	/*console.log(calculoMedia14);
 	console.log(contadorMedia14);*/
 	
 	
 	//eMedia.emit(contadorMedia14 + '', dato);
+	if(arrVelaOperativa.length > 13){
+		//contadorMedia14--;
+		calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 14]['close'] / 14;
+		arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
+		ee.emit('ordenMedia', dato);
+	}
 	
 	//calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 15]['close'] / 14;
 	
@@ -310,7 +340,7 @@ process.on('message', (msg) => {
 				});
 		
 		process.send({ cmd: 'fin proceso', data: process.pid });
-		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia] });
+		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMedia14] });
 		
 	});
 

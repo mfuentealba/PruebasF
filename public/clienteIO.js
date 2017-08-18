@@ -61,7 +61,15 @@ socket.on('fnAdd', function(arrMini){
 			risingColor: "#F79B8E",
 			dataPoints: arrMini[1]
 			
+		}, {        
+			type: "line",
+			lineThickness:3,
+			showInLegend: true,           
+			name: "China",
+			//axisYType:"secondary",
+			dataPoints: arrMini[3]
 		}
+
 		]
 	});
 	chart2.render();
