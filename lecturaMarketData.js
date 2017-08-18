@@ -284,8 +284,11 @@ process.on('message', (msg) => {
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
 	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
+		console.log(fs);
+		fs.close(2, function(){});
+		delete fs;
 		//console.log(err);
-		arr = data.split("\n");
+		/*arr = data.split("\n");
 		arrVelaFuerza = [];
 		arrVelaFuerza2 = [];
 		arrVelaOperativa = [];
@@ -296,12 +299,7 @@ process.on('message', (msg) => {
 		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
 		for(let i = 0; i < arr.length - 1; i++){	
-		/*var i = -1;
-		while(arrVelaOperativa.length < 15){
-			console.log(arrVelaOperativa.length);
-			i++;*/
-			//console.log(JSON.stringify(arr[i].split(',')));
-
+		
 
 			var dato = arr[i].split(',');
 			try{
@@ -341,9 +339,9 @@ process.on('message', (msg) => {
 		
 		process.send({ cmd: 'fin proceso', data: process.pid });
 		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMedia14] });
-		
+		*/
 	});
-
+	
 
 	
 });
