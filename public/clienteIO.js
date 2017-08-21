@@ -59,7 +59,7 @@ socket.on('fnAdd', function(arrMini){
 		{
 			type: "candlestick",
 			risingColor: "#F79B8E",
-			dataPoints: arrMini[0]
+			dataPoints: arrMini[1]
 			
 		}, {        
 			type: "line",

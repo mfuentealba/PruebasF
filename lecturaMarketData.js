@@ -14,6 +14,7 @@ var arrVelaReferencia2 = [];
 var arrVelaFuerza2 = [];
 var arrMedia14 = [{x: 1, y:1.08522}, {x: 2, y:1.08522}, {x: 3, y:1.08522}, {x: 4, y:1.08522}, {x: 5, y:1.08522}, {x: 6, y:1.08522}, {x: 7, y:1.08522}, {x: 8, y:1.08522}, {x: 9, y:1.08522}, {x: 11.08522, y:1.08522}, {x: 11, y:1.08522}, {x: 12, y:1.08522}, {x: 13, y:1.08522}];
 var arrCalculoMedia14 = [];
+var arrMarcaOrdenes = [];
 var calculoMedia14 = 0;
 var contadorMedia14 = 1;
 
@@ -59,39 +60,43 @@ var arrOrdenes = [];
 
 
 function fnAbrirOrdenMedia(close){
-	console.log(vela.close + ' - ' + calculoMedia14  + ' - ' +  vela.open);
+	//console.log(vela.close + ' - ' + calculoMedia14  + ' - ' +  vela.open);
 	if(vela.close > calculoMedia14 && vela.open < calculoMedia14){
 		console.log('OPCION COMPRA');
 		if(orden != null){
-			if(orden.date - close[1] > 5){
+			if(orden.date - close[1] > 3){
 				orden.close = close[3];
 				orden.fecFin = close[1];
 				orden.fin = vela.date;
 				orden.total = ((close[3] - orden.open) * -100000) - 16;	
 				orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
 				arrOrdenes.push(orden);
+				arrMarcaOrdenes.push({x: close[1], y: close[3]});
 			}
 			
 		} else {
 			orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
 			arrOrdenes.push(orden);
+			arrMarcaOrdenes.push({x: close[1], y: close[3]});
 		}
 		
 	} else if(vela.close < calculoMedia14 && vela.open > calculoMedia14){
 		console.log('OPCION VENTA');
 		if(orden != null){
-			if(orden.date - close[1] > 5){
+			if(orden.date - close[1] > 3){
 				orden.close = close[3];
 				orden.fecFin = close[1];
 				orden.fin = vela.date;
 				orden.total = ((close[3] - orden.open) * 100000) - 16;	
 				orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
 				arrOrdenes.push(orden);
+				arrMarcaOrdenes.push({x: close[1], y: close[3]});
 			}
 			
 		} else {
 			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
 			arrOrdenes.push(orden);
+			arrMarcaOrdenes.push({x: close[1], y: close[3]});
 		}
 		
 	}
@@ -102,7 +107,7 @@ function fnAbrirOrdenMedia(close){
 function fnAbrirOrden(vela2, close){
 	
 	if(vela2.open == vela2.low && (vela2.high - vela2.close) / (vela2.close - vela2.open) < 1 / 4){
-	orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela2.date};
+		orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela2.date};
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnCerrarOrdenCompra);
 		arrOrdenes.push(orden);
@@ -116,7 +121,7 @@ function fnAbrirOrden(vela2, close){
 }
 
 function fnCerrarOrdenCompra(vela2, close){
-	if(vela2.close - vela2.open < 0){
+	if(vela2.close - vela2.open < 0 || ((close[3] - orden.open) * 100000) - 16 < -30){
 		orden.close = close[3];
 		orden.fecFin = close[1];
 		orden.fin = vela2.date;
@@ -127,7 +132,7 @@ function fnCerrarOrdenCompra(vela2, close){
 }
 
 function fnCerrarOrdenVenta(vela2, close){
-	if(vela2.close - vela2.open > 0){
+	if(vela2.close - vela2.open > 0 || ((close[3] - orden.open) * -100000) - 16 < -30){
 		orden.close = close[3];
 		orden.fecFin = close[1];
 		orden.fin = vela2.date;
@@ -284,11 +289,11 @@ process.on('message', (msg) => {
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
 	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
-		console.log(fs);
+		/*console.log(fs);
 		fs.close(2, function(){});
-		delete fs;
+		delete fs;*/
 		//console.log(err);
-		/*arr = data.split("\n");
+		arr = data.split("\n");
 		arrVelaFuerza = [];
 		arrVelaFuerza2 = [];
 		arrVelaOperativa = [];
@@ -314,6 +319,7 @@ process.on('message', (msg) => {
 		var total = 0;
 		var totalPos = 0;
 		var totalNeg = 0;
+		arrOrdenes.pop();
 		for(let i in arrOrdenes){//8624190
 			fs2.appendFileSync('./querysReconstruccion/ordenes.txt', JSON.stringify(arrOrdenes[i]) + "\n", (err) => {
 				if (err) throw err;
@@ -321,7 +327,7 @@ process.on('message', (msg) => {
 				});
 			try{
 				//total += Math.abs(arrOrdenes[i]['total']) > 1 ? arrOrdenes[i]['total'] : 0;
-				total += arrOrdenes[i]['total'] < -50 ? -50 : arrOrdenes[i]['total'];
+				total += arrOrdenes[i]['total'];//arrOrdenes[i]['total'] < -30 ? -30 : arrOrdenes[i]['total'];
 				if(arrOrdenes[i]['total'] > 0){
 					totalPos += arrOrdenes[i]['total'];
 				} else {
@@ -338,8 +344,8 @@ process.on('message', (msg) => {
 				});
 		
 		process.send({ cmd: 'fin proceso', data: process.pid });
-		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMedia14] });
-		*/
+		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMarcaOrdenes] });
+		
 	});
 	
 
