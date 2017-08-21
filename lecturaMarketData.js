@@ -64,15 +64,20 @@ function fnAbrirOrdenMedia(close){
 	if(vela.close > calculoMedia14 && vela.open < calculoMedia14){
 		console.log('OPCION COMPRA');
 		if(orden != null){
-			if(orden.date - close[1] > 3){
+			//if(orden.date - close[1] > 3){
 				orden.close = close[3];
 				orden.fecFin = close[1];
 				orden.fin = vela.date;
 				orden.total = ((close[3] - orden.open) * -100000) - 16;	
 				orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
 				arrOrdenes.push(orden);
-				arrMarcaOrdenes.push({x: close[1], y: close[3]});
-			}
+				/*arrVelaOperativa2[vela.date].markerType = "circle";
+				arrVelaOperativa2[vela.date].markerSize = 1000;
+				arrVelaOperativa2[vela.date].markerColor = "brown";
+				arrVelaOperativa2[vela.date].indexLabel = "C";
+				console.log(arrVelaOperativa2[vela.date]);*/
+				//arrMarcaOrdenes.push({x: close[1], y: close[3]});
+			//}
 			
 		} else {
 			orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
@@ -83,15 +88,19 @@ function fnAbrirOrdenMedia(close){
 	} else if(vela.close < calculoMedia14 && vela.open > calculoMedia14){
 		console.log('OPCION VENTA');
 		if(orden != null){
-			if(orden.date - close[1] > 3){
+			//if(orden.date - close[1] > 3){
 				orden.close = close[3];
 				orden.fecFin = close[1];
 				orden.fin = vela.date;
 				orden.total = ((close[3] - orden.open) * 100000) - 16;	
 				orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
 				arrOrdenes.push(orden);
-				arrMarcaOrdenes.push({x: close[1], y: close[3]});
-			}
+				//arrMarcaOrdenes.push({x: close[1], y: close[3]});
+				/*arrVelaOperativa2[vela.date].markerType = "circle";
+				arrVelaOperativa2[vela.date].markerSize = 1000;
+				arrVelaOperativa2[vela.date].markerColor = "brown";
+				arrVelaOperativa2[vela.date].indexLabel = "V";*/
+			//}
 			
 		} else {
 			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
@@ -100,6 +109,7 @@ function fnAbrirOrdenMedia(close){
 		}
 		
 	}
+	return;
 	
 }
 
@@ -139,6 +149,8 @@ function fnCerrarOrdenVenta(vela2, close){
 		orden.total = ((close[3] - orden.open) * -100000) - 16;
 		ee.removeAllListeners('orden');
 		ee.on('orden', fnAbrirOrden);
+	} else {
+		
 	}
 }
 
@@ -303,7 +315,7 @@ process.on('message', (msg) => {
 		var cont = 0;
 		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
-		for(let i = 0; i < arr.length - 1; i++){	
+		for(let i = 0; i < arr.length/64 - 1; i++){	
 		
 
 			var dato = arr[i].split(',');
@@ -344,7 +356,7 @@ process.on('message', (msg) => {
 				});
 		
 		process.send({ cmd: 'fin proceso', data: process.pid });
-		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMarcaOrdenes] });
+		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMedia14] });
 		
 	});
 	
