@@ -21,6 +21,7 @@ var contadorMedia14 = 1;
 
 
 var vela;
+var velaOperativa;
 var vela2;
 var vela3;
 var orden;
@@ -61,53 +62,73 @@ var arrOrdenes = [];
 
 function fnAbrirOrdenMedia(close){
 	//console.log(vela.close + ' - ' + calculoMedia14  + ' - ' +  vela.open);
+	/*if(orden != null){
+		if(((close[3] - orden.open) * 100000) - 16 < -50){
+			orden.close = close[3];
+			orden.fecFin = close[1];
+			orden.fin = vela.date;
+			orden.total = ((close[3] - orden.open) * -100000) - 16;	
+			orden = null;
+		}	
+	}*/
+	
 	if(vela.close > calculoMedia14 && vela.open < calculoMedia14){
-		console.log('OPCION COMPRA');
-		if(orden != null){
+		console.log('OPCION COMPRA ' + vela.date);
+		if(orden != null && orden.tipo == 'V'){
+			orden.close = close[3];
+			orden.fecFin = close[1];
+			orden.fin = vela.date;
+			orden.obs = "señal";
+			orden.total = ((close[3] - orden.open) * -100000) - 16;	
+			orden = null;
+			console.log('CERRANDO.... ' + vela.date);
+			//console.log(arrOrdenes);
+		}
+		if(orden == null && ((vela.close == vela.high) || ((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000 > 1))){
+			
 			//if(orden.date - close[1] > 3){
-				orden.close = close[3];
-				orden.fecFin = close[1];
-				orden.fin = vela.date;
-				orden.total = ((close[3] - orden.open) * -100000) - 16;	
+				console.log((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000);
 				orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
 				arrOrdenes.push(orden);
-				/*arrVelaOperativa2[vela.date].markerType = "circle";
-				arrVelaOperativa2[vela.date].markerSize = 1000;
-				arrVelaOperativa2[vela.date].markerColor = "brown";
-				arrVelaOperativa2[vela.date].indexLabel = "C";
-				console.log(arrVelaOperativa2[vela.date]);*/
+				velaOperativa.markerType = "circle";
+				velaOperativa.markerSize = 1000;
+				velaOperativa.markerColor = "brown";
+				velaOperativa.indexLabel = "C";
+				console.log(vela);
+				console.log(velaOperativa);
 				//arrMarcaOrdenes.push({x: close[1], y: close[3]});
-			//}
-			
-		} else {
-			orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
-			arrOrdenes.push(orden);
-			arrMarcaOrdenes.push({x: close[1], y: close[3]});
+			//}	
 		}
 		
+			
+		
+		
 	} else if(vela.close < calculoMedia14 && vela.open > calculoMedia14){
-		console.log('OPCION VENTA');
-		if(orden != null){
+		console.log('OPCION VENTA ' + vela.date);
+		if(orden != null && orden.tipo == 'C'){
 			//if(orden.date - close[1] > 3){
 				orden.close = close[3];
 				orden.fecFin = close[1];
 				orden.fin = vela.date;
+				orden.obs = "señal";
 				orden.total = ((close[3] - orden.open) * 100000) - 16;	
-				orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
-				arrOrdenes.push(orden);
-				//arrMarcaOrdenes.push({x: close[1], y: close[3]});
-				/*arrVelaOperativa2[vela.date].markerType = "circle";
-				arrVelaOperativa2[vela.date].markerSize = 1000;
-				arrVelaOperativa2[vela.date].markerColor = "brown";
-				arrVelaOperativa2[vela.date].indexLabel = "V";*/
-			//}
-			
-		} else {
+				orden = null;
+				console.log('CERRANDO.... ' + vela.date);
+				//console.log(arrOrdenes);
+			//}			
+		}
+		if(orden == null && ((vela.close == vela.low) || ((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000 < -1))){
+			console.log((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000);
 			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
 			arrOrdenes.push(orden);
-			arrMarcaOrdenes.push({x: close[1], y: close[3]});
+			//arrMarcaOrdenes.push({x: close[1], y: close[3]});
+			velaOperativa.markerType = "circle";
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = "V";
+			console.log(vela);
+			console.log(velaOperativa);
 		}
-		
 	}
 	return;
 	
@@ -179,10 +200,12 @@ function fnVelaNueva(dato){
 	
 	
 	//eMedia.emit(contadorMedia14 + '', dato);
+	velaOperativa = {x: vela.date, y:[vela.open, vela.high, vela.low, vela.close]};
 	if(arrVelaOperativa.length > 13){
 		//contadorMedia14--;
 		calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 14]['close'] / 14;
 		arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
+		arrCalculoMedia14.push(calculoMedia14);
 		ee.emit('ordenMedia', dato);
 	}
 	
@@ -191,7 +214,8 @@ function fnVelaNueva(dato){
 	
 	dato[3] = Number(dato[3]);
 	//arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
-	arrVelaOperativa2.push({x: vela.date, y:[vela.open, vela.high, vela.low, vela.close]});
+	
+	arrVelaOperativa2.push(velaOperativa);
 	//arrVelaFuerza2.push([vela2.date, vela2.low, vela2.open, vela2.close, vela2.high]);
 	arrVelaFuerza2.push({x: vela2.date, y: [vela2.open, vela2.high, vela2.low, vela2.close]});
 	
@@ -315,10 +339,52 @@ process.on('message', (msg) => {
 		var cont = 0;
 		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
-		for(let i = 0; i < arr.length/64 - 1; i++){	
-		
-
+		for(let i = 0; i < arr.length/16 - 1; i++){	
 			var dato = arr[i].split(',');
+			if(orden != null){
+				if(orden.tipo == 'C'){
+					if(((dato[3] - orden.open) * 100000) - 16 < -46){
+						orden.close = dato[3];
+						orden.fecFin = dato[1];
+						orden.fin = vela.date;
+						orden.obs = "stopLoss";
+						orden.total = ((dato[3] - orden.open) * 100000) - 16;	
+						
+						orden = null;
+					} else {
+						if(((dato[3] - orden.open) * 100000) - 16 > 300){
+							orden.close = dato[3];
+							orden.fecFin = dato[1];
+							orden.fin = vela.date;
+							orden.obs = "takeProfit";
+							orden.total = ((dato[3] - orden.open) * 100000) - 16;	
+							
+							orden = null;
+						}
+					}
+				} else {
+					if(((dato[3] - orden.open) * -100000) - 16 < -46){
+						orden.close = dato[3];
+						orden.fecFin = dato[1];
+						orden.fin = vela2.date;
+						orden.obs = "stopLoss";
+						orden.total = ((dato[3] - orden.open) * -100000) - 16;
+						orden = null;
+					} else {
+						if(((dato[3] - orden.open) * -100000) - 16 > 300){
+							orden.close = dato[3];
+							orden.fecFin = dato[1];
+							orden.fin = vela2.date;
+							orden.obs = "takeProfit";
+							orden.total = ((dato[3] - orden.open) * -100000) - 16;
+							orden = null;
+						}
+					}
+				}
+					
+			}
+
+			
 			try{
 				ee.emit(dato[1][13] % 5, dato);
 			} catch(e){
@@ -331,7 +397,12 @@ process.on('message', (msg) => {
 		var total = 0;
 		var totalPos = 0;
 		var totalNeg = 0;
-		arrOrdenes.pop();
+		var totalCompras = 0;
+		var totalVentas = 0;
+		if(arrOrdenes[arrOrdenes.length - 1]['close'] == null){
+			arrOrdenes.pop();
+		}
+		//
 		for(let i in arrOrdenes){//8624190
 			fs2.appendFileSync('./querysReconstruccion/ordenes.txt', JSON.stringify(arrOrdenes[i]) + "\n", (err) => {
 				if (err) throw err;
@@ -345,12 +416,17 @@ process.on('message', (msg) => {
 				} else {
 					totalNeg += arrOrdenes[i]['total'];
 				}
+				if(arrOrdenes[i]['tipo'] == 'C'){
+					totalCompras += arrOrdenes[i]['total'];
+				} else {
+					totalVentas += arrOrdenes[i]['total'];
+				}
 			} catch(e){
 				
 			}	
 			
 		}
-		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "TOTAL: " + total +  "\n" +  "TOTAL: " + totalPos +  "\n" +  "TOTAL: " + totalNeg +  "\n", (err) => {
+		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "TOTAL GRAL:: " + total +  "\n" +  "TOTAL BUENAS: " + totalPos +  "\n" +  "TOTAL MALAS: " + totalNeg +  "\nTOTAL COMPRAS: " + totalCompras +  "\n" +  "TOTAL VENTAS: " + totalVentas + "\n", (err) => {
 				if (err) throw err;
 					console.log('The "data to append" was appended to file!');
 				});

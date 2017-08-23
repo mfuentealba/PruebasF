@@ -68,6 +68,12 @@ socket.on('fnAdd', function(arrMini){
 			name: "China",
 			//axisYType:"secondary",
 			dataPoints: arrMini[3]
+		},
+		{
+			type: "candlestick",
+			risingColor: "#f0f0f0",
+			dataPoints: arrMini[0]
+			
 		}
 
 		]
