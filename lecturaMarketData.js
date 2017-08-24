@@ -4,7 +4,8 @@ var EventEmitter = require('events').EventEmitter;
 
 const cluster = require('cluster');
 var arr;
-
+var mediaUsada = 40;
+var takeProfit = 350;
 
 var arrVelaOperativa = [];
 var arrVelaReferencia = [];
@@ -12,7 +13,14 @@ var arrVelaFuerza = [];
 var arrVelaOperativa2 = [];
 var arrVelaReferencia2 = [];
 var arrVelaFuerza2 = [];
-var arrMedia14 = [{x: 1, y:1.08522}, {x: 2, y:1.08522}, {x: 3, y:1.08522}, {x: 4, y:1.08522}, {x: 5, y:1.08522}, {x: 6, y:1.08522}, {x: 7, y:1.08522}, {x: 8, y:1.08522}, {x: 9, y:1.08522}, {x: 11.08522, y:1.08522}, {x: 11, y:1.08522}, {x: 12, y:1.08522}, {x: 13, y:1.08522}];
+var arrMedia14 = [];
+
+for(var a = 0; a < mediaUsada; a++){
+	arrMedia14.push({x: (a + 1), y:1.08522});
+	
+}
+
+
 var arrCalculoMedia14 = [];
 var arrMarcaOrdenes = [];
 var calculoMedia14 = 0;
@@ -49,7 +57,7 @@ function fnCalculaMedia(dato){
 	
 	//console.log('fnCalculaMedia :' + arrVelaOperativa[arrVelaOperativa.length - 13]['close']);
 	contadorMedia14--;
-	calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 13]['close'] / 14;
+	calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - mediaUsada - 1]['close'] / mediaUsada;
 	arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
 	ee.emit('ordenMedia', dato);
 	//console.log(calculoMedia14);
@@ -62,15 +70,7 @@ var arrOrdenes = [];
 
 function fnAbrirOrdenMedia(close){
 	//console.log(vela.close + ' - ' + calculoMedia14  + ' - ' +  vela.open);
-	/*if(orden != null){
-		if(((close[3] - orden.open) * 100000) - 16 < -50){
-			orden.close = close[3];
-			orden.fecFin = close[1];
-			orden.fin = vela.date;
-			orden.total = ((close[3] - orden.open) * -100000) - 16;	
-			orden = null;
-		}	
-	}*/
+	
 	
 	if(vela.close > calculoMedia14 && vela.open < calculoMedia14){
 		console.log('OPCION COMPRA ' + vela.date);
@@ -84,11 +84,13 @@ function fnAbrirOrdenMedia(close){
 			console.log('CERRANDO.... ' + vela.date);
 			//console.log(arrOrdenes);
 		}
-		if(orden == null && ((vela.close == vela.high) || ((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000 > 1))){
+		if(orden == null && ((vela.close == vela.high) || ((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000 > 5))
+			&& vela2.open == vela2.low && 0 < (vela2.high - vela2.close) / (vela2.close - vela2.open) < 1 / 4){
 			
 			//if(orden.date - close[1] > 3){
 				console.log((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000);
 				orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
+				orden['INDICADOR_MEDIA'] = (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000;
 				arrOrdenes.push(orden);
 				velaOperativa.markerType = "circle";
 				velaOperativa.markerSize = 1000;
@@ -117,9 +119,11 @@ function fnAbrirOrdenMedia(close){
 				//console.log(arrOrdenes);
 			//}			
 		}
-		if(orden == null && ((vela.close == vela.low) || ((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000 < -1))){
+		if(orden == null && ((vela.close == vela.low) || ((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000 < -5))
+			&& vela2.open == vela2.high && 0 < (vela2.close - vela2.low) / (vela2.open - vela2.close) < 1 / 4){
 			console.log((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000);
 			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
+			orden['INDICADOR_MEDIA'] = (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000;
 			arrOrdenes.push(orden);
 			//arrMarcaOrdenes.push({x: close[1], y: close[3]});
 			velaOperativa.markerType = "circle";
@@ -181,7 +185,7 @@ function fnInicial(dato){
 	vela = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 	vela2 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 	vela3 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
-	calculoMedia14 = dato[3] / 14;
+	calculoMedia14 = dato[3] / mediaUsada;
 	arrVelaOperativa.push(vela);
 	arrVelaFuerza.push(vela2);
 	arrVelaReferencia.push(vela3);
@@ -193,17 +197,20 @@ function fnVelaNueva(dato){
 	//console.log("fnVelaNueva");
 	contadorMedia14++;
 	//console.log(contadorMedia14);
-	calculoMedia14 += dato[3] / 14;
+	calculoMedia14 += dato[3] / mediaUsada;
 	//ee.emit('orden', vela2, dato);
-	/*console.log(calculoMedia14);
-	console.log(contadorMedia14);*/
+	if(arrVelaOperativa.length <= mediaUsada){
+		console.log(calculoMedia14);
+	}
+	
+	//console.log(contadorMedia14);
 	
 	
 	//eMedia.emit(contadorMedia14 + '', dato);
 	velaOperativa = {x: vela.date, y:[vela.open, vela.high, vela.low, vela.close]};
-	if(arrVelaOperativa.length > 13){
+	if(arrVelaOperativa.length > mediaUsada - 1){
 		//contadorMedia14--;
-		calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 14]['close'] / 14;
+		calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - mediaUsada]['close'] / mediaUsada;
 		arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
 		arrCalculoMedia14.push(calculoMedia14);
 		ee.emit('ordenMedia', dato);
@@ -324,7 +331,7 @@ process.on('message', (msg) => {
 	console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2016-02.csv", 'utf8', function(err, data) {
 		/*console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
@@ -339,11 +346,11 @@ process.on('message', (msg) => {
 		var cont = 0;
 		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
-		for(let i = 0; i < arr.length/16 - 1; i++){	
+		for(let i = 0; i < arr.length/1 - 1; i++){	
 			var dato = arr[i].split(',');
 			if(orden != null){
 				if(orden.tipo == 'C'){
-					if(((dato[3] - orden.open) * 100000) - 16 < -46){
+					if(((dato[3] - orden.open) * 100000) - 16 < -116){
 						orden.close = dato[3];
 						orden.fecFin = dato[1];
 						orden.fin = vela.date;
@@ -352,7 +359,7 @@ process.on('message', (msg) => {
 						
 						orden = null;
 					} else {
-						if(((dato[3] - orden.open) * 100000) - 16 > 300){
+						if(((dato[3] - orden.open) * 100000) - 16 > takeProfit){
 							orden.close = dato[3];
 							orden.fecFin = dato[1];
 							orden.fin = vela.date;
@@ -363,7 +370,7 @@ process.on('message', (msg) => {
 						}
 					}
 				} else {
-					if(((dato[3] - orden.open) * -100000) - 16 < -46){
+					if(((dato[3] - orden.open) * -100000) - 16 < -116){
 						orden.close = dato[3];
 						orden.fecFin = dato[1];
 						orden.fin = vela2.date;
@@ -371,7 +378,7 @@ process.on('message', (msg) => {
 						orden.total = ((dato[3] - orden.open) * -100000) - 16;
 						orden = null;
 					} else {
-						if(((dato[3] - orden.open) * -100000) - 16 > 300){
+						if(((dato[3] - orden.open) * -100000) - 16 > takeProfit){
 							orden.close = dato[3];
 							orden.fecFin = dato[1];
 							orden.fin = vela2.date;
@@ -399,9 +406,17 @@ process.on('message', (msg) => {
 		var totalNeg = 0;
 		var totalCompras = 0;
 		var totalVentas = 0;
-		if(arrOrdenes[arrOrdenes.length - 1]['close'] == null){
+		if(arrOrdenes.length > 0 && arrOrdenes[arrOrdenes.length - 1]['close'] == null){
 			arrOrdenes.pop();
 		}
+		
+		
+		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "******************************************************************\nMEDIA = " + mediaUsada + "      Take Profit=" + takeProfit + "\n", (err) => {
+				if (err) throw err;
+					console.log('The "data to append" was appended to file!');
+				});
+		
+		
 		//
 		for(let i in arrOrdenes){//8624190
 			fs2.appendFileSync('./querysReconstruccion/ordenes.txt', JSON.stringify(arrOrdenes[i]) + "\n", (err) => {
