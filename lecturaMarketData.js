@@ -89,7 +89,7 @@ function fnAbrirOrdenMedia(close){
 			
 			//if(orden.date - close[1] > 3){
 				console.log((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000);
-				orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date};
+				orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date, stopLoss: -166};
 				orden['INDICADOR_MEDIA'] = (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000;
 				arrOrdenes.push(orden);
 				velaOperativa.markerType = "circle";
@@ -122,7 +122,7 @@ function fnAbrirOrdenMedia(close){
 		if(orden == null && ((vela.close == vela.low) || ((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000 < -5))
 			&& vela2.open == vela2.high && 0 < (vela2.close - vela2.low) / (vela2.open - vela2.close) < 1 / 4){
 			console.log((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000);
-			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date};
+			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date, stopLoss: -166};
 			orden['INDICADOR_MEDIA'] = (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000;
 			arrOrdenes.push(orden);
 			//arrMarcaOrdenes.push({x: close[1], y: close[3]});
@@ -198,7 +198,7 @@ function fnVelaNueva(dato){
 	contadorMedia14++;
 	//console.log(contadorMedia14);
 	calculoMedia14 += dato[3] / mediaUsada;
-	//ee.emit('orden', vela2, dato);
+	ee.emit('orden', vela2, dato);
 	if(arrVelaOperativa.length <= mediaUsada){
 		console.log(calculoMedia14);
 	}
@@ -208,15 +208,21 @@ function fnVelaNueva(dato){
 	
 	//eMedia.emit(contadorMedia14 + '', dato);
 	velaOperativa = {x: vela.date, y:[vela.open, vela.high, vela.low, vela.close]};
-	if(arrVelaOperativa.length > mediaUsada - 1){
+	
+	
+	
+	
+	/*****************LA MEDIA**********************/
+	
+	/*if(arrVelaOperativa.length > mediaUsada - 1){
 		//contadorMedia14--;
 		calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - mediaUsada]['close'] / mediaUsada;
 		arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
 		arrCalculoMedia14.push(calculoMedia14);
 		ee.emit('ordenMedia', dato);
-	}
+	}*/
 	
-	//calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - 15]['close'] / 14;
+	/*****************FIN LA MEDIA**********************/
 	
 	
 	dato[3] = Number(dato[3]);
@@ -331,7 +337,7 @@ process.on('message', (msg) => {
 	console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/EURUSD-2016-02.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
 		/*console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
@@ -350,7 +356,7 @@ process.on('message', (msg) => {
 			var dato = arr[i].split(',');
 			if(orden != null){
 				if(orden.tipo == 'C'){
-					if(((dato[3] - orden.open) * 100000) - 16 < -116){
+					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss){
 						orden.close = dato[3];
 						orden.fecFin = dato[1];
 						orden.fin = vela.date;
@@ -367,10 +373,16 @@ process.on('message', (msg) => {
 							orden.total = ((dato[3] - orden.open) * 100000) - 16;	
 							
 							orden = null;
+						} else {
+							if(((dato[3] - orden.open) * 100000) - 16 >= 50){
+								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 66){
+									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 66;
+								}
+							}
 						}
 					}
 				} else {
-					if(((dato[3] - orden.open) * -100000) - 16 < -116){
+					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss){
 						orden.close = dato[3];
 						orden.fecFin = dato[1];
 						orden.fin = vela2.date;
@@ -385,6 +397,12 @@ process.on('message', (msg) => {
 							orden.obs = "takeProfit";
 							orden.total = ((dato[3] - orden.open) * -100000) - 16;
 							orden = null;
+						} else {
+							if(((dato[3] - orden.open) * -100000) - 16 >= 50){
+								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 66){
+									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 66;
+								}
+							}
 						}
 					}
 				}
