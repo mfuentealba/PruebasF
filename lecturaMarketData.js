@@ -4,7 +4,7 @@ var EventEmitter = require('events').EventEmitter;
 
 const cluster = require('cluster');
 var arr;
-var mediaUsada = 40;
+var mediaUsada = 14;
 var takeProfit = 350;
 
 var arrVelaOperativa = [];
@@ -37,7 +37,7 @@ var cont = 0;
 
 var ee = new EventEmitter();
 var eMedia = new EventEmitter();
-
+var nStopLoss;
 
 
 ee.once('ini', fnInicial);
@@ -140,28 +140,33 @@ function fnAbrirOrdenMedia(close){
 
 
 function fnAbrirOrden(vela2, close){
-	
-	if(vela2.open == vela2.low && (vela2.high - vela2.close) / (vela2.close - vela2.open) < 1 / 4){
-		orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela2.date, stopLoss: -316};
-		velaOperativa.markerType = "circle";
-		velaOperativa.markerSize = 1000;
-		velaOperativa.markerColor = "brown";
-		velaOperativa.indexLabel = "C";
+	try{
+		if(vela2.open == vela2.low && (vela2.high - vela2.close) / (vela2.close - vela2.open) < 1 / 4 && (vela2.close - vela2.open) * 100000 > 100){
+			orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela2.date, stopLoss: -216, tamVela: (vela2.close - vela2.open) * 100000};
+			velaOperativa.markerType = "circle";
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = "C";
+			nStopLoss = 0;
+			ee.removeAllListeners('orden');
+			//ee.on('orden', fnCerrarOrdenCompra);
+			arrOrdenes.push(orden);
+		} else if(vela2.open == vela2.high && (vela2.close - vela2.low) / (vela2.open - vela2.close) < 1 / 4 && (vela2.close - vela2.open) * 100000 < -100){
+			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela2.date, stopLoss: -216, tamVela: (vela2.close - vela2.open) * 100000};
+			velaOperativa.markerType = "circle";
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = "V";
+			nStopLoss = 0;
+			ee.removeAllListeners('orden');
+			//ee.on('orden', fnCerrarOrdenVenta);
+			arrOrdenes.push(orden);
+		}	
+	} catch(e){
 		
-		ee.removeAllListeners('orden');
-		//ee.on('orden', fnCerrarOrdenCompra);
-		arrOrdenes.push(orden);
-	} else if(vela2.open == vela2.high && (vela2.close - vela2.low) / (vela2.open - vela2.close) < 1 / 4){
-		orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela2.date, stopLoss: -316};
-		velaOperativa.markerType = "circle";
-		velaOperativa.markerSize = 1000;
-		velaOperativa.markerColor = "brown";
-		velaOperativa.indexLabel = "V";
-		
-		ee.removeAllListeners('orden');
-		//ee.on('orden', fnCerrarOrdenVenta);
-		arrOrdenes.push(orden);
 	}
+	
+	
 	
 }
 
@@ -347,7 +352,7 @@ process.on('message', (msg) => {
 	console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2016-02.csv", 'utf8', function(err, data) {
 		/*console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
@@ -366,7 +371,7 @@ process.on('message', (msg) => {
 			var dato = arr[i].split(',');
 			if(orden != null){
 				if(orden.tipo == 'C'){
-					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss){
+					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) *10000 < -5){
 						orden.close = dato[3];
 						orden.fecFin = dato[1];
 						orden.fin = vela.date;
@@ -375,7 +380,7 @@ process.on('message', (msg) => {
 						ee.on('orden', fnAbrirOrden);
 						orden = null;
 					} else {
-						if(((dato[3] - orden.open) * 100000) - 16 > takeProfit){
+						/*if(((dato[3] - orden.open) * 100000) - 16 > takeProfit){
 							orden.close = dato[3];
 							orden.fecFin = dato[1];
 							orden.fin = vela.date;
@@ -383,16 +388,16 @@ process.on('message', (msg) => {
 							orden.total = ((dato[3] - orden.open) * 100000) - 16;	
 							ee.on('orden', fnAbrirOrden);
 							orden = null;
-						} else {
-							if(((dato[3] - orden.open) * 100000) - 16 >= 50){
-								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 66){
-									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 66;
+						} else {*/
+							//if(((dato[3] - orden.open) * 100000) - 16 >= 150){
+								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 216 - nStopLoss){
+									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 216 + (nStopLoss+=5);
 								}
-							}
-						}
+							//}
+						//}
 					}
 				} else {
-					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss){
+					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 100000 > 5){
 						orden.close = dato[3];
 						orden.fecFin = dato[1];
 						orden.fin = vela2.date;
@@ -401,7 +406,7 @@ process.on('message', (msg) => {
 						ee.on('orden', fnAbrirOrden);
 						orden = null;
 					} else {
-						if(((dato[3] - orden.open) * -100000) - 16 > takeProfit){
+						/*if(((dato[3] - orden.open) * -100000) - 16 > takeProfit){
 							orden.close = dato[3];
 							orden.fecFin = dato[1];
 							orden.fin = vela2.date;
@@ -409,13 +414,13 @@ process.on('message', (msg) => {
 							orden.total = ((dato[3] - orden.open) * -100000) - 16;
 							ee.on('orden', fnAbrirOrden);
 							orden = null;
-						} else {
-							if(((dato[3] - orden.open) * -100000) - 16 >= 50){
-								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 66){
-									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 66;
+						} else {*/
+							//if(((dato[3] - orden.open) * -100000) - 16 >= 150){
+								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 216 - nStopLoss){
+									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 216 + (nStopLoss+=5);
 								}
-							}
-						}
+							//}
+						//}
 					}
 				}
 					
@@ -437,7 +442,14 @@ process.on('message', (msg) => {
 		var totalCompras = 0;
 		var totalVentas = 0;
 		if(arrOrdenes.length > 0 && arrOrdenes[arrOrdenes.length - 1]['close'] == null){
-			arrOrdenes.pop();
+			//arrOrdenes.pop();
+			orden.close = dato[3];
+			orden.fecFin = dato[1];
+			orden.fin = vela2.date;
+			orden.obs = "stopLoss";
+			orden.total = ((dato[3] - orden.open) * -100000) - 16;
+			ee.on('orden', fnAbrirOrden);
+			orden = null;
 		}
 		
 		
@@ -478,10 +490,10 @@ process.on('message', (msg) => {
 		
 		process.send({ cmd: 'fin proceso', data: process.pid });
 		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMedia14] });
-		
+		return;
 	});
 	
-
+	console.log("FIN");
 	
 });
 process.send({ cmd: process.pid });

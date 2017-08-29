@@ -65,7 +65,7 @@ socket.on('fnAdd', function(arrMini){
 			type: "line",
 			lineThickness:3,
 			showInLegend: true,           
-			name: "China",
+			name: "Data",
 			//axisYType:"secondary",
 			dataPoints: arrMini[3]
 		},
