@@ -46,6 +46,7 @@ ee.on('1', fnVelaNormal);
 ee.on('2', fnVelaNormal);
 ee.on('3', fnVelaNormal);
 ee.on('4', fnVelaNormal);
+ee.on('5', fnVelaNormal);
 eMedia.on('14', fnCalculaMedia);
 ee.on('orden', fnAbrirOrden);
 ee.on('ordenMedia', fnAbrirOrdenMedia);
@@ -142,7 +143,7 @@ function fnAbrirOrdenMedia(close){
 function fnAbrirOrden(vela2, close){
 	try{
 		if(vela2.open == vela2.low && (vela2.high - vela2.close) / (vela2.close - vela2.open) < 1 / 4 && (vela2.close - vela2.open) * 100000 > 100){
-			orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela2.date, stopLoss: -216, tamVela: (vela2.close - vela2.open) * 100000};
+			orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])};
 			velaOperativa.markerType = "circle";
 			velaOperativa.markerSize = 1000;
 			velaOperativa.markerColor = "brown";
@@ -152,7 +153,7 @@ function fnAbrirOrden(vela2, close){
 			//ee.on('orden', fnCerrarOrdenCompra);
 			arrOrdenes.push(orden);
 		} else if(vela2.open == vela2.high && (vela2.close - vela2.low) / (vela2.open - vela2.close) < 1 / 4 && (vela2.close - vela2.open) * 100000 < -100){
-			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela2.date, stopLoss: -216, tamVela: (vela2.close - vela2.open) * 100000};
+			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])};
 			velaOperativa.markerType = "circle";
 			velaOperativa.markerSize = 1000;
 			velaOperativa.markerColor = "brown";
@@ -352,7 +353,7 @@ process.on('message', (msg) => {
 	console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/EURUSD-2016-02.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
 		/*console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
@@ -371,11 +372,11 @@ process.on('message', (msg) => {
 			var dato = arr[i].split(',');
 			if(orden != null){
 				if(orden.tipo == 'C'){
-					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) *10000 < -5){
+					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) *10000 < -3){
 						orden.close = dato[3];
 						orden.fecFin = dato[1];
 						orden.fin = vela.date;
-						orden.obs = "stopLoss";
+						orden.obs = ((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss ? "stopLoss" : 'señal';
 						orden.total = ((dato[3] - orden.open) * 100000) - 16;	
 						ee.on('orden', fnAbrirOrden);
 						orden = null;
@@ -390,14 +391,14 @@ process.on('message', (msg) => {
 							orden = null;
 						} else {*/
 							//if(((dato[3] - orden.open) * 100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 216 - nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 216 + (nStopLoss+=5);
+								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 316 - nStopLoss){
+									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5);
 								}
 							//}
 						//}
 					}
 				} else {
-					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 100000 > 5){
+					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 100000 > 3){
 						orden.close = dato[3];
 						orden.fecFin = dato[1];
 						orden.fin = vela2.date;
@@ -416,8 +417,8 @@ process.on('message', (msg) => {
 							orden = null;
 						} else {*/
 							//if(((dato[3] - orden.open) * -100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 216 - nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 216 + (nStopLoss+=5);
+								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 316 - nStopLoss){
+									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5);
 								}
 							//}
 						//}
@@ -428,7 +429,11 @@ process.on('message', (msg) => {
 
 			
 			try{
-				ee.emit(dato[1][13] % 5, dato);
+				/*if(){
+					ee.emit('0', dato);
+				}*/
+				//ee.emit(dato[1][13] % 5, dato);
+				ee.emit(dato[1][12], dato);
 			} catch(e){
 				//console.log(JSON.stringify(arr[i].split(',')));
 				//break;
