@@ -143,7 +143,7 @@ function fnAbrirOrdenMedia(close){
 function fnAbrirOrden(vela2, close){
 	try{
 		if(vela2.open == vela2.low && (vela2.high - vela2.close) / (vela2.close - vela2.open) < 1 / 4 && (vela2.close - vela2.open) * 100000 > 100
-		&& vela.close - vela.open > 0 && /*vela2.close >= vela.open &&*/ vela.close > vela2.close){
+		&& vela.close - vela.open > 0/* && (vela.open - vela2.close) * 100000 < 20 && vela.close > vela2.close*/){
 			orden = {open: close[3], tipo: 'C'/*, fecIni: close[1]*/, ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])};
 			velaOperativa.markerType = "circle";
 			orden.vo = velaOperativa;
@@ -155,7 +155,7 @@ function fnAbrirOrden(vela2, close){
 			//ee.on('orden', fnCerrarOrdenCompra);
 			arrOrdenes.push(orden);
 		} else if(vela2.open == vela2.high && (vela2.close - vela2.low) / (vela2.open - vela2.close) < 1 / 4 && (vela2.close - vela2.open) * 100000 < -100
-			&& vela.close - vela.open < 0 /*&& vela2.close <= vela.open*/ && vela.close < vela2.close){
+			&& vela.close - vela.open < 0 /*&& (vela.open - vela2.close) * 100000 < -20 && vela.close < vela2.close*/){
 			orden = {open: close[3], tipo: 'V', /*fecIni: close[1], */ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])};
 			velaOperativa.markerType = "circle";
 			orden.vo = velaOperativa;
@@ -385,7 +385,7 @@ process.on('message', (msg) => {
 			var dato = arr[i].split(',');
 			if(orden != null){
 				if(orden.tipo == 'C'){
-					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) *10000 < -3){
+					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 10000 < -3){
 						orden.close = dato[3];
 						orden.vo.indexLabel = 'c';
 						//orden.fecFin = dato[1];
@@ -408,8 +408,8 @@ process.on('message', (msg) => {
 							orden = null;
 						} else {*/
 							//if(((dato[3] - orden.open) * 100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 316 - nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5);
+								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 316 + nStopLoss){
+									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 16 >= 50 ? (((dato[3] - orden.open) * 100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5);
 								}
 							//}
 						//}
@@ -438,8 +438,8 @@ process.on('message', (msg) => {
 							orden = null;
 						} else {*/
 							//if(((dato[3] - orden.open) * -100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 316 - nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5);
+								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 316 + nStopLoss){
+									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 16 >= 50 ? (((dato[3] - orden.open) * -100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5);
 								}
 							//}
 						//}
