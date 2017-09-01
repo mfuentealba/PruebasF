@@ -3,7 +3,7 @@ var fs2 = require('fs');
 var EventEmitter = require('events').EventEmitter;
 
 const cluster = require('cluster');
-var arr = [];
+var arr;
 var mediaUsada = 14;
 var takeProfit = 350;
 
@@ -355,15 +355,23 @@ function fnVelaNormal(dato){
 	}
 }
 
-var arrFile = ["./marketdata/EURUSD-2016-01.csv", "./marketdata/EURUSD-2016-02.csv", "./marketdata/EURUSD-2016-03.csv", "./marketdata/EURUSD-2016-04.csv", "./marketdata/EURUSD-2016-05.csv", "./marketdata/EURUSD-2016-06.csv", "./marketdata/EURUSD-2016-07.csv", "./marketdata/EURUSD-2016-08.csv", "./marketdata/EURUSD-2016-09.csv", "./marketdata/EURUSD-2016-10.csv", "./marketdata/EURUSD-2016-11.csv"];
 
-var cnt = 0;
 
-function fnLecturaArchivo(err, data){
-	if(arrFile.length == cnt){
-		console.log(arr.length);
-		console.log(arr[arr.length - 1]);
-		console.log("FIN");
+
+
+
+process.on('message', (msg) => {
+	console.log('inicio Proceso');
+	process.send({ cmd: 'inicio Proceso', data: process.pid });
+	console.log(msg + ' ' + process.pid);
+	
+	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
+		/*console.log(fs);
+		fs.close(2, function(){});
+		delete fs;*/
+		//console.log(err);
+		arr = data.split("\n");
 		arrVelaFuerza = [];
 		arrVelaFuerza2 = [];
 		arrVelaOperativa = [];
@@ -371,9 +379,9 @@ function fnLecturaArchivo(err, data){
 		arrVelaReferencia = [];
 		arrVelaReferencia2 = [];
 		var cont = 0;
-		ee.emit('ini', arr[1].split(','));
+		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
-		for(let i = 1; i < arr.length/1 - 1; i++){	
+		for(let i = 0; i < arr.length/1 - 1; i++){	
 			var dato = arr[i].split(',');
 			if(orden != null){
 				if(orden.tipo == 'C'){
@@ -509,32 +517,10 @@ function fnLecturaArchivo(err, data){
 		
 		process.send({ cmd: 'fin proceso', data: process.pid });
 		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMedia14] });
-	} else {
-		if(arr.length > 0){
-			console.log(cnt)
-			arr = [arr, ...data.split("\n")];	
-		} else {
-			arr = data.split("\n");	
-		}
-		fs.readFile(arrFile[cnt++], 'utf8', fnLecturaArchivo);	
-	}
-	
-}
-
-process.on('message', (msg) => {
-	console.log('inicio Proceso');
-	process.send({ cmd: 'inicio Proceso', data: process.pid });
-	console.log(msg + ' ' + process.pid);
-	
-	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile(arrFile[cnt++], 'utf8', function(err, data) {
-		
-			
-		
-		fnLecturaArchivo(err, data);
+		return;
 	});
 	
-	//console.log("FIN");
+	console.log("FIN");
 	
 });
 process.send({ cmd: process.pid });
