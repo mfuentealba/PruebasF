@@ -3,8 +3,11 @@ var fs2 = require('fs');
 var EventEmitter = require('events').EventEmitter;
 
 const cluster = require('cluster');
-var arr = [];
-var mediaUsada = 14;
+var arr;
+var mediaUsada = 20;
+var estocasticoK = 6;
+var estocasticoD = 6;
+var entocasticoPeriodos = 10
 var takeProfit = 350;
 
 var arrVelaOperativa = [];
@@ -254,6 +257,53 @@ function fnVelaNueva(dato){
 	/*****************FIN LA MEDIA**********************/
 	
 	
+	/*****************ESTOCASTICO**********************/
+	
+	
+	if(arrVelaOperativa.length > 10){
+		
+	} else {
+		var min = 100;
+		var max = 0;
+		for(var i = arrVelaOperativa.length - 11; i < arrVelaOperativa.length; i++){
+			if(arrVelaOperativa[i].low < min){
+				min = arrVelaOperativa[i].low;
+			} else if(arrVelaOperativa[i].high > max){
+				max = arrVelaOperativa[i].high;
+			}				
+		}
+		
+		if(arrVelaOperativa.length > 16){
+			estocasticoK = (arrVelaOperativa[arrVelaOperativa.length - 1].close - min)/ (max - min);
+		} else {
+			
+		}
+		
+		
+		
+	}
+	
+	if(arrMinEstoc[arrMinEstoc - 1].valor >= vela.low ){		
+		arrMinEstoc.push(vela.low);
+	} else if(objMinEstoc.valor == vela.close ){
+		
+	}
+	
+	
+	if(arrVelaOperativa.length > entocasticoPeriodos - 1){
+		//contadorMedia14--;
+		calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - mediaUsada]['close'] / mediaUsada;
+		arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
+		arrCalculoMedia14.push(calculoMedia14);
+		//ee.emit('ordenMedia', dato);
+	}
+	
+	/*****************FIN ESTOCASTICO**********************/
+	
+	
+	
+	
+	
 	dato[3] = Number(dato[3]);
 	//arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
 	
@@ -355,25 +405,23 @@ function fnVelaNormal(dato){
 	}
 }
 
-var arrFile = [/*"./marketdata/EURUSD-2016-01.csv", "./marketdata/EURUSD-2016-02.csv", "./marketdata/EURUSD-2016-03.csv", */"./marketdata/EURUSD-2016-04_1.csv"/*, "./marketdata/EURUSD-2016-04_2.csv"/*, "./marketdata/EURUSD-2016-05.csv", "./marketdata/EURUSD-2016-06.csv", "./marketdata/EURUSD-2016-07.csv", "./marketdata/EURUSD-2016-08.csv", "./marketdata/EURUSD-2016-09.csv", "./marketdata/EURUSD-2016-10.csv", "./marketdata/EURUSD-2016-11.csv"*/];
 
-var cnt = 0;
 
-function fnLecturaArchivo(err, data){
-	console.log(err);
-	if(arrFile.length == cnt){
-		//console.log(data);
-		try{
-			arr = arr.concat(('' + data).split("\n"));	
-		} catch(e){
-			console.log(err);
-		}
-		
-		
-		console.log(arr.length);
-		console.log(arr[0]);
-		console.log(arr[arr.length - 2]);
-		console.log("FIN");
+
+
+
+process.on('message', (msg) => {
+	console.log('inicio Proceso');
+	process.send({ cmd: 'inicio Proceso', data: process.pid });
+	console.log(msg + ' ' + process.pid);
+	
+	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
+		/*console.log(fs);
+		fs.close(2, function(){});
+		delete fs;*/
+		//console.log(err);
+		arr = data.split("\n");
 		arrVelaFuerza = [];
 		arrVelaFuerza2 = [];
 		arrVelaOperativa = [];
@@ -383,7 +431,7 @@ function fnLecturaArchivo(err, data){
 		var cont = 0;
 		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
-		for(let i = 1; i < arr.length/13 - 1; i++){	
+		for(let i = 0; i < arr.length/1 - 1; i++){	
 			var dato = arr[i].split(',');
 			if(orden != null){
 				if(orden.tipo == 'C'){
@@ -400,21 +448,11 @@ function fnLecturaArchivo(err, data){
 						ee.on('orden', fnAbrirOrden);
 						orden = null;
 					} else {
-						/*if(((dato[3] - orden.open) * 100000) - 16 > takeProfit){
-							orden.close = dato[3];
-							orden.fecFin = dato[1];
-							orden.fin = vela.date;
-							orden.obs = "takeProfit";
-							orden.total = ((dato[3] - orden.open) * 100000) - 16;	
-							ee.on('orden', fnAbrirOrden);
-							orden = null;
-						} else {*/
-							//if(((dato[3] - orden.open) * 100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 316 + nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 16 >= 50 ? (((dato[3] - orden.open) * 100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5);
-								}
-							//}
-						//}
+				
+						if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 316 + nStopLoss){
+							orden.stopLoss = ((dato[3] - orden.open) * 100000) - 16 >= 50 ? (((dato[3] - orden.open) * 100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5);
+						}
+							
 					}
 				} else {
 					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 100000 > 3){
@@ -430,21 +468,11 @@ function fnLecturaArchivo(err, data){
 						ee.on('orden', fnAbrirOrden);
 						orden = null;
 					} else {
-						/*if(((dato[3] - orden.open) * -100000) - 16 > takeProfit){
-							orden.close = dato[3];
-							orden.fecFin = dato[1];
-							orden.fin = vela2.date;
-							orden.obs = "takeProfit";
-							orden.total = ((dato[3] - orden.open) * -100000) - 16;
-							ee.on('orden', fnAbrirOrden);
-							orden = null;
-						} else {*/
-							//if(((dato[3] - orden.open) * -100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 316 + nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 16 >= 50 ? (((dato[3] - orden.open) * -100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5);
-								}
-							//}
-						//}
+						
+						if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 316 + nStopLoss){
+							orden.stopLoss = ((dato[3] - orden.open) * -100000) - 16 >= 50 ? (((dato[3] - orden.open) * -100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5);
+						}
+						
 					}
 				}
 					
@@ -452,11 +480,8 @@ function fnLecturaArchivo(err, data){
 
 			
 			try{
-				/*if(){
-					ee.emit('0', dato);
-				}*/
-				//ee.emit(dato[1][13] % 5, dato);
-				ee.emit(dato[1][12], dato);
+				ee.emit(dato[1][13] % 5, dato);
+				//ee.emit(dato[1][12], dato);
 			} catch(e){
 				//console.log(JSON.stringify(arr[i].split(',')));
 				//break;
@@ -519,32 +544,10 @@ function fnLecturaArchivo(err, data){
 		
 		process.send({ cmd: 'fin proceso', data: process.pid });
 		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMedia14] });
-	} else {
-		if(arr.length > 0){
-			console.log(cnt)
-			arr = [arr, ...data.split("\n")];	
-		} else {
-			arr = data.split("\n");	
-		}
-		fs.readFile(arrFile[cnt++], 'utf8', fnLecturaArchivo);	
-	}
-	
-}
-
-process.on('message', (msg) => {
-	console.log('inicio Proceso');
-	process.send({ cmd: 'inicio Proceso', data: process.pid });
-	console.log(msg + ' ' + process.pid);
-	
-	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile(arrFile[cnt++], 'utf8', function(err, data) {
-		
-			
-		
-		fnLecturaArchivo(err, data);
+		return;
 	});
 	
-	//console.log("FIN");
+	console.log("FIN");
 	
 });
 process.send({ cmd: process.pid });
