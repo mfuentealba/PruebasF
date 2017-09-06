@@ -260,26 +260,44 @@ function fnVelaNueva(dato){
 	/*****************ESTOCASTICO**********************/
 	
 	
-	if(arrVelaOperativa.length > 10){
-		
-	} else {
+	if(arrVelaOperativa.length > 9){
 		var min = 100;
 		var max = 0;
-		for(var i = arrVelaOperativa.length - 11; i < arrVelaOperativa.length; i++){
+		
+		for(var i = arrVelaOperativa.length - 10; i < arrVelaOperativa.length; i++){
 			if(arrVelaOperativa[i].low < min){
 				min = arrVelaOperativa[i].low;
 			} else if(arrVelaOperativa[i].high > max){
 				max = arrVelaOperativa[i].high;
 			}				
 		}
-		
 		if(arrVelaOperativa.length > 16){
-			estocasticoK = (arrVelaOperativa[arrVelaOperativa.length - 1].close - min)/ (max - min);
+			estocasticoK = estocasticoK + ((arrVelaOperativa[arrVelaOperativa.length - 1].close - min) / 6 * (max - min)) - arrEstocasticoK[0];
+			arrEstocasticoK.shift();
+			arrEstocasticoK.push((arrVelaOperativa[arrVelaOperativa.length - 1].close - min) / 6 * (max - min));
+			if(arrVelaOperativa.length > 22){
+				estocasticoD = estocasticoD + ( arrEstocasticoK[arrEstocasticoK.length - 1] / 6 ) - arrEstocasticoD[0];
+				arrEstocasticoD.shift();
+				arrEstocasticoD.push((arrEstocasticoK[arrEstocasticoK.length - 1]) / 6);
+
+				/******** SEÑALES Estocastico *********/
+					if(estocasticoK > estocasticoD && estocasticoK < 20 && estocasticoD < 20 && arrEstocasticoD[arrEstocasticoD.length - 1] > arrEstocasticoK[arrEstocasticok.length - 1]){
+
+					} else if(estocasticoK < estocasticoD && estocasticoK > 80 && estocasticoD > 80 && arrEstocasticoD[arrEstocasticoD.length - 1] < arrEstocasticoK[arrEstocasticok.length - 1]){
+						
+					}
+				/******** FIN SEÑALES Estocastico *********/
+
+
+			} else {
+				estocasticoD += (arrEstocasticoK[arrEstocasticoK.length - 1]) / 6;
+				arrEstocasticoD.push((arrEstocasticoK[arrEstocasticoK.length - 1]) / 6);
+			}
 		} else {
-			
+			estocasticoK += (arrVelaOperativa[arrVelaOperativa.length - 1].close - min) / 6 * (max - min);
+			arrEstocasticoK.push((arrVelaOperativa[arrVelaOperativa.length - 1].close - min) / 6 * (max - min));
 		}
-		
-		
+	} else {	
 		
 	}
 	
