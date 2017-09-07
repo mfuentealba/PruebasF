@@ -2,37 +2,17 @@ var fs = require('fs');
 var fs2 = require('fs');
 var EventEmitter = require('events').EventEmitter;
 const Stochastic = require('technicalindicators').Stochastic;
-
-
+var inputIni = {
+	  high: [],
+	  low: [],
+	  close: [],
+	  period: 10,
+	  signalPeriod: 3
+	};
+var stochastic = new Stochastic(inputIni);
 
 const cluster = require('cluster');
 var arr;
-var mediaUsada = 20;
-var estocasticoK = 6;
-var estocasticoD = 6;
-var entocasticoPeriodos = 10
-var takeProfit = 350;
-
-var arrVelaOperativa = [];
-var arrVelaReferencia = [];
-var arrVelaFuerza = [];
-var arrVelaOperativa2 = [];
-var arrVelaReferencia2 = [];
-var arrVelaFuerza2 = [];
-var arrMedia14 = [];
-
-for(var a = 0; a < mediaUsada; a++){
-	arrMedia14.push({x: (a + 1), y:1.08522});
-	
-}
-
-
-var arrCalculoMedia14 = [];
-var arrMarcaOrdenes = [];
-var calculoMedia14 = 0;
-var contadorMedia14 = 1;
-
-
 
 var vela;
 var velaOperativa;
@@ -41,186 +21,13 @@ var vela3;
 var orden;
 var cont = 0;
 
-var ee = new EventEmitter();
-var eMedia = new EventEmitter();
-var nStopLoss;
-
-
-ee.once('ini', fnInicial);
-ee.on('0', fnVelaNueva);
-ee.on('1', fnVelaNormal);
-ee.on('2', fnVelaNormal);
-ee.on('3', fnVelaNormal);
-ee.on('4', fnVelaNormal);
-ee.on('5', fnVelaNormal);
-eMedia.on('14', fnCalculaMedia);
-ee.on('orden', fnAbrirOrden);
-ee.on('ordenMedia', fnAbrirOrdenMedia);
-//ee.on('reset', fnRestarNuevaVela);
-
-
-function fnCalculaMedia(dato){
-	
-	
-	//console.log('fnCalculaMedia :' + arrVelaOperativa[arrVelaOperativa.length - 13]['close']);
-	contadorMedia14--;
-	calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - mediaUsada - 1]['close'] / mediaUsada;
-	arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
-	ee.emit('ordenMedia', dato);
-	//console.log(calculoMedia14);
-	
-}
-
-
-var arrOrdenes = [];
-
-
-function fnAbrirOrdenMedia(close){
-	//console.log(vela.close + ' - ' + calculoMedia14  + ' - ' +  vela.open);
-	
-	
-	if(vela.close > calculoMedia14 && vela.open < calculoMedia14){
-		console.log('OPCION COMPRA ' + vela.date);
-		if(orden != null && orden.tipo == 'V'){
-			orden.close = close[3];
-			orden.fecFin = close[1];
-			orden.fin = vela.date;
-			orden.obs = "señal";
-			orden.total = ((close[3] - orden.open) * -100000) - 16;	
-			orden = null;
-			console.log('CERRANDO.... ' + vela.date);
-			//console.log(arrOrdenes);
-		}
-		if(orden == null && ((vela.close == vela.high) || ((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000 > 5))
-			&& vela2.open == vela2.low && 0 < (vela2.high - vela2.close) / (vela2.close - vela2.open) < 1 / 4){
-			
-			//if(orden.date - close[1] > 3){
-				console.log((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000);
-				orden = {open: close[3], tipo: 'C', fecIni: close[1], ini: vela.date, stopLoss: -166, vo: velaOperativa};
-				orden['INDICADOR_MEDIA'] = (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000;
-				arrOrdenes.push(orden);
-				velaOperativa.markerType = "circle";
-				velaOperativa.markerSize = 1000;
-				velaOperativa.markerColor = "brown";
-				velaOperativa.indexLabel = "C";
-				console.log(vela);
-				console.log(velaOperativa);
-				//arrMarcaOrdenes.push({x: close[1], y: close[3]});
-			//}	
-		}
-		
-			
-		
-		
-	} else if(vela.close < calculoMedia14 && vela.open > calculoMedia14){
-		console.log('OPCION VENTA ' + vela.date);
-		if(orden != null && orden.tipo == 'C'){
-			//if(orden.date - close[1] > 3){
-				orden.close = close[3];
-				orden.fecFin = close[1];
-				orden.fin = vela.date;
-				orden.obs = "señal";
-				orden.total = ((close[3] - orden.open) * 100000) - 16;	
-				orden = null;
-				console.log('CERRANDO.... ' + vela.date);
-				//console.log(arrOrdenes);
-			//}			
-		}
-		if(orden == null && ((vela.close == vela.low) || ((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000 < -5))
-			&& vela2.open == vela2.high && 0 < (vela2.close - vela2.low) / (vela2.open - vela2.close) < 1 / 4){
-			console.log((arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000);
-			orden = {open: close[3], tipo: 'V', fecIni: close[1], ini: vela.date, stopLoss: -166};
-			orden['INDICADOR_MEDIA'] = (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2]) * 100000;
-			arrOrdenes.push(orden);
-			//arrMarcaOrdenes.push({x: close[1], y: close[3]});
-			velaOperativa.markerType = "circle";
-			velaOperativa.markerSize = 1000;
-			velaOperativa.markerColor = "brown";
-			velaOperativa.indexLabel = "V";
-			console.log(vela);
-			console.log(velaOperativa);
-		}
-	}
-	return;
-	
-}
-
-
-function fnAbrirOrden(vela2, close){
-	try{
-		if(vela2.open == vela2.low && (vela2.high - vela2.close) / (vela2.close - vela2.open) < 1 / 4 && (vela2.close - vela2.open) * 100000 > 100
-		&& vela.close - vela.open > 0/* && (vela.open - vela2.close) * 100000 < 20 && vela.close > vela2.close*/){
-			orden = {open: close[3], tipo: 'C'/*, fecIni: close[1]*/, ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])};
-			velaOperativa.markerType = "circle";
-			orden.vo = velaOperativa;
-			velaOperativa.markerSize = 1000;
-			velaOperativa.markerColor = "brown";
-			velaOperativa.indexLabel = "C";
-			nStopLoss = 0;
-			ee.removeAllListeners('orden');
-			//ee.on('orden', fnCerrarOrdenCompra);
-			arrOrdenes.push(orden);
-		} else if(vela2.open == vela2.high && (vela2.close - vela2.low) / (vela2.open - vela2.close) < 1 / 4 && (vela2.close - vela2.open) * 100000 < -100
-			&& vela.close - vela.open < 0 /*&& (vela.open - vela2.close) * 100000 < -20 && vela.close < vela2.close*/){
-			orden = {open: close[3], tipo: 'V', /*fecIni: close[1], */ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])};
-			velaOperativa.markerType = "circle";
-			orden.vo = velaOperativa;
-			velaOperativa.markerSize = 1000;
-			velaOperativa.markerColor = "brown";
-			velaOperativa.indexLabel = "V";
-			nStopLoss = 0;
-			ee.removeAllListeners('orden');
-			//ee.on('orden', fnCerrarOrdenVenta);
-			arrOrdenes.push(orden);
-		}	
-	} catch(e){
-		
-	}
-	
-	
-	
-}
-
-function fnCerrarOrdenCompra(vela2, close){
-	if(vela2.close - vela2.open < 0 || ((close[3] - orden.open) * 100000) - 16 < -30){
-		orden.close = close[3];
-		orden.fecFin = close[1];
-		orden.fin = vela2.date;
-
-		
-		orden.total = ((close[3] - orden.open) * 100000) - 16;
-		if(orden.total < 0){
-			orden.vo.indexLabel = 'L';
-		}
-		ee.removeAllListeners('orden');
-		ee.on('orden', fnAbrirOrden);
-	}
-}
-
-function fnCerrarOrdenVenta(vela2, close){
-	if(vela2.close - vela2.open > 0 || ((close[3] - orden.open) * -100000) - 16 < -30){
-		orden.close = close[3];
-		orden.fecFin = close[1];
-		orden.fin = vela2.date;
-		
-		orden.total = ((close[3] - orden.open) * -100000) - 16;
-		if(orden.total < 0){
-			orden.vo.indexLabel = 'S';
-		}
-		ee.removeAllListeners('orden');
-		ee.on('orden', fnAbrirOrden);
-	} else {
-		
-	}
-}
-
 
 function fnInicial(dato){
 	dato[3] = Number(dato[3]);
 	vela = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 	vela2 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
 	vela3 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
-	calculoMedia14 = dato[3] / mediaUsada;
+	
 	arrVelaOperativa.push(vela);
 	arrVelaFuerza.push(vela2);
 	arrVelaReferencia.push(vela3);
@@ -229,106 +36,24 @@ function fnInicial(dato){
 
 
 function fnVelaNueva(dato){
-	//console.log("fnVelaNueva");
-	contadorMedia14++;
-	//console.log(contadorMedia14);
-	calculoMedia14 += dato[3] / mediaUsada;
-	ee.emit('orden', vela2, dato);
-	if(arrVelaOperativa.length <= mediaUsada){
-		console.log(calculoMedia14);
-	}
-	
-	//console.log(contadorMedia14);
-	
-	
-	//eMedia.emit(contadorMedia14 + '', dato);
+	//console.log('fnVelaNueva');
 	velaOperativa = {x: vela.date, y:[vela.open, vela.high, vela.low, vela.close]};
-	
-	
-	
-	
-	/*****************LA MEDIA**********************/
-	
-	if(arrVelaOperativa.length > mediaUsada - 1){
-		//contadorMedia14--;
-		calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - mediaUsada]['close'] / mediaUsada;
-		arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
-		arrCalculoMedia14.push(calculoMedia14);
-		//ee.emit('ordenMedia', dato);
-	}
-	
-	/*****************FIN LA MEDIA**********************/
-	
-	
-	/*****************ESTOCASTICO**********************/
-	
-	
-	if(arrVelaOperativa.length > 9){
-		var min = 100;
-		var max = 0;
-		
-		for(var i = arrVelaOperativa.length - 10; i < arrVelaOperativa.length; i++){
-			if(arrVelaOperativa[i].low < min){
-				min = arrVelaOperativa[i].low;
-			} else if(arrVelaOperativa[i].high > max){
-				max = arrVelaOperativa[i].high;
-			}				
-		}
-		if(arrVelaOperativa.length > 16){
-			estocasticoK = estocasticoK + ((arrVelaOperativa[arrVelaOperativa.length - 1].close - min) / 6 * (max - min)) - arrEstocasticoK[0];
-			arrEstocasticoK.shift();
-			arrEstocasticoK.push((arrVelaOperativa[arrVelaOperativa.length - 1].close - min) / 6 * (max - min));
-			if(arrVelaOperativa.length > 22){
-				estocasticoD = estocasticoD + ( arrEstocasticoK[arrEstocasticoK.length - 1] / 6 ) - arrEstocasticoD[0];
-				arrEstocasticoD.shift();
-				arrEstocasticoD.push((arrEstocasticoK[arrEstocasticoK.length - 1]) / 6);
-
-				/******** SEÑALES Estocastico *********/
-					if(estocasticoK > estocasticoD && estocasticoK < 20 && estocasticoD < 20 && arrEstocasticoD[arrEstocasticoD.length - 1] > arrEstocasticoK[arrEstocasticok.length - 1]){
-
-					} else if(estocasticoK < estocasticoD && estocasticoK > 80 && estocasticoD > 80 && arrEstocasticoD[arrEstocasticoD.length - 1] < arrEstocasticoK[arrEstocasticok.length - 1]){
-
-					}
-				/******** FIN SEÑALES Estocastico *********/
-
-
-			} else {
-				estocasticoD += (arrEstocasticoK[arrEstocasticoK.length - 1]) / 6;
-				arrEstocasticoD.push((arrEstocasticoK[arrEstocasticoK.length - 1]) / 6);
-			}
-		} else {
-			estocasticoK += (arrVelaOperativa[arrVelaOperativa.length - 1].close - min) / 6 * (max - min);
-			arrEstocasticoK.push((arrVelaOperativa[arrVelaOperativa.length - 1].close - min) / 6 * (max - min));
-		}
-	} else {	
-		
-	}
-	
-	if(arrMinEstoc[arrMinEstoc - 1].valor >= vela.low ){		
-		arrMinEstoc.push(vela.low);
-	} else if(objMinEstoc.valor == vela.close ){
-		
-	}
-	
-	
-	if(arrVelaOperativa.length > entocasticoPeriodos - 1){
-		//contadorMedia14--;
-		calculoMedia14 -= arrVelaOperativa[arrVelaOperativa.length - mediaUsada]['close'] / mediaUsada;
-		arrMedia14.push({x: arrVelaOperativa[arrVelaOperativa.length - 1]['date'], y: calculoMedia14});
-		arrCalculoMedia14.push(calculoMedia14);
-		//ee.emit('ordenMedia', dato);
-	}
-	
-	/*****************FIN ESTOCASTICO**********************/
-	
-	
-	
-	
-	
 	dato[3] = Number(dato[3]);
 	//arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
-	
+	//console.log(velaOperativa);
 	arrVelaOperativa2.push(velaOperativa);
+	
+	
+	var input = {
+	  high: [vela.high],
+	  low: [vela.low],
+	  close: [vela.close],
+	  period: 10,
+	  signalPeriod: 3
+	};
+	
+	console.log(stochastic.nextValue(input));
+	
 	//arrVelaFuerza2.push([vela2.date, vela2.low, vela2.open, vela2.close, vela2.high]);
 	arrVelaFuerza2.push({x: vela2.date, y: [vela2.open, vela2.high, vela2.low, vela2.close]});
 	
@@ -350,12 +75,11 @@ function fnVelaNueva(dato){
 		vela3.date = arrVelaReferencia.length;
 		//break;
 	}
-	ee.removeListener('0', fnVelaNueva);
-	ee.on('0', fnVelaNormal2);
+	
+	objFunciones['0'] = fnVelaNormal2;
 }
 
 function fnVelaNormal2(dato){
-	//console.log("fnVelaNormal2");
 	dato[3] = Number(dato[3]);
 	vela.close = dato[3];
 	vela3.close = dato[3];
@@ -390,9 +114,7 @@ function fnVelaNormal2(dato){
 }//2134068
 
 function fnVelaNormal(dato){
-	//console.log("fnVelaNormal");
-	ee.removeAllListeners('0');
-	ee.on('0', fnVelaNueva);
+	objFunciones['0'] = fnVelaNueva;
 	dato[3] = Number(dato[3]);
 	vela.close = dato[3];
 	vela3.close = dato[3];
@@ -428,6 +150,23 @@ function fnVelaNormal(dato){
 
 
 
+var arrVelaOperativa = [];
+var arrVelaReferencia = [];
+var arrVelaFuerza = [];
+var arrVelaOperativa2 = [];
+var arrVelaReferencia2 = [];
+var arrVelaFuerza2 = [];
+var arrMedia14 = [];
+
+var objFunciones = {};
+objFunciones['ini'] = fnInicial;
+objFunciones['0'] = fnVelaNueva;
+objFunciones['1'] = fnVelaNormal;
+objFunciones['2'] = fnVelaNormal;
+objFunciones['3'] = fnVelaNormal;
+objFunciones['4'] = fnVelaNormal;
+objFunciones['5'] = fnVelaNormal;
+
 
 
 
@@ -441,7 +180,7 @@ process.on('message', (msg) => {
 		/*console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
-		//console.log(err);
+		console.log(err);
 		arr = data.split("\n");
 		arrVelaFuerza = [];
 		arrVelaFuerza2 = [];
@@ -450,122 +189,18 @@ process.on('message', (msg) => {
 		arrVelaReferencia = [];
 		arrVelaReferencia2 = [];
 		var cont = 0;
-		ee.emit('ini', arr[0].split(','));
+		objFunciones['ini'](arr[0].split(','));
 		//for(let i in arr){
 		for(let i = 0; i < arr.length/1 - 1; i++){	
 			var dato = arr[i].split(',');
-			if(orden != null){
-				if(orden.tipo == 'C'){
-					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 10000 < -3){
-						orden.close = dato[3];
-						orden.vo.indexLabel = 'c';
-						//orden.fecFin = dato[1];
-						orden.fin = vela.date;
-						orden.obs = ((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss ? "stopLoss" : 'señal';
-						orden.total = ((dato[3] - orden.open) * 100000) - 16;	
-						if(orden.total < 0){
-							orden.vo.indexLabel = 'L';
-						}
-						ee.on('orden', fnAbrirOrden);
-						orden = null;
-					} else {
-				
-						if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 316 + nStopLoss){
-							orden.stopLoss = ((dato[3] - orden.open) * 100000) - 16 >= 50 ? (((dato[3] - orden.open) * 100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5);
-						}
-							
-					}
-				} else {
-					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 100000 > 3){
-						orden.close = dato[3];
-						//orden.fecFin = dato[1];
-						orden.vo.indexLabel = 'v';
-						orden.fin = vela2.date;
-						orden.obs = "stopLoss";
-						orden.total = ((dato[3] - orden.open) * -100000) - 16;
-						if(orden.total < 0){
-							orden.vo.indexLabel = 'S';
-						}
-						ee.on('orden', fnAbrirOrden);
-						orden = null;
-					} else {
-						
-						if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 316 + nStopLoss){
-							orden.stopLoss = ((dato[3] - orden.open) * -100000) - 16 >= 50 ? (((dato[3] - orden.open) * -100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5);
-						}
-						
-					}
-				}
-					
-			}
-
-			
-			try{
-				ee.emit(dato[1][13] % 5, dato);
-				//ee.emit(dato[1][12], dato);
-			} catch(e){
-				//console.log(JSON.stringify(arr[i].split(',')));
-				//break;
-			}
-			//break;
-						
-		}
-		var total = 0;
-		var totalPos = 0;
-		var totalNeg = 0;
-		var totalCompras = 0;
-		var totalVentas = 0;
-		if(arrOrdenes.length > 0 && arrOrdenes[arrOrdenes.length - 1]['close'] == null){
-			//arrOrdenes.pop();
-			orden.close = dato[3];
-			orden.fecFin = dato[1];
-			orden.fin = vela2.date;
-			orden.obs = "stopLoss";
-			orden.total = ((dato[3] - orden.open) * -100000) - 16;
-			
-			ee.on('orden', fnAbrirOrden);
-			orden = null;
+			//console.log(dato[1][13] % 5);
+		    objFunciones[dato[1][13] % 5](dato);	
 		}
 		
-		
-		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "******************************************************************\nMEDIA = " + mediaUsada + "      Take Profit=" + takeProfit + "\n", (err) => {
-				if (err) throw err;
-					console.log('The "data to append" was appended to file!');
-				});
-		
-		
-		//
-		for(let i in arrOrdenes){//8624190
-			fs2.appendFileSync('./querysReconstruccion/ordenes.txt', JSON.stringify(arrOrdenes[i]) + "\n", (err) => {
-				if (err) throw err;
-					console.log('The "data to append" was appended to file!');
-				});
-			try{
-				//total += Math.abs(arrOrdenes[i]['total']) > 1 ? arrOrdenes[i]['total'] : 0;
-				total += arrOrdenes[i]['total'];//arrOrdenes[i]['total'] < -30 ? -30 : arrOrdenes[i]['total'];
-				if(arrOrdenes[i]['total'] > 0){
-					totalPos += arrOrdenes[i]['total'];
-				} else {
-					totalNeg += arrOrdenes[i]['total'];
-				}
-				if(arrOrdenes[i]['tipo'] == 'C'){
-					totalCompras += arrOrdenes[i]['total'];
-				} else {
-					totalVentas += arrOrdenes[i]['total'];
-				}
-			} catch(e){
-				
-			}	
-			
-		}
-		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "TOTAL GRAL:: " + total +  "\n" +  "TOTAL BUENAS: " + totalPos +  "\n" +  "TOTAL MALAS: " + totalNeg +  "\nTOTAL COMPRAS: " + totalCompras +  "\n" +  "TOTAL VENTAS: " + totalVentas + "\n", (err) => {
-				if (err) throw err;
-					console.log('The "data to append" was appended to file!');
-				});
-		
+		console.log("FINALIZANDO");
 		process.send({ cmd: 'fin proceso', data: process.pid });
 		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMedia14] });
-		return;
+		
 	});
 	
 	console.log("FIN");

@@ -10,7 +10,7 @@ socket.on('fnAdd', function(arrMini){
   google.charts.setOnLoadCallback(function(){
     drawChart(arrMini);
   });*/
-  /*var chart = new CanvasJS.Chart("chartContainer",
+  var chart = new CanvasJS.Chart("chartContainer",
 	{
 		title:{
 			text: "Candle Stick chart using risingColor property"
@@ -36,8 +36,8 @@ socket.on('fnAdd', function(arrMini){
 		}
 		]
 	});
-	chart.render();
-	*/
+	chart.render()/*.then(function(){console.log("FINNNN")});*/
+	
 	var chart2 = new CanvasJS.Chart("chartContainer2",
 	{
 		title:{

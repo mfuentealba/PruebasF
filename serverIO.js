@@ -9,6 +9,51 @@ var io = require('socket.io')(server);
 const cluster = require('cluster');
 const numCPUs = require('os').cpus().length;
 
+/*function* gen() 
+{ 
+	var a=0,b=undefined,c=0; 
+	
+	while(a<20)
+	{ 
+		if(b!=undefined) 
+		{ 
+			a=b; // resetea la variuable "a" para que empiece desde el valor indicado como parametro en yield
+			c++; // suma un reset mas a la cantidad total hasta ahora
+		} 
+		b=yield a+','+c; // retorna el valor de "a" concatenado con "c" y en el siguiente next()recibe un valor para "b"
+		a++; 
+	} 
+	return 'yield terminados. Esto es el return.';
+} 
+
+var secuencia = gen();
+
+console.log(secuencia.next()); // Object { value="0,0",  done=false}
+console.log(secuencia.next()); // Object { value="1,0",  done=false}
+console.log(secuencia.next()); // Object { value="2,0",  done=false}
+console.log(secuencia.next(10)); // Object { value="10,1",  done=false} 
+console.log(secuencia.next()); // Object { value="11,1",  done=false}
+console.log(secuencia.next()); // Object { value="12,1",  done=false}
+console.log(secuencia.next(5)); // Object { value="5,2",  done=false} 
+console.log(secuencia.next()); // Object { value="6,2",  done=false}
+console.log(secuencia.next(19)); // Object { value="19,3",  done=false} 
+console.log(secuencia.next()); // Object { value="20,3",  done=false}
+console.log(secuencia.next()); // Object { value="yield terminados. Esto es el return.",  done=true}
+*/
+
+
+function *crearGenerador() {
+    let primero = yield 1;
+    let segundo = yield primero + 2;       // 4 + 2
+    yield segundo + 3;                   // 5 + 3
+}
+
+let generador = crearGenerador();
+
+console.log(generador.next());           // "{ value: 1, done: false }"
+console.log(generador.next(4));          // "{ value: 6, done: false }"
+console.log(generador.next(5));          // "{ value: 8, done: false }"
+console.log(generador.next());           // "{ value: undefined, done: true }"+
 
 
 
@@ -63,7 +108,7 @@ if (cluster.isMaster) {
 
   cluster.setupMaster({
 	  //exec: 'lecturaLog.js',
-	  exec: 'lecturaMarketData.js',
+	  exec: 'tendencias.js',
 	  args: [],
 	  silent: false
   });
