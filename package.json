@@ -40,6 +40,7 @@
     "rtmp-server": "^0.2.0",
     "socket.io": "^2.0.3",
     "techan": "^0.8.0",
+    "technicalindicators": "^1.0.20",
     "websocket": "^1.0.24",
     "ws": "^3.1.0"
   }

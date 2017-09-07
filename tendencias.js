@@ -1,6 +1,9 @@
 var fs = require('fs');
 var fs2 = require('fs');
 var EventEmitter = require('events').EventEmitter;
+const Stochastic = require('technicalindicators').Stochastic;
+
+
 
 const cluster = require('cluster');
 var arr;
@@ -284,7 +287,7 @@ function fnVelaNueva(dato){
 					if(estocasticoK > estocasticoD && estocasticoK < 20 && estocasticoD < 20 && arrEstocasticoD[arrEstocasticoD.length - 1] > arrEstocasticoK[arrEstocasticok.length - 1]){
 
 					} else if(estocasticoK < estocasticoD && estocasticoK > 80 && estocasticoD > 80 && arrEstocasticoD[arrEstocasticoD.length - 1] < arrEstocasticoK[arrEstocasticok.length - 1]){
-						
+
 					}
 				/******** FIN SEÑALES Estocastico *********/
 
