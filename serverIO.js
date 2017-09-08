@@ -55,7 +55,17 @@ console.log(generador.next(4));          // "{ value: 6, done: false }"
 console.log(generador.next(5));          // "{ value: 8, done: false }"
 console.log(generador.next());           // "{ value: undefined, done: true }"+
 
+var BufferClass = function(){
+	
+	console.log(this.x)
+}
 
+BufferClass.prototype.x = 2;
+
+
+/*var h = new BufferClass();
+console.log(h.x);
+*/
 
 var objLecturaLog = {};
 var objLecturaLogPersistente = {};
@@ -107,8 +117,8 @@ if (cluster.isMaster) {
   
 
   cluster.setupMaster({
-	  //exec: 'lecturaLog.js',
-	  exec: 'tendencias.js',
+	  exec: 'lecturaLog.js',
+	  //exec: 'tendencias.js',
 	  args: [],
 	  silent: false
   });

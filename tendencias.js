@@ -67,6 +67,53 @@ function fnInicial(dato){
 }
 
 
+function fnSignals(){
+	valorWMA = wma.nextValue(vela.close);
+	valorSMA = smaProducer.nextValue(vela.close);
+	
+	objFunciones[signalIni](valorWMA, valorSMA);
+	
+	
+	return;
+}
+
+var arrCruceSMAWMA = [];
+/*
+var BufferClass = function(){}
+
+BufferClass.prototype.nivel = 2;
+BufferClass.prototype.fnArrPush = function(arr){
+	
+}*/
+
+function fnSignalWait(valorWMA, valorSMA){
+	
+	if(arrVelaOperativa.length == 20){
+		signalIni = 'signalEnable';
+		objFunciones[signalIni](valorWMA, valorSMA);
+	}
+	
+}
+
+function fnArrCruceSMAWMA1(){
+	return false;
+}
+
+var objResultadoCruceWMASMA = {'1, -1': 'V', '-1, 1': 'C', '1, 1': false, '-1, -1': false, '0, 0': false, '-1, 0': false, '0, -1': false, '0, 1': false, '1, 0': false};
+
+function fnArrCruceSMAWMA2(){
+	
+	var res = objResultadoCruceWMASMA[arrCruceSMAWMA[0]/arrCruceSMAWMA[0] + ', ' +  arrCruceSMAWMA[1]/arrCruceSMAWMA[1]];
+	arrCruceSMAWMA.shift();
+	return res;
+}
+
+function fnSignalEnable(valorWMA, valorSMA){
+	arrCruceSMAWMA.push(valorSMA - valorWMA);
+	objFunciones['fnArrCruceSMAWMA' + arrCruceSMAWMA.length]()
+}
+
+
 function fnVelaNueva(dato){
 	//console.log('fnVelaNueva');
 	velaOperativa = {x: vela.date, y:[vela.open, vela.high, vela.low, vela.close]};
@@ -88,7 +135,11 @@ function fnVelaNueva(dato){
 	//console.log(smaProducer.nextValue(vela.close));
 	//console.log(wma.nextValue(vela.close));
 	//console.log(rsi.nextValue(vela.close));
-	console.log(macd.nextValue(vela.close));
+	//console.log(macd.nextValue(vela.close));
+	
+	if(fnSignals()){
+		
+	}
 	
 	//arrVelaFuerza2.push([vela2.date, vela2.low, vela2.open, vela2.close, vela2.high]);
 	arrVelaFuerza2.push({x: vela2.date, y: [vela2.open, vela2.high, vela2.low, vela2.close]});
@@ -193,6 +244,7 @@ var arrVelaOperativa2 = [];
 var arrVelaReferencia2 = [];
 var arrVelaFuerza2 = [];
 var arrMedia14 = [];
+var signalIni = 'signalWait';
 
 var objFunciones = {};
 objFunciones['ini'] = fnInicial;
@@ -202,6 +254,8 @@ objFunciones['2'] = fnVelaNormal;
 objFunciones['3'] = fnVelaNormal;
 objFunciones['4'] = fnVelaNormal;
 objFunciones['5'] = fnVelaNormal;
+objFunciones['signalWait'] = fnSignalWait;
+objFunciones['signalEnable'] = fnSignalEnable;
 
 
 
