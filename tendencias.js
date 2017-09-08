@@ -2,6 +2,10 @@ var fs = require('fs');
 var fs2 = require('fs');
 var EventEmitter = require('events').EventEmitter;
 const Stochastic = require('technicalindicators').Stochastic;
+var SMA = require('technicalindicators').SMA;
+var WMA = require('technicalindicators').WMA;
+var RSI = require('technicalindicators').RSI;
+var MACD = require('technicalindicators').MACD;
 var inputIni = {
 	  high: [],
 	  low: [],
@@ -10,6 +14,34 @@ var inputIni = {
 	  signalPeriod: 3
 	};
 var stochastic = new Stochastic(inputIni);
+var smaProducer = new SMA({period : 20, values : []});
+var wma = new WMA({
+      period : 10,
+      values : []
+    });
+	
+	
+var inputRSI = {
+  values : [],
+  period : 28
+};
+var rsi = new RSI(inputRSI);
+
+
+var macdInput = {
+  values            : [],
+  fastPeriod        : 24,
+  slowPeriod        : 52,
+  signalPeriod      : 18 ,
+  SimpleMAOscillator: false,
+  SimpleMASignal    : false
+}
+var macd = new MACD(macdInput);
+
+
+
+
+
 
 const cluster = require('cluster');
 var arr;
@@ -52,7 +84,11 @@ function fnVelaNueva(dato){
 	  signalPeriod: 3
 	};
 	
-	console.log(stochastic.nextValue(input));
+	//console.log(stochastic.nextValue(input));
+	//console.log(smaProducer.nextValue(vela.close));
+	//console.log(wma.nextValue(vela.close));
+	//console.log(rsi.nextValue(vela.close));
+	console.log(macd.nextValue(vela.close));
 	
 	//arrVelaFuerza2.push([vela2.date, vela2.low, vela2.open, vela2.close, vela2.high]);
 	arrVelaFuerza2.push({x: vela2.date, y: [vela2.open, vela2.high, vela2.low, vela2.close]});
