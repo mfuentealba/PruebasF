@@ -10,7 +10,7 @@ socket.on('fnAdd', function(arrMini){
   google.charts.setOnLoadCallback(function(){
     drawChart(arrMini);
   });*/
-  var chart = new CanvasJS.Chart("chartContainer",
+  /*var chart = new CanvasJS.Chart("chartContainer",
 	{
 		title:{
 			text: "Candle Stick chart using risingColor property"
@@ -65,16 +65,24 @@ socket.on('fnAdd', function(arrMini){
 			type: "line",
 			lineThickness:3,
 			showInLegend: true,           
-			name: "Data",
+			name: "SMA",
 			//axisYType:"secondary",
 			dataPoints: arrMini[3]
-		},
+		}
+		, {        
+			type: "line",
+			lineThickness:3,
+			showInLegend: true,           
+			name: "WMA",
+			//axisYType:"secondary",
+			dataPoints: arrMini[4]
+		}/*,
 		{
 			type: "candlestick",
 			risingColor: "#f0f0f0",
 			dataPoints: arrMini[0]
 			
-		}
+		}*/
 
 		]
 	});
