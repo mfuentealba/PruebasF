@@ -355,7 +355,7 @@ function fnVelaNormal(dato){
 	}
 }
 
-var arrFile = [/*"./marketdata/EURUSD-2016-01.csv", "./marketdata/EURUSD-2016-02.csv", "./marketdata/EURUSD-2016-03.csv", */"./marketdata/EURUSD-2016-04_1.csv"/*, "./marketdata/EURUSD-2016-04_2.csv"/*, "./marketdata/EURUSD-2016-05.csv", "./marketdata/EURUSD-2016-06.csv", "./marketdata/EURUSD-2016-07.csv", "./marketdata/EURUSD-2016-08.csv", "./marketdata/EURUSD-2016-09.csv", "./marketdata/EURUSD-2016-10.csv", "./marketdata/EURUSD-2016-11.csv"*/];
+var arrFile = ["./marketdata/EURUSD-2016-01.csv"/*, "./marketdata/EURUSD-2016-02.csv", "./marketdata/EURUSD-2016-03.csv", "./marketdata/EURUSD-2016-04_1.csv", "./marketdata/EURUSD-2016-04_2.csv"/*, "./marketdata/EURUSD-2016-05.csv", "./marketdata/EURUSD-2016-06.csv", "./marketdata/EURUSD-2016-07.csv", "./marketdata/EURUSD-2016-08.csv", "./marketdata/EURUSD-2016-09.csv", "./marketdata/EURUSD-2016-10.csv", "./marketdata/EURUSD-2016-11.csv"*/];
 
 var cnt = 0;
 
@@ -383,7 +383,7 @@ function fnLecturaArchivo(err, data){
 		var cont = 0;
 		ee.emit('ini', arr[0].split(','));
 		//for(let i in arr){
-		for(let i = 1; i < arr.length/13 - 1; i++){	
+		for(let i = 1; i < arr.length/1 - 1; i++){	
 			var dato = arr[i].split(',');
 			if(orden != null){
 				if(orden.tipo == 'C'){

@@ -29,7 +29,7 @@ var rsi = new RSI(inputRSI);
 var stoc;
 
 var rsiCalc;
-var MACDCalc;
+var macdCalc;
 
 var macdInput = {
   values            : [],
@@ -107,15 +107,31 @@ function fnArrCruceSMAWMA1(){
 var objResultadoCruceWMASMA = {'1, -1': 'fnEvaluaCompraEstocastico', '-1, 1': 'fnEvaluaVentaEstocastico', '1, 1': 'NO', '-1, -1': 'NO', '0, 0': 'NO', '-1, 0': 'NO', '0, -1': 'NO', '0, 1': 'NO', '1, 0': 'NO'};
 //var objResultadoCruceWMASMA = {'1, -1': 'fnCompra', '-1, 1': 'fnVenta', '1, 1': 'NO', '-1, -1': 'NO', '0, 0': 'NO', '-1, 0': 'NO', '0, -1': 'NO', '0, 1': 'NO', '1, 0': 'NO'};
 var objResultadoEstocastico = {'C1': 'fnEvaluaCompraRSI', 'C-1': 'NO', 'C0': 'NO', 'V1': 'NO', 'V-1': 'fnEvaluaVentaRSI', 'V0': 'NO'};
-var objResultadoRSI = {'C1': 'fnCompra', 'C-1': 'NO', 'C0': 'NO', 'V1': 'NO', 'V-1': 'fnVenta', 'V0': 'NO'};
+var objResultadoRSI = {'C1': 'fnEvaluaCompraMACD', 'C-1': 'NO', 'C0': 'NO', 'V1': 'NO', 'V-1': 'fnEvaluaVentaMACD', 'V0': 'NO'};
 var objResultadoMACD = {'C1, 1': 'fnCompra', 'V-1, -1': 'fnVenta'};
 
 function fnEvaluaCompraEstocastico(dato){
-	
+	if(orden != null){
+		if(orden.tipo == 'V'){
+			
+			orden.close = dato[3];
+			orden.vo.indexLabel = 'v';
+			orden.fin = vela2.date;
+			orden.obs = "señal";
+			orden.total = ((dato[3] - orden.open) * -100000) - 16;
+			if(orden.total < 0){
+				orden.vo.indexLabel = 'S';
+			}			
+		}
+	}
 	  
 	//console.log(stoc);
+	if(stoc.k < 30 && stoc.d < 30){
+		var res = objResultadoEstocastico['C' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];		
+	} else {
+		res = 'NO';
+	}
 	
-	var res = objResultadoEstocastico['C' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];	
 	console.log("***********fnEvaluaCompraEstocastico************* " + res);
 	res = objFunciones[res](dato);
 	return res;
@@ -124,7 +140,27 @@ function fnEvaluaCompraEstocastico(dato){
 
 
 function fnEvaluaVentaEstocastico(dato){
-	var res = objResultadoEstocastico['V' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];	
+	if(orden != null){
+		if(orden.tipo == 'C'){
+			
+			orden.close = dato[3];
+			orden.vo.indexLabel = 'c';
+			
+			orden.fin = vela.date;
+			orden.obs = 'señal';
+			orden.total = ((dato[3] - orden.open) * 100000) - 16;	
+			if(orden.total < 0){
+				orden.vo.indexLabel = 'L';
+			}
+			
+		}
+	}
+	if(stoc.k > 70 && stoc.d > 70){
+		var res = objResultadoEstocastico['V' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];	
+	} else {
+		res = 'NO';
+	}
+	
 	console.log("**********fnEvaluaVentaEstocastico***********" + res);
 	res = objFunciones[res](dato);
 	return res;
@@ -140,7 +176,7 @@ function fnEvaluaCompraRSI(dato){
 	
 	var res = objResultadoRSI['C' + (rsiCalc - 50) / Math.abs((rsiCalc - 50))];	
 	console.log("***********fnEvaluaCompraRSI************* " + res);
-	//res = objFunciones[res](dato);
+	res = objFunciones[res](dato);
 	return res;
 	
 }
@@ -149,7 +185,7 @@ function fnEvaluaCompraRSI(dato){
 function fnEvaluaVentaRSI(dato){
 	var res = objResultadoRSI['V' + (rsiCalc - 50) / Math.abs((rsiCalc - 50))];	
 	console.log("**********fnEvaluaVentaRSI***********" + res);
-	//res = objFunciones[res](dato);
+	res = objFunciones[res](dato);
 	return res;
 	
 	
@@ -161,17 +197,22 @@ function fnEvaluaCompraMACD(dato){
 	  
 	//console.log(stoc);
 	
-	/*var res = objResultadoMACD['C' + (macdCalc - 50) / Math.abs((macdCalc - 50))] ? : 'NO';	
-	console.log("***********fnEvaluaCompraRSI************* " + res);
+	var res = objResultadoMACD['C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] ? objResultadoMACD['C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] : 'NO';	
+	if(res == undefined){
+		res = 'NO'; 
+	}
+	console.log('C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)));
+	console.log("***********fnEvaluaCompraMACD************* " + res);
 	//res = objFunciones[res](dato);
 	return res;
-	*/
+	
 }
 
 
 function fnEvaluaVentaMACD(dato){
-	var res = objResultadoMACD['V' + (rsiCalc - 50) / Math.abs((rsiCalc - 50))];	
-	console.log("**********fnEvaluaVentaRSI***********" + res);
+	var res = objResultadoMACD['V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] ? objResultadoMACD['V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] : 'NO';
+	console.log('*****V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)) + "*******");
+	console.log("**********fnEvaluaVentaMACD***********" + res);
 	//res = objFunciones[res](dato);
 	return res;
 	
@@ -223,11 +264,12 @@ function fnVelaNueva(dato){
 	
 	stoc = stochastic.nextValue(input);
 	rsiCalc = rsi.nextValue(vela.close);
-	MACDCalc = macd.nextValue(vela.close);
+	macdCalc = macd.nextValue(vela.close);
 	//console.log(stochastic.nextValue(input));
 	//console.log(smaProducer.nextValue(vela.close));
 	//console.log(wma.nextValue(vela.close));
-	console.log(MACDCalc);
+	//console.log(macdCalc);
+	console.log(stoc);
 	//console.log(macd.nextValue(vela.close));
 	
 	fnSignals(dato);
@@ -359,13 +401,15 @@ objFunciones['fnEvaluaCompraEstocastico'] = fnEvaluaCompraEstocastico;
 objFunciones['fnEvaluaVentaEstocastico'] = fnEvaluaVentaEstocastico;
 objFunciones['fnEvaluaCompraRSI'] = fnEvaluaCompraRSI;
 objFunciones['fnEvaluaVentaRSI'] = fnEvaluaVentaRSI;
+objFunciones['fnEvaluaCompraMACD'] = fnEvaluaCompraMACD;
+objFunciones['fnEvaluaVentaMACD'] = fnEvaluaVentaMACD;
 objFunciones['NO'] = fnNo;
 
 
 
 function fnCompra(close){
 	var dato = close;
-	if(orden != null){
+	/*if(orden != null){
 		if(orden.tipo == 'C'){
 			
 			orden.close = dato[3];
@@ -390,7 +434,7 @@ function fnCompra(close){
 			}
 			
 		}
-	}
+	}*/
 	orden = {open: close[3], tipo: 'C'/*, fecIni: close[1]*/, ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000/*, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])*/};
 	velaOperativa.markerType = "circle";
 	orden.vo = velaOperativa;
@@ -405,7 +449,7 @@ function fnCompra(close){
 
 function fnVenta(close){
 	var dato = close;
-	if(orden != null){
+	/*if(orden != null){
 		if(orden.tipo == 'C'){
 			
 			orden.close = dato[3];
@@ -430,7 +474,7 @@ function fnVenta(close){
 			}
 			
 		}
-	}
+	}*/
 	orden = {open: close[3], tipo: 'V', /*fecIni: close[1], */ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000/*, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])*/};
 	velaOperativa.markerType = "circle";
 	orden.vo = velaOperativa;
@@ -452,7 +496,7 @@ process.on('message', (msg) => {
 	console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2016-02.csv", 'utf8', function(err, data) {
 		/*console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
@@ -547,7 +591,7 @@ process.on('message', (msg) => {
 			orden.fecFin = dato[1];
 			orden.fin = vela2.date;
 			orden.obs = "stopLoss";
-			orden.total = ((dato[3] - orden.open) * -100000) - 16;
+			orden.total = ((dato[3] - orden.open) * 100000 * (orden.tipo == 'V' ? -1 : 1)) - 16;
 			
 			//ee.on('orden', fnAbrirOrden);
 			orden = null;
