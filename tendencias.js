@@ -121,16 +121,25 @@ function fnEvaluaCompraEstocastico(dato){
 			orden.total = ((dato[3] - orden.open) * -100000) - 16;
 			if(orden.total < 0){
 				orden.vo.indexLabel = 'S';
-			}			
+			}	
+			if(stoc.k < 30 && stoc.d < 30){
+				var res = objResultadoEstocastico['C' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];		
+			} else {
+				res = 'NO';
+			}		
+		} else {
+			res = 'NO';
+		}
+	} else {
+		if(stoc.k < 30 && stoc.d < 30){
+			var res = objResultadoEstocastico['C' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];		
+		} else {
+			res = 'NO';
 		}
 	}
 	  
 	//console.log(stoc);
-	if(stoc.k < 30 && stoc.d < 30){
-		var res = objResultadoEstocastico['C' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];		
-	} else {
-		res = 'NO';
-	}
+	
 	
 	console.log("***********fnEvaluaCompraEstocastico************* " + res);
 	res = objFunciones[res](dato);
@@ -152,20 +161,43 @@ function fnEvaluaVentaEstocastico(dato){
 			if(orden.total < 0){
 				orden.vo.indexLabel = 'L';
 			}
-			
+			if(stoc.k > 70 && stoc.d > 70){
+				var res = objResultadoEstocastico['V' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];	
+			} else {
+				res = 'NO';
+			}	
+		} else {
+			res = 'NO';
+		}
+	} else {
+		if(stoc.k > 70 && stoc.d > 70){
+			var res = objResultadoEstocastico['V' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];	
+		} else {
+			res = 'NO';
 		}
 	}
-	if(stoc.k > 70 && stoc.d > 70){
-		var res = objResultadoEstocastico['V' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];	
-	} else {
-		res = 'NO';
-	}
+	
 	
 	console.log("**********fnEvaluaVentaEstocastico***********" + res);
 	res = objFunciones[res](dato);
 	return res;
 	
 	
+}
+
+function fnEvaluaEstocastico(dato){
+	
+	if(stoc.k > 70 && stoc.d > 70){
+		var res = objFunciones['fnEvaluaVentaEstocastico'](dato);	
+	} else if(stoc.k < 30 && stoc.d < 30){
+		var res = objFunciones['fnEvaluaCompraEstocastico'](dato);	
+	} else {
+		res = 'NO';
+	}
+	
+	console.log("**********fnEvaluaEstocastico***********" + res);
+	//res = objFunciones[res](dato);
+	return res;
 }
 
 
@@ -193,28 +225,38 @@ function fnEvaluaVentaRSI(dato){
 
 
 function fnEvaluaCompraMACD(dato){
-	
-	  
-	//console.log(stoc);
-	
-	var res = objResultadoMACD['C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] ? objResultadoMACD['C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] : 'NO';	
-	if(res == undefined){
-		res = 'NO'; 
+	try{
+		console.log(macdCalc);
+		
+		var res = objResultadoMACD['C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] ? objResultadoMACD['C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] : 'NO';	
+		if(res == undefined){
+			res = 'NO'; 
+		}
+		console.log('C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)));
+		console.log("***********fnEvaluaCompraMACD************* " + res);
+		//res = objFunciones[res](dato);
+		return res;
+	} catch(e){
+		return 'NO';
 	}
-	console.log('C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)));
-	console.log("***********fnEvaluaCompraMACD************* " + res);
-	//res = objFunciones[res](dato);
-	return res;
+	  
+	
 	
 }
 
 
 function fnEvaluaVentaMACD(dato){
-	var res = objResultadoMACD['V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] ? objResultadoMACD['V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] : 'NO';
-	console.log('*****V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)) + "*******");
-	console.log("**********fnEvaluaVentaMACD***********" + res);
-	//res = objFunciones[res](dato);
-	return res;
+	try{
+		console.log(macdCalc);
+		var res = objResultadoMACD['V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] ? objResultadoMACD['V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] : 'NO';
+		console.log('*****V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)) + "*******");
+		console.log("**********fnEvaluaVentaMACD***********" + res);
+		//res = objFunciones[res](dato);
+		return res;
+	} catch(e){
+		return 'NO';
+	}
+	
 	
 	
 }
@@ -234,7 +276,8 @@ function fnArrCruceSMAWMA2(dato){
 function fnSignalEnable(valorWMA, valorSMA, dato){
 	
 	arrCruceSMAWMA.push(valorSMA - valorWMA);
-	var sign = objFunciones['fnArrCruceSMAWMA' + arrCruceSMAWMA.length](dato);
+	//var sign = objFunciones['fnArrCruceSMAWMA' + arrCruceSMAWMA.length](dato);
+	var sign = objFunciones['fnEvaluaEstocastico'](dato);
 	console.log('*****fnSignalEnable****' + sign);
 	if(sign != 'NO'){
 		console.log('********' + sign);
@@ -399,6 +442,7 @@ objFunciones['fnCompra'] = fnCompra;
 objFunciones['fnVenta'] = fnVenta;
 objFunciones['fnEvaluaCompraEstocastico'] = fnEvaluaCompraEstocastico;
 objFunciones['fnEvaluaVentaEstocastico'] = fnEvaluaVentaEstocastico;
+objFunciones['fnEvaluaEstocastico'] = fnEvaluaEstocastico;
 objFunciones['fnEvaluaCompraRSI'] = fnEvaluaCompraRSI;
 objFunciones['fnEvaluaVentaRSI'] = fnEvaluaVentaRSI;
 objFunciones['fnEvaluaCompraMACD'] = fnEvaluaCompraMACD;
@@ -496,7 +540,7 @@ process.on('message', (msg) => {
 	console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/EURUSD-2016-02.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
 		/*console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
