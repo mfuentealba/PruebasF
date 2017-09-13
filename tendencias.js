@@ -1,3 +1,8 @@
+var abandonedbaby = require('technicalindicators').abandonedbaby;
+
+
+//var result        = AbandonedBaby.logic(threeDayInput);
+//console.log('Is Abandoned Baby : '+ result);
 var fs = require('fs');
 var fs2 = require('fs');
 var EventEmitter = require('events').EventEmitter;
@@ -122,26 +127,28 @@ function fnEvaluaCompraEstocastico(dato){
 			if(orden.total < 0){
 				orden.vo.indexLabel = 'S';
 			}	
-			if(stoc.k < 30 && stoc.d < 30){
+			console.log(orden);
+			orden = null;
+			//if(stoc.k < 70 && stoc.d < 70){
 				var res = objResultadoEstocastico['C' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];		
-			} else {
+			/*} else {
 				res = 'NO';
-			}		
+			}*/		
 		} else {
 			res = 'NO';
 		}
 	} else {
-		if(stoc.k < 30 && stoc.d < 30){
+		//if(stoc.k < 70 && stoc.d < 70){
 			var res = objResultadoEstocastico['C' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];		
-		} else {
+		/*} else {
 			res = 'NO';
-		}
+		}*/
 	}
 	  
-	//console.log(stoc);
+	////console.log(stoc);
 	
 	
-	console.log("***********fnEvaluaCompraEstocastico************* " + res);
+	////console.log("***********fnEvaluaCompraEstocastico************* " + res);
 	res = objFunciones[res](dato);
 	return res;
 	
@@ -161,24 +168,26 @@ function fnEvaluaVentaEstocastico(dato){
 			if(orden.total < 0){
 				orden.vo.indexLabel = 'L';
 			}
-			if(stoc.k > 70 && stoc.d > 70){
+			console.log(orden);
+			orden = null;
+			//if(stoc.k > 30 && stoc.d > 30){
 				var res = objResultadoEstocastico['V' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];	
-			} else {
+			/*} else {
 				res = 'NO';
-			}	
+			}*/	
 		} else {
 			res = 'NO';
 		}
 	} else {
-		if(stoc.k > 70 && stoc.d > 70){
+		//if(stoc.k > 30 && stoc.d > 30){
 			var res = objResultadoEstocastico['V' + (stoc.k - stoc.d) / Math.abs((stoc.k - stoc.d))];	
-		} else {
+		/*} else {
 			res = 'NO';
-		}
+		}*/
 	}
 	
 	
-	console.log("**********fnEvaluaVentaEstocastico***********" + res);
+	////console.log("**********fnEvaluaVentaEstocastico***********" + res);
 	res = objFunciones[res](dato);
 	return res;
 	
@@ -195,7 +204,7 @@ function fnEvaluaEstocastico(dato){
 		res = 'NO';
 	}
 	
-	console.log("**********fnEvaluaEstocastico***********" + res);
+	////console.log("**********fnEvaluaEstocastico***********" + res);
 	//res = objFunciones[res](dato);
 	return res;
 }
@@ -204,10 +213,10 @@ function fnEvaluaEstocastico(dato){
 function fnEvaluaCompraRSI(dato){
 	
 	  
-	//console.log(stoc);
+	////console.log(stoc);
 	
 	var res = objResultadoRSI['C' + (rsiCalc - 50) / Math.abs((rsiCalc - 50))];	
-	console.log("***********fnEvaluaCompraRSI************* " + res);
+	////console.log("***********fnEvaluaCompraRSI************* " + res);
 	res = objFunciones[res](dato);
 	return res;
 	
@@ -216,7 +225,7 @@ function fnEvaluaCompraRSI(dato){
 
 function fnEvaluaVentaRSI(dato){
 	var res = objResultadoRSI['V' + (rsiCalc - 50) / Math.abs((rsiCalc - 50))];	
-	console.log("**********fnEvaluaVentaRSI***********" + res);
+	////console.log("**********fnEvaluaVentaRSI***********" + res);
 	res = objFunciones[res](dato);
 	return res;
 	
@@ -226,14 +235,14 @@ function fnEvaluaVentaRSI(dato){
 
 function fnEvaluaCompraMACD(dato){
 	try{
-		console.log(macdCalc);
+		////console.log(macdCalc);
 		
 		var res = objResultadoMACD['C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] ? objResultadoMACD['C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] : 'NO';	
 		if(res == undefined){
 			res = 'NO'; 
 		}
-		console.log('C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)));
-		console.log("***********fnEvaluaCompraMACD************* " + res);
+		//console.log('C' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)));
+		//console.log("***********fnEvaluaCompraMACD************* " + res);
 		//res = objFunciones[res](dato);
 		return res;
 	} catch(e){
@@ -247,10 +256,10 @@ function fnEvaluaCompraMACD(dato){
 
 function fnEvaluaVentaMACD(dato){
 	try{
-		console.log(macdCalc);
+		//console.log(macdCalc);
 		var res = objResultadoMACD['V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] ? objResultadoMACD['V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal))] : 'NO';
-		console.log('*****V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)) + "*******");
-		console.log("**********fnEvaluaVentaMACD***********" + res);
+		//console.log('*****V' + (macdCalc.MACD / Math.abs(macdCalc.MACD)) + ', ' + (macdCalc.signal / Math.abs(macdCalc.signal)) + "*******");
+		//console.log("**********fnEvaluaVentaMACD***********" + res);
 		//res = objFunciones[res](dato);
 		return res;
 	} catch(e){
@@ -265,10 +274,10 @@ function fnEvaluaVentaMACD(dato){
 function fnArrCruceSMAWMA2(dato){
 	
 	var res = objResultadoCruceWMASMA[arrCruceSMAWMA[0]/Math.abs(arrCruceSMAWMA[0]) + ', ' +  arrCruceSMAWMA[1]/Math.abs(arrCruceSMAWMA[1])];
-//	console.log(arrCruceSMAWMA[0]/Math.abs(arrCruceSMAWMA[0]) + ', ' +  arrCruceSMAWMA[1]/Math.abs(arrCruceSMAWMA[1]));
+//	//console.log(arrCruceSMAWMA[0]/Math.abs(arrCruceSMAWMA[0]) + ', ' +  arrCruceSMAWMA[1]/Math.abs(arrCruceSMAWMA[1]));
 	arrCruceSMAWMA.shift();
-	console.log("*********fnArrCruceSMAWMA2*********** " + res);
-	//console.log(objResultadoEstocastico[res]);
+	//console.log("*********fnArrCruceSMAWMA2*********** " + res);
+	////console.log(objResultadoEstocastico[res]);
 	res = objFunciones[res](dato);
 	return res;
 }
@@ -276,11 +285,11 @@ function fnArrCruceSMAWMA2(dato){
 function fnSignalEnable(valorWMA, valorSMA, dato){
 	
 	arrCruceSMAWMA.push(valorSMA - valorWMA);
-	//var sign = objFunciones['fnArrCruceSMAWMA' + arrCruceSMAWMA.length](dato);
-	var sign = objFunciones['fnEvaluaEstocastico'](dato);
-	console.log('*****fnSignalEnable****' + sign);
+	var sign = objFunciones['fnArrCruceSMAWMA' + arrCruceSMAWMA.length](dato);
+	//var sign = objFunciones['fnEvaluaEstocastico'](dato);
+	//console.log('*****fnSignalEnable****' + sign);
 	if(sign != 'NO'){
-		console.log('********' + sign);
+		//console.log('********' + sign);
 		objFunciones[sign](dato);
 		
 	}
@@ -288,14 +297,28 @@ function fnSignalEnable(valorWMA, valorSMA, dato){
 }
 
 
+
+function fnEvaluaVelas(){
+	if(arrVelaOperativa2.length > 2){
+		var input = {
+		  open: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][0], arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][0], arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][0]],
+		  high: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][1], arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][1], arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][1]],
+		  close: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][3], arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][3], arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][3]],
+		  low: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][2], arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][2], arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][2]]
+		};
+		//var abandonedBaby = new AbandonedBaby ();
+		console.log(abandonedbaby(input));
+	}
+}
+
 function fnVelaNueva(dato){
-	//console.log('fnVelaNueva');
+	////console.log('fnVelaNueva');
 	velaOperativa = {x: vela.date, y:[vela.open, vela.high, vela.low, vela.close]};
 	dato[3] = Number(dato[3]);
 	//arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
-	//console.log(velaOperativa);
+	////console.log(velaOperativa);
 	arrVelaOperativa2.push(velaOperativa);
-	
+	fnEvaluaVelas();
 	
 	var input = {
 	  high: [vela.high],
@@ -308,12 +331,12 @@ function fnVelaNueva(dato){
 	stoc = stochastic.nextValue(input);
 	rsiCalc = rsi.nextValue(vela.close);
 	macdCalc = macd.nextValue(vela.close);
-	//console.log(stochastic.nextValue(input));
-	//console.log(smaProducer.nextValue(vela.close));
-	//console.log(wma.nextValue(vela.close));
-	//console.log(macdCalc);
-	console.log(stoc);
-	//console.log(macd.nextValue(vela.close));
+	////console.log(stochastic.nextValue(input));
+	////console.log(smaProducer.nextValue(vela.close));
+	////console.log(wma.nextValue(vela.close));
+	////console.log(macdCalc);
+	//console.log(stoc);
+	////console.log(macd.nextValue(vela.close));
 	
 	fnSignals(dato);
 		
@@ -326,8 +349,8 @@ function fnVelaNueva(dato){
 	
 	vela2 = {open: (vela2.open + vela2.close) / 2, close: (vela2.open + vela2.close) / 2, low: (vela2.open + vela2.close) / 2, high: (vela2.open + vela2.close) / 2};
 	
-	//console.log(vela);
-	//console.log(vela2);
+	////console.log(vela);
+	////console.log(vela2);
 	arrVelaFuerza.push(vela2)
 	arrVelaOperativa.push(vela);
 	vela.date = arrVelaFuerza.length;
@@ -448,7 +471,7 @@ objFunciones['fnEvaluaVentaRSI'] = fnEvaluaVentaRSI;
 objFunciones['fnEvaluaCompraMACD'] = fnEvaluaCompraMACD;
 objFunciones['fnEvaluaVentaMACD'] = fnEvaluaVentaMACD;
 objFunciones['NO'] = fnNo;
-
+objFunciones['fnVelas'] = fnEvaluaVelas;
 
 
 function fnCompra(close){
@@ -486,6 +509,17 @@ function fnCompra(close){
 	velaOperativa.markerColor = "brown";
 	velaOperativa.indexLabel = "C";
 	nStopLoss = 0;
+	
+	console.log("************************** INICIO ORDEN ****************************");
+	console.log(vela);
+	console.log(stoc);
+	console.log(rsiCalc);
+	console.log(macdCalc);
+	console.log(orden);
+	console.log("\n\n\n");
+	
+	
+	
 	//ee.removeAllListeners('orden');
 	//ee.on('orden', fnCerrarOrdenCompra);
 	arrOrdenes.push(orden);
@@ -528,6 +562,16 @@ function fnVenta(close){
 	nStopLoss = 0;
 	//ee.removeAllListeners('orden');
 	//ee.on('orden', fnCerrarOrdenVenta);
+	
+	console.log("************************** INICIO ORDEN ****************************");
+	console.log(vela);
+	console.log(stoc);
+	console.log(rsiCalc);
+	console.log(macdCalc);
+	console.log(orden);
+	console.log("\n\n\n");
+	
+	
 	arrOrdenes.push(orden);
 	}
 
@@ -535,16 +579,16 @@ function fnVenta(close){
 
 
 process.on('message', (msg) => {
-	console.log('inicio Proceso');
+	//console.log('inicio Proceso');
 	process.send({ cmd: 'inicio Proceso', data: process.pid });
-	console.log(msg + ' ' + process.pid);
+	//console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
 	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
-		/*console.log(fs);
+		/*//console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
-		console.log(err);
+		//console.log(err);
 		arr = data.split("\n");
 		arrVelaFuerza = [];
 		arrVelaFuerza2 = [];
@@ -557,7 +601,9 @@ process.on('message', (msg) => {
 		//for(let i in arr){
 		for(let i = 0; i < arr.length/1 - 1; i++){	
 			var dato = arr[i].split(',');
-			objFunciones[dato[1][13] % 5](dato);	
+			//objFunciones[dato[1][13] % 5](dato);	
+			//console.log(dato[1][12]);
+			objFunciones[dato[1][12]](dato);
 			if(orden != null){
 				if(orden.tipo == 'C'){
 					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss){
@@ -569,6 +615,7 @@ process.on('message', (msg) => {
 						if(orden.total < 0){
 							orden.vo.indexLabel = 'L';
 						}
+						console.log(orden);
 						//ee.on('orden', fnAbrirOrden);
 						orden = null;
 					} else {
@@ -599,6 +646,7 @@ process.on('message', (msg) => {
 						if(orden.total < 0){
 							orden.vo.indexLabel = 'S';
 						}
+						console.log(orden);
 						//ee.on('orden', fnAbrirOrden);
 						orden = null;
 					} else {
@@ -644,7 +692,7 @@ process.on('message', (msg) => {
 		
 		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "******************************************************************\n", (err) => {
 				if (err) throw err;
-					console.log('The "data to append" was appended to file!');
+					//console.log('The "data to append" was appended to file!');
 				});
 		
 		
@@ -652,7 +700,7 @@ process.on('message', (msg) => {
 		for(let i in arrOrdenes){//8624190
 			fs2.appendFileSync('./querysReconstruccion/ordenes.txt', JSON.stringify(arrOrdenes[i]) + "\n", (err) => {
 				if (err) throw err;
-					console.log('The "data to append" was appended to file!');
+					//console.log('The "data to append" was appended to file!');
 				});
 			try{
 				//total += Math.abs(arrOrdenes[i]['total']) > 1 ? arrOrdenes[i]['total'] : 0;
@@ -674,19 +722,19 @@ process.on('message', (msg) => {
 		}
 		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "TOTAL GRAL:: " + total +  "\n" +  "TOTAL BUENAS: " + totalPos +  "\n" +  "TOTAL MALAS: " + totalNeg +  "\nTOTAL COMPRAS: " + totalCompras +  "\n" +  "TOTAL VENTAS: " + totalVentas + "\n", (err) => {
 				if (err) throw err;
-					console.log('The "data to append" was appended to file!');
+					//console.log('The "data to append" was appended to file!');
 				});
 
 
 
 
-		console.log("FINALIZANDO");
+		//console.log("FINALIZANDO");
 		process.send({ cmd: 'fin proceso', data: process.pid });
 		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrSMA, arrWMA] });
 		
 	});
 	
-	console.log("FIN");
+	//console.log("FIN");
 	
 });
 process.send({ cmd: process.pid });
