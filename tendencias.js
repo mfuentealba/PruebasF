@@ -1,5 +1,31 @@
 var abandonedbaby = require('technicalindicators').abandonedbaby;
 
+var bearishengulfingpattern = require('technicalindicators').bearishengulfingpattern;
+var bullishengulfingpattern = require('technicalindicators').bullishengulfingpattern;
+var darkcloudcover = require('technicalindicators').darkcloudcover;
+var downsidetasukigap = require('technicalindicators').downsidetasukigap;
+//var Doji = require('technicalindicators').Doji;
+var dragonflydoji = require('technicalindicators').dragonflydoji;
+var gravestonedoji = require('technicalindicators').gravestonedoji;
+var bullishharami = require('technicalindicators').bullishharami;
+var bearishharamicross = require('technicalindicators').bearishharamicross;
+var bullishharamicross = require('technicalindicators').bullishharamicross;
+var bullishmarubozu = require('technicalindicators').bullishmarubozu;
+var bearishmarubozu = require('technicalindicators').bearishmarubozu;
+var eveningdojistar = require('technicalindicators').eveningdojistar;
+var eveningstar = require('technicalindicators').eveningstar;
+var bearishharami = require('technicalindicators').bearishharami;
+var piercingline = require('technicalindicators').piercingline;
+var bullishspinningtop = require('technicalindicators').bullishspinningtop;
+var bearishspinningtop = require('technicalindicators').bearishspinningtop;
+var morningdojistar = require('technicalindicators').morningdojistar;
+var morningstar = require('technicalindicators').morningstar;
+var threeblackcrows = require('technicalindicators').threeblackcrows;
+var threewhitesoldiers = require('technicalindicators').threewhitesoldiers;
+
+
+
+
 
 //var result        = AbandonedBaby.logic(threeDayInput);
 //console.log('Is Abandoned Baby : '+ result);
@@ -297,17 +323,202 @@ function fnSignalEnable(valorWMA, valorSMA, dato){
 }
 
 
+var arrEval = [];
 
-function fnEvaluaVelas(){
+
+function fnEvaluaVelas(dato){
 	if(arrVelaOperativa2.length > 2){
 		var input = {
-		  open: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][0], arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][0], arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][0]],
-		  high: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][1], arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][1], arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][1]],
-		  close: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][3], arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][3], arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][3]],
-		  low: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][2], arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][2], arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][2]]
+		  open: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][0] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][0] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][0] * 100000],
+		  high: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][1] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][1] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][1] * 100000],
+		  close: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][3] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][3] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][3] * 100000],
+		  low: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][2] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][2] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][2] * 100000]
 		};
 		//var abandonedBaby = new AbandonedBaby ();
-		console.log(abandonedbaby(input));
+		//console.log();
+		if(abandonedbaby(input)){
+			console.log('abandonedbaby');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = "1";
+		}
+		var sw = false;
+		if(bearishengulfingpattern(input)){
+			sw = true;
+			arrEval.push(2);
+			console.log('bearishengulfingpattern');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "2";
+		}
+		if(bullishengulfingpattern(input)){
+			sw = true;
+			arrEval.push(3);
+			console.log('bullishengulfingpattern');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "3";
+		}
+		if(darkcloudcover(input)){
+			console.log('darkcloudcover');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "4";
+		}
+		
+		
+		if(arrEval.length > 1 && sw){
+			if(arrEval[arrEval.length - 2] == arrEval[arrEval.length - 1]){
+				if(orden == null){
+					if(arrEval[arrEval.length - 2] == 2){
+						fnVenta(dato);
+					} else {
+						fnCompra(dato);
+					}	
+				}
+				
+				
+				
+				
+			} else {
+				if(orden != null){
+					if(orden.tipo == 'C'){
+						
+						orden.close = dato[3];
+						orden.vo.indexLabel = 'C';
+						
+						orden.fin = vela.date;
+						orden.obs = 'señal';
+						orden.total = ((dato[3] - orden.open) * 100000) - 16;	
+						if(orden.total < 0){
+							orden.vo.indexLabel = 'L';
+						}
+						console.log(orden);
+						orden = null;							
+					} else {
+						orden.close = dato[3];
+						orden.vo.indexLabel = 'v';
+						orden.fin = vela2.date;
+						orden.obs = "señal";
+						orden.total = ((dato[3] - orden.open) * -100000) - 16;
+						if(orden.total < 0){
+							orden.vo.indexLabel = 'S';
+						}	
+						console.log(orden);
+						orden = null;
+							
+					}
+				} else {
+					
+				}
+			}
+		}
+		
+		
+		
+		if(downsidetasukigap(input)){
+			console.log('downsidetasukigap');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "5";
+		}
+		/*if(dragonflydoji(input)){
+			console.log('dragonflydoji');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "6";
+		}
+		if(gravestonedoji(input)){
+			console.log('gravestonedoji');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "7";
+		}*/
+		if(bullishharami(input)){
+			console.log('bullishharami');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "8";
+		}
+		/*if(bearishharamicross(input)){
+			console.log('bearishharamicross');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "9";
+		}
+		if(bullishharamicross(input)){
+			console.log('bullishharamicross');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "10";
+		}
+		if(bullishmarubozu(input)){
+			console.log('bullishmarubozu');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "11";
+		}
+		if(bearishmarubozu(input)){
+			console.log('bearishmarubozu');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "12";
+		}
+		if(eveningdojistar(input)){
+			console.log('eveningdojistar');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "13";
+		}
+		if(bearishharami(input)){
+			console.log('bearishharami');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "14";
+		}
+		if(piercingline(input)){
+			console.log('piercingline');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "15";
+		}
+		if(bullishspinningtop(input)){
+			console.log('bullishspinningtop');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "16";
+		}
+		if(bearishspinningtop(input)){
+			console.log('bearishspinningtop');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "17";
+		}*/
+		if(morningdojistar(input)){
+			console.log('morningdojistar');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "18";
+		}
+		if(morningstar(input)){
+			console.log('morningstar');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "19";
+		}
+		/*if(threeblackcrows(input)){
+			console.log('threeblackcrows');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "20";
+		}
+		if(threewhitesoldiers(input)){
+			console.log('threewhitesoldiers');
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "21";
+		}*/
+		
 	}
 }
 
@@ -318,7 +529,7 @@ function fnVelaNueva(dato){
 	//arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
 	////console.log(velaOperativa);
 	arrVelaOperativa2.push(velaOperativa);
-	fnEvaluaVelas();
+	fnEvaluaVelas(dato);
 	
 	var input = {
 	  high: [vela.high],
@@ -338,7 +549,7 @@ function fnVelaNueva(dato){
 	//console.log(stoc);
 	////console.log(macd.nextValue(vela.close));
 	
-	fnSignals(dato);
+	//fnSignals(dato);
 		
 	
 	
@@ -584,7 +795,7 @@ process.on('message', (msg) => {
 	//console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/EURUSD-2016-01.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2016-02.csv", 'utf8', function(err, data) {
 		/*//console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
@@ -601,74 +812,9 @@ process.on('message', (msg) => {
 		//for(let i in arr){
 		for(let i = 0; i < arr.length/1 - 1; i++){	
 			var dato = arr[i].split(',');
-			//objFunciones[dato[1][13] % 5](dato);	
-			//console.log(dato[1][12]);
+			//objFunciones[dato[1][13] % 5](dato);				
 			objFunciones[dato[1][12]](dato);
-			if(orden != null){
-				if(orden.tipo == 'C'){
-					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss){
-						orden.close = dato[3];
-						orden.vo.indexLabel = 'c';					
-						orden.fin = vela.date;
-						orden.obs = ((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss ? "stopLoss" : 'señal';
-						orden.total = ((dato[3] - orden.open) * 100000) - 16;	
-						if(orden.total < 0){
-							orden.vo.indexLabel = 'L';
-						}
-						console.log(orden);
-						//ee.on('orden', fnAbrirOrden);
-						orden = null;
-					} else {
-						/*if(((dato[3] - orden.open) * 100000) - 16 > takeProfit){
-							orden.close = dato[3];
-							orden.fecFin = dato[1];
-							orden.fin = vela.date;
-							orden.obs = "takeProfit";
-							orden.total = ((dato[3] - orden.open) * 100000) - 16;	
-							ee.on('orden', fnAbrirOrden);
-							orden = null;
-						} else {*/
-							//if(((dato[3] - orden.open) * 100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 316 + nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 16 >= 50 ? (((dato[3] - orden.open) * 100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss) : 0) : ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss);
-								}
-							//}
-						//}
-					}
-				} else {
-					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss){
-						orden.close = dato[3];
-						//orden.fecFin = dato[1];
-						orden.vo.indexLabel = 'v';
-						orden.fin = vela2.date;
-						orden.obs = "stopLoss";
-						orden.total = ((dato[3] - orden.open) * -100000) - 16;
-						if(orden.total < 0){
-							orden.vo.indexLabel = 'S';
-						}
-						console.log(orden);
-						//ee.on('orden', fnAbrirOrden);
-						orden = null;
-					} else {
-						/*if(((dato[3] - orden.open) * -100000) - 16 > takeProfit){
-							orden.close = dato[3];
-							orden.fecFin = dato[1];
-							orden.fin = vela2.date;
-							orden.obs = "takeProfit";
-							orden.total = ((dato[3] - orden.open) * -100000) - 16;
-							ee.on('orden', fnAbrirOrden);
-							orden = null;
-						} else {*/
-							//if(((dato[3] - orden.open) * -100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 316 + nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 16 >= 50 ? (((dato[3] - orden.open) * -100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss) : 0) : ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss);
-								}
-							//}
-						//}
-					}
-				}
-			}
-
+			
 			
 		}
 		

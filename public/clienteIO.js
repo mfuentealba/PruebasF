@@ -76,13 +76,13 @@ socket.on('fnAdd', function(arrMini){
 			name: "WMA",
 			//axisYType:"secondary",
 			dataPoints: arrMini[4]
-		},
+		}/*,
 		{
 			type: "candlestick",
 			risingColor: "#f0f0f0",
 			dataPoints: arrMini[0]
 			
-		}
+		}*/
 
 		]
 	});
