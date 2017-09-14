@@ -107,7 +107,7 @@ function fnSignals(dato){
 	valorSMA = smaProducer.nextValue(vela.close);
 	arrSMA.push({x: vela.date, y:valorSMA});
 	arrWMA.push({x: vela.date, y:valorWMA});
-	objFunciones[signalIni](valorWMA, valorSMA, dato);
+	//objFunciones[signalIni](valorWMA, valorSMA, dato);
 	
 	
 	return;
@@ -370,11 +370,15 @@ function fnEvaluaVelas(dato){
 		if(arrEval.length > 1 && sw){
 			if(arrEval[arrEval.length - 2] == arrEval[arrEval.length - 1]){
 				if(orden == null){
-					if(arrEval[arrEval.length - 2] == 2){
-						fnVenta(dato);
-					} else {
-						fnCompra(dato);
-					}	
+					console.log(arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][1]  + " >= " + arrWMA[arrWMA.length - 1].y + " >= " + arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][2])
+					if(Number(arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][1]) >= Number(arrWMA[arrWMA.length - 1].y) && Number(arrWMA[arrWMA.length - 1].y) >=  Number(arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][2])){
+						if(arrEval[arrEval.length - 2] == 2){
+							fnVenta(dato);
+						} else {
+							fnCompra(dato);
+						}
+					}
+						
 				}
 				
 				
@@ -389,7 +393,8 @@ function fnEvaluaVelas(dato){
 						
 						orden.fin = vela.date;
 						orden.obs = 'señal';
-						orden.total = ((dato[3] - orden.open) * 100000) - 16;	
+						orden.total = (((dato[3] - orden.open) * 100000) - 16) * Math.abs(orden.tamVela);	
+						orden.totalReal = ((dato[3] - orden.open) * 100000) - 16;	
 						if(orden.total < 0){
 							orden.vo.indexLabel = 'L';
 						}
@@ -400,7 +405,8 @@ function fnEvaluaVelas(dato){
 						orden.vo.indexLabel = 'v';
 						orden.fin = vela2.date;
 						orden.obs = "señal";
-						orden.total = ((dato[3] - orden.open) * -100000) - 16;
+						orden.total = (((dato[3] - orden.open) * -100000) - 16) * Math.abs(orden.tamVela);
+						orden.totalReal = ((dato[3] - orden.open) * -100000) - 16;	
 						if(orden.total < 0){
 							orden.vo.indexLabel = 'S';
 						}	
@@ -549,7 +555,7 @@ function fnVelaNueva(dato){
 	//console.log(stoc);
 	////console.log(macd.nextValue(vela.close));
 	
-	//fnSignals(dato);
+	fnSignals(dato);
 		
 	
 	
@@ -687,104 +693,57 @@ objFunciones['fnVelas'] = fnEvaluaVelas;
 
 function fnCompra(close){
 	var dato = close;
-	/*if(orden != null){
-		if(orden.tipo == 'C'){
-			
-			orden.close = dato[3];
-			orden.vo.indexLabel = 'c';
-			
-			orden.fin = vela.date;
-			orden.obs = 'señal';
-			orden.total = ((dato[3] - orden.open) * 100000) - 16;	
-			if(orden.total < 0){
-				orden.vo.indexLabel = 'L';
-			}
-			
-		} else {
-			
-			orden.close = dato[3];
-			orden.vo.indexLabel = 'v';
-			orden.fin = vela2.date;
-			orden.obs = "señal";
-			orden.total = ((dato[3] - orden.open) * -100000) - 16;
-			if(orden.total < 0){
-				orden.vo.indexLabel = 'S';
-			}
-			
-		}
-	}*/
-	orden = {open: close[3], tipo: 'C'/*, fecIni: close[1]*/, ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000/*, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])*/};
-	velaOperativa.markerType = "circle";
-	orden.vo = velaOperativa;
-	velaOperativa.markerSize = 1000;
-	velaOperativa.markerColor = "brown";
-	velaOperativa.indexLabel = "C";
-	nStopLoss = 0;
+	if((vela2.close - vela2.open) * 100000 > 11){
+		orden = {open: close[3], tipo: 'C'/*, fecIni: close[1]*/, ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000/*, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])*/};
+		velaOperativa.markerType = "circle";
+		orden.vo = velaOperativa;
+		velaOperativa.markerSize = 1000;
+		velaOperativa.markerColor = "brown";
+		velaOperativa.indexLabel = "C";
+		nStopLoss = 0;
+		
+		console.log("************************** INICIO ORDEN ****************************");
+		console.log(vela);
+		console.log(stoc);
+		console.log(rsiCalc);
+		console.log(macdCalc);
+		console.log(orden);
+		console.log("\n\n\n");
+		
+		
+		
+		//ee.removeAllListeners('orden');
+		//ee.on('orden', fnCerrarOrdenCompra);
+		arrOrdenes.push(orden);
+	}
 	
-	console.log("************************** INICIO ORDEN ****************************");
-	console.log(vela);
-	console.log(stoc);
-	console.log(rsiCalc);
-	console.log(macdCalc);
-	console.log(orden);
-	console.log("\n\n\n");
-	
-	
-	
-	//ee.removeAllListeners('orden');
-	//ee.on('orden', fnCerrarOrdenCompra);
-	arrOrdenes.push(orden);
 }
 
 function fnVenta(close){
 	var dato = close;
-	/*if(orden != null){
-		if(orden.tipo == 'C'){
-			
-			orden.close = dato[3];
-			orden.vo.indexLabel = 'c';
-			
-			orden.fin = vela.date;
-			orden.obs = 'señal';
-			orden.total = ((dato[3] - orden.open) * 100000) - 16;	
-			if(orden.total < 0){
-				orden.vo.indexLabel = 'L';
-			}
-			
-		} else {
-			
-			orden.close = dato[3];
-			orden.vo.indexLabel = 'v';
-			orden.fin = vela2.date;
-			orden.obs = "señal";
-			orden.total = ((dato[3] - orden.open) * -100000) - 16;
-			if(orden.total < 0){
-				orden.vo.indexLabel = 'S';
-			}
-			
-		}
-	}*/
-	orden = {open: close[3], tipo: 'V', /*fecIni: close[1], */ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000/*, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])*/};
-	velaOperativa.markerType = "circle";
-	orden.vo = velaOperativa;
-	velaOperativa.markerSize = 1000;
-	velaOperativa.markerColor = "brown";
-	velaOperativa.indexLabel = "V";
-	nStopLoss = 0;
-	//ee.removeAllListeners('orden');
-	//ee.on('orden', fnCerrarOrdenVenta);
-	
-	console.log("************************** INICIO ORDEN ****************************");
-	console.log(vela);
-	console.log(stoc);
-	console.log(rsiCalc);
-	console.log(macdCalc);
-	console.log(orden);
-	console.log("\n\n\n");
-	
-	
-	arrOrdenes.push(orden);
+	if((vela2.close - vela2.open) * 100000 < -11){
+		orden = {open: close[3], tipo: 'V', /*fecIni: close[1], */ini: vela2.date, stopLoss: -316, tamVela: (vela2.close - vela2.open) * 100000, tamVelaAnt: (arrVelaFuerza[arrVelaFuerza.length - 2].close - arrVelaFuerza[arrVelaFuerza.length - 2].open) * 100000/*, pendienteOrden: (arrCalculoMedia14[arrCalculoMedia14.length - 1] - arrCalculoMedia14[arrCalculoMedia14.length - 2])*/};
+		velaOperativa.markerType = "circle";
+		orden.vo = velaOperativa;
+		velaOperativa.markerSize = 1000;
+		velaOperativa.markerColor = "brown";
+		velaOperativa.indexLabel = "V";
+		nStopLoss = 0;
+		
+		console.log("************************** INICIO ORDEN ****************************");
+		console.log((vela2.close - vela2.open) * 100000);
+		console.log(vela);
+		console.log(stoc);
+		console.log(rsiCalc);
+		console.log(macdCalc);
+		console.log(orden);
+		console.log("\n\n\n");
+		
+		
+		arrOrdenes.push(orden);	
 	}
+	
+}
 
 
 
@@ -795,11 +754,12 @@ process.on('message', (msg) => {
 	//console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/EURUSD-2016-02.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/EURUSD-2015-04.csv", 'utf8', function(err, data) {
+	//fs.readFile("./marketdata/NZDUSD-2016-04.csv", 'utf8', function(err, data) {
 		/*//console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
-		//console.log(err);
+		console.log(err);
 		arr = data.split("\n");
 		arrVelaFuerza = [];
 		arrVelaFuerza2 = [];
@@ -814,7 +774,36 @@ process.on('message', (msg) => {
 			var dato = arr[i].split(',');
 			//objFunciones[dato[1][13] % 5](dato);				
 			objFunciones[dato[1][12]](dato);
-			
+			/*if(orden != null){
+				if(orden.tipo == 'C'){
+					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 10000 < -3){
+						orden.close = dato[3];
+						orden.vo.indexLabel = 'c';
+						//orden.fecFin = dato[1];
+						orden.fin = vela.date;
+						orden.obs = ((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss ? "stopLoss" : 'señal';
+						orden.total = ((dato[3] - orden.open) * 100000) - 16;	
+						if(orden.total < 0){
+							orden.vo.indexLabel = 'L';
+						}
+						//ee.on('orden', fnAbrirOrden);
+						orden = null;
+				} else {
+					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 100000 > 3){
+						orden.close = dato[3];
+						//orden.fecFin = dato[1];
+						orden.vo.indexLabel = 'v';
+						orden.fin = vela2.date;
+						orden.obs = "stopLoss";
+						orden.total = ((dato[3] - orden.open) * -100000) - 16;
+						if(orden.total < 0){
+							orden.vo.indexLabel = 'S';
+						}
+						//ee.on('orden', fnAbrirOrden);
+						orden = null;
+				}
+					
+			}*/
 			
 		}
 		
@@ -877,6 +866,7 @@ process.on('message', (msg) => {
 		//console.log("FINALIZANDO");
 		process.send({ cmd: 'fin proceso', data: process.pid });
 		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrSMA, arrWMA] });
+		console.log(arrEval);
 		
 	});
 	
