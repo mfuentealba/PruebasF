@@ -91,9 +91,9 @@ var cont = 0;
 
 function fnInicial(dato){
 	dato[3] = Number(dato[3]);
-	vela = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
-	vela2 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
-	vela3 = {date: 1, open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
+	vela = {date: 1, open: dato[4], close: dato[4], low: dato[4], high: dato[4]};
+	vela2 = {date: 1, open: dato[4], close: dato[4], low: dato[4], high: dato[4]};
+	vela3 = {date: 1, open: dato[4], close: dato[4], low: dato[4], high: dato[4]};
 	
 	arrVelaOperativa.push(vela);
 	arrVelaFuerza.push(vela2);
@@ -531,7 +531,10 @@ function fnEvaluaVelas(dato){
 function fnVelaNueva(dato){
 	////console.log('fnVelaNueva');
 	velaOperativa = {x: vela.date, y:[vela.open, vela.high, vela.low, vela.close]};
+	dato[1] = Number(dato[1]);
+	dato[2] = Number(dato[2]);
 	dato[3] = Number(dato[3]);
+	dato[4] = Number(dato[4]);
 	//arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
 	////console.log(velaOperativa);
 	arrVelaOperativa2.push(velaOperativa);
@@ -562,7 +565,7 @@ function fnVelaNueva(dato){
 	//arrVelaFuerza2.push([vela2.date, vela2.low, vela2.open, vela2.close, vela2.high]);
 	arrVelaFuerza2.push({x: vela2.date, y: [vela2.open, vela2.high, vela2.low, vela2.close]});
 	
-	vela = {open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
+	vela = {open: dato[1], close: dato[4], low: dato[3], high: dato[2]};
 	
 	vela2 = {open: (vela2.open + vela2.close) / 2, close: (vela2.open + vela2.close) / 2, low: (vela2.open + vela2.close) / 2, high: (vela2.open + vela2.close) / 2};
 	
@@ -575,7 +578,7 @@ function fnVelaNueva(dato){
 	cont++;
 	if(cont == 4){
 		cont = 0;
-		vela3 = {open: dato[3], close: dato[3], low: dato[3], high: dato[3]};
+		vela3 = {open: dato[1], close: dato[4], low: dato[3], high: dato[2]};
 		arrVelaReferencia.push(vela3);
 		vela3.date = arrVelaReferencia.length;
 		//break;
@@ -585,19 +588,23 @@ function fnVelaNueva(dato){
 }
 
 function fnVelaNormal2(dato){
+	
+	dato[2] = Number(dato[2]);
 	dato[3] = Number(dato[3]);
-	vela.close = dato[3];
-	vela3.close = dato[3];
-	vela2.close = (dato[3] + vela2.open + vela2.low + vela2.high) / 4;
-	if(dato[3] > vela.high){
-		vela.high = dato[3];
+	dato[4] = Number(dato[4]);
+	vela.close = dato[4];
+	vela3.close = dato[4];
+	vela2.close = (dato[4] + vela2.open + vela2.low + vela2.high) / 4;
+	if(dato[2] > vela.high){
+		vela.high = dato[2];
 		
-	} else {
-		if(dato[3] < vela.low){
-			vela.low = dato[3];
-			
-		}
 	}
+
+	if(dato[3] < vela.low){
+		vela.low = dato[3];
+		
+	}
+	
 	if(vela2.close > vela2.high){
 		
 		vela2.high = vela2.close;
@@ -607,32 +614,36 @@ function fnVelaNormal2(dato){
 			vela2.low = vela2.close;
 		}
 	}
-	if(dato[3] > vela3.high){
+	if(dato[2] > vela3.high){
+		vela.high = dato[2];
 		
-		vela3.high = dato[3];
-	} else {
-		if(dato[3] < vela3.low){
-			vela3.low = dato[3];
-			
-		}
+	}
+	 
+	if(dato[3] < vela3.low){
+		vela.low = dato[3];
+		
 	}
 }//2134068
 
 function fnVelaNormal(dato){
 	objFunciones['0'] = fnVelaNueva;
+	
+	dato[2] = Number(dato[2]);
 	dato[3] = Number(dato[3]);
-	vela.close = dato[3];
-	vela3.close = dato[3];
-	vela2.close = (dato[3] + vela2.open + vela2.low + vela2.high) / 4;
-	if(dato[3] > vela.high){
-		vela.high = dato[3];
+	dato[4] = Number(dato[4]);
+	vela.close = dato[4];
+	vela3.close = dato[4];
+	vela2.close = (dato[4] + vela2.open + vela2.low + vela2.high) / 4;
+	if(dato[2] > vela.high){
+		vela.high = dato[2];
 		
-	} else {
-		if(dato[3] < vela.low){
-			vela.low = dato[3];
-			
-		}
 	}
+
+	if(dato[3] < vela.low){
+		vela.low = dato[3];
+		
+	}
+	
 	if(vela2.close > vela2.high){
 		
 		vela2.high = vela2.close;
@@ -642,14 +653,14 @@ function fnVelaNormal(dato){
 			vela2.low = vela2.close;
 		}
 	}
-	if(dato[3] > vela3.high){
+	if(dato[2] > vela3.high){
+		vela.high = dato[2];
 		
-		vela3.high = dato[3];
-	} else {
-		if(dato[3] < vela3.low){
-			vela3.low = dato[3];
-			
-		}
+	}
+	 
+	if(dato[3] < vela3.low){
+		vela.low = dato[3];
+		
 	}
 }
 
@@ -674,6 +685,7 @@ objFunciones['2'] = fnVelaNormal;
 objFunciones['3'] = fnVelaNormal;
 objFunciones['4'] = fnVelaNormal;
 objFunciones['5'] = fnVelaNormal;
+
 objFunciones['signalWait'] = fnSignalWait;
 objFunciones['signalEnable'] = fnSignalEnable;
 objFunciones['fnArrCruceSMAWMA1'] = fnArrCruceSMAWMA1;
@@ -754,13 +766,14 @@ process.on('message', (msg) => {
 	//console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/EURUSD-2015-04.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/DAT_NT_EURUSD_M1_2016.csv", 'utf8', function(err, data) {
 	//fs.readFile("./marketdata/NZDUSD-2016-04.csv", 'utf8', function(err, data) {
 		/*//console.log(fs);
 		fs.close(2, function(){});
 		delete fs;*/
 		console.log(err);
 		arr = data.split("\n");
+		console.log(arr.length);
 		arrVelaFuerza = [];
 		arrVelaFuerza2 = [];
 		arrVelaOperativa = [];
@@ -768,12 +781,12 @@ process.on('message', (msg) => {
 		arrVelaReferencia = [];
 		arrVelaReferencia2 = [];
 		var cont = 0;
-		objFunciones['ini'](arr[0].split(','));
+		objFunciones['ini'](arr[0].split(';'));
 		//for(let i in arr){
 		for(let i = 0; i < arr.length/1 - 1; i++){	
-			var dato = arr[i].split(',');
+			var dato = arr[i].split(';');
 			//objFunciones[dato[1][13] % 5](dato);				
-			objFunciones[dato[1][12]](dato);
+			objFunciones[dato[0][11]](dato);
 			/*if(orden != null){
 				if(orden.tipo == 'C'){
 					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 10000 < -3){

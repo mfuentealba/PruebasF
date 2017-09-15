@@ -118,7 +118,7 @@ if (cluster.isMaster) {
 
   cluster.setupMaster({
 	  //exec: 'lecturaLog.js',
-	  exec: 'tendencias.js',
+	  exec: 'tendencias.1.js',
 	  //exec: 'lecturaMarketData.js',
 	  args: [],
 	  silent: false
