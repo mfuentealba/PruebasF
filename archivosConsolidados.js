@@ -1,6 +1,10 @@
 var fs = require('fs');
 var fs2 = require('fs');
-var arrFiles = ["./marketdata/DAT_NT_EURUSD_M1_2000.csv", "./marketdata/DAT_NT_EURUSD_M1_2001.csv", "./marketdata/DAT_NT_EURUSD_M1_2002.csv", "./marketdata/DAT_NT_EURUSD_M1_2003.csv", "./marketdata/DAT_NT_EURUSD_M1_2004.csv", "./marketdata/DAT_NT_EURUSD_M1_2005.csv", "./marketdata/DAT_NT_EURUSD_M1_2006.csv", "./marketdata/DAT_NT_EURUSD_M1_2007.csv", "./marketdata/DAT_NT_EURUSD_M1_2008.csv", "./marketdata/DAT_NT_EURUSD_M1_2009.csv", "./marketdata/DAT_NT_EURUSD_M1_2010.csv", "./marketdata/DAT_NT_EURUSD_M1_2011.csv", "./marketdata/DAT_NT_EURUSD_M1_2012.csv"/*, "./marketdata/DAT_NT_EURUSD_M1_2013.csv", "./marketdata/DAT_NT_EURUSD_M1_2014.csv", "./marketdata/DAT_NT_EURUSD_M1_2015.csv", "./marketdata/DAT_NT_EURUSD_M1_2016.csv"*/];	
+//var arrFiles = ["./marketdata/DAT_NT_EURUSD_M1_2000.csv", "./marketdata/DAT_NT_EURUSD_M1_2001.csv", "./marketdata/DAT_NT_EURUSD_M1_2002.csv", "./marketdata/DAT_NT_EURUSD_M1_2003.csv", "./marketdata/DAT_NT_EURUSD_M1_2004.csv", "./marketdata/DAT_NT_EURUSD_M1_2005.csv", "./marketdata/DAT_NT_EURUSD_M1_2006.csv", "./marketdata/DAT_NT_EURUSD_M1_2007.csv", "./marketdata/DAT_NT_EURUSD_M1_2008.csv", "./marketdata/DAT_NT_EURUSD_M1_2009.csv", "./marketdata/DAT_NT_EURUSD_M1_2010.csv", "./marketdata/DAT_NT_EURUSD_M1_2011.csv", "./marketdata/DAT_NT_EURUSD_M1_2012.csv"/*, "./marketdata/DAT_NT_EURUSD_M1_2013.csv", "./marketdata/DAT_NT_EURUSD_M1_2014.csv", "./marketdata/DAT_NT_EURUSD_M1_2015.csv", "./marketdata/DAT_NT_EURUSD_M1_2016.csv"*/];	
+//var arrFiles = [/*"./marketdata/DAT_NT_GBPCHF_M1_2002.csv", "./marketdata/DAT_NT_GBPCHF_M1_2003.csv", "./marketdata/DAT_NT_GBPCHF_M1_2004.csv", "./marketdata/DAT_NT_GBPCHF_M1_2005.csv", "./marketdata/DAT_NT_GBPCHF_M1_2006.csv",*/ "./marketdata/DAT_NT_GBPCHF_M1_2007.csv", "./marketdata/DAT_NT_GBPCHF_M1_2008.csv", "./marketdata/DAT_NT_GBPCHF_M1_2009.csv", "./marketdata/DAT_NT_GBPCHF_M1_2010.csv"/*, "./marketdata/DAT_NT_GBPCHF_M1_2011.csv", "./marketdata/DAT_NT_GBPCHF_M1_2012.csv", "./marketdata/DAT_NT_GBPCHF_M1_2013.csv", "./marketdata/DAT_NT_GBPCHF_M1_2014.csv"/*, "./marketdata/DAT_NT_GBPCHF_M1_2015.csv", "./marketdata/DAT_NT_GBPCHF_M1_2016.csv"*/];	
+//var arrFiles = [ "./marketdata/DAT_NT_EURUSD_M1_2014.csv", "./marketdata/DAT_NT_EURUSD_M1_2015.csv", "./marketdata/DAT_NT_EURUSD_M1_2016.csv", "./marketdata/DAT_NT_EURUSD_M1_201701.csv", "./marketdata/DAT_NT_EURUSD_M1_201702.csv", "./marketdata/DAT_NT_EURUSD_M1_201703.csv", "./marketdata/DAT_NT_EURUSD_M1_201704.csv", "./marketdata/DAT_NT_EURUSD_M1_201705.csv", "./marketdata/DAT_NT_EURUSD_M1_201706.csv", "./marketdata/DAT_NT_EURUSD_M1_201707.csv", "./marketdata/DAT_NT_EURUSD_M1_201708.csv", "./marketdata/DAT_NT_EURUSD_M1_201709.csv"];	
+var arrFiles = [ "./marketdata/DAT_NT_EURAUD_M1_2015.csv", "./marketdata/DAT_NT_EURAUD_M1_2016.csv"];	
+
 function fnProcesaArchivos(cont){
 	if(cont == arrFiles.length){
 		return;
@@ -13,7 +17,7 @@ function fnProcesaArchivos(cont){
 		var arr = data.split("\n");
 		for(let i = 0; i < arr.length/1 - 1; i++){	
 			var dato = arr[i];
-			fs2.appendFileSync('./marketdata/DAT_NT_EURUSD_M1_TOTAL.csv', dato + "\n", (err) => {
+			fs2.appendFileSync('./marketdata/DAT_NT_EURAUD_M1_TOTAL.csv', dato + "\n", (err) => {
 				if (err) throw err;
 					//console.log('The "data to append" was appended to file!');
 				});

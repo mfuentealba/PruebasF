@@ -210,7 +210,9 @@ class SMA extends Indicator {
                     sum = sum + current;
                 }
                 else {
-                    sum = sum - list.shift() + current;
+                    var ant = list.shift();
+                    //console.log('sum:' + sum + ' - list.shift(): ' + ant + ' + current: ' + current)
+                    sum = sum - ant + current;
                     result = ((sum) / period);
                     list.push(current);
                 }
@@ -788,6 +790,7 @@ class BollingerBands extends Indicator {
     constructor(input) {
         super(input);
         var period = input.period;
+
         var priceArray = input.values;
         var stdDev = input.stdDev;
         var format = this.format;
@@ -801,9 +804,14 @@ class BollingerBands extends Indicator {
             var calcSMA;
             var calcsd;
             tick = yield;
+            //console.log('tick');
+            
             while (true) {
+                //console.log(tick);
                 calcSMA = sma$$1.nextValue(tick);
+                //console.log('calcSMA : ' + calcSMA + " " + sma$$1.period);
                 calcsd = sd$$1.nextValue(tick);
+                //console.log('calcsd : ' + calcsd);
                 if (calcSMA) {
                     let middle = format(calcSMA);
                     let upper = format(calcSMA + (calcsd * stdDev));
@@ -816,7 +824,9 @@ class BollingerBands extends Indicator {
                         pb: pb
                     };
                 }
+                //console.log('RESULT : ' + result);
                 tick = yield result;
+                //console.log(tick);
             }
         })();
         this.generator.next();
@@ -2201,6 +2211,8 @@ class CandlestickFinder {
     getAllPatternIndex(data) {
         
         if (data.close.length < this.requiredCount) {
+            /*console.log('*************getAllPatternIndex');
+            console.log(this);*/
             console.warn('Data count less than data required for the strategy ', this.name);
             return [];
         }
@@ -2221,6 +2233,8 @@ class CandlestickFinder {
     hasPattern(data) {
         //console.log(data);
         if (data.close.length < this.requiredCount) {
+            /*console.log(data);
+            console.log(this);*/
             console.warn('Data count less than data required for the strategy ', this.name);
             return false;
         }
@@ -2234,8 +2248,12 @@ class CandlestickFinder {
         return strategyFn.call(this, this._getLastDataForCandleStick(data));
     }
     _getLastDataForCandleStick(data) {
+        /*console.log("_getLastDataForCandleStick");
+        console.log(data);
+        console.log(this);*/
         let requiredCount = this.requiredCount;
         if (data.close.length === requiredCount) {
+            //console.log('OK');
             return data;
         }
         else {
@@ -2259,7 +2277,10 @@ class CandlestickFinder {
         }
     }
     _generateDataForCandleStick(data) {
+
         let requiredCount = this.requiredCount;
+        /*console.log('_generateDataForCandleStick');
+        console.log(this);*/
         let generatedData = data.close.map(function (currentData, index) {
             let i = 0;
             let returnVal = {
@@ -2352,6 +2373,46 @@ class BullishEngulfingPattern extends CandlestickFinder {
 }
 function bullishengulfingpattern(data) {
     return new BullishEngulfingPattern().hasPattern(data);
+}
+
+class ThreeOutSideUp extends CandlestickFinder {
+    constructor() {
+        super();
+        this.name = 'ThreeOutSideUp';
+        this.requiredCount = 3;
+    }
+    logic(data) {
+        let firstdaysOpen = data.open[0];
+        let firstdaysClose = data.close[0];
+        let firstdaysHigh = data.high[0];
+        let firstdaysLow = data.low[0];
+        let seconddaysOpen = data.open[1];
+        let seconddaysClose = data.close[1];
+        let seconddaysHigh = data.high[1];
+        let seconddaysLow = data.low[1];
+        let thirddaysOpen = data.open[2];
+        let thirddaysClose = data.close[2];
+        let thirddaysHigh = data.high[2];
+        let thirddaysLow = data.low[2];
+        
+        data.open.shift();
+        data.close.shift();
+        data.high.shift();
+        data.low.shift();
+        
+        let isBullishEngulfing = bullishengulfingpattern(data);
+        
+        let prom = data.prom;
+        let isthreeooutsideup = ((seconddaysClose <= thirddaysOpen) &&
+            (seconddaysClose < thirddaysClose) &&
+            (thirddaysOpen < thirddaysClose) &&
+            isBullishEngulfing);
+        return (isthreeooutsideup);
+    }
+}
+function threeOutSideUp(data) {
+    //console.log(data);
+    return new ThreeOutSideUp().hasPattern(data);
 }
 
 class BullishHarami extends CandlestickFinder {
@@ -2519,7 +2580,8 @@ class BullishMarubozu extends CandlestickFinder {
             this.approximateEqual(daysLow, daysOpen) &&
             daysOpen < daysClose &&
             daysOpen < daysHigh &&
-            tamVela > data.tamVelas * 5 / 3;
+            tamVela > data.tamVelas * 5 / 3/* &&
+            tamVela < data.tamVelas * 3*/;
         return (isBullishMarbozu);
     }
 }
@@ -2590,7 +2652,7 @@ function threewhitesoldiers(data) {
     return new ThreeWhiteSoldiers().hasPattern(data);
 }
 
-let bullishPatterns = [new BullishEngulfingPattern(), new DownsideTasukiGap(), new BullishHarami(), new BullishHaramiCross(),
+let bullishPatterns = [new BullishEngulfingPattern(), new ThreeOutSideUp(), new DownsideTasukiGap(), new BullishHarami(), new BullishHaramiCross(),
     new MorningDojiStar(), new MorningStar(), new BullishMarubozu(), new PiercingLine(), new ThreeWhiteSoldiers()];
 class BullishPatterns extends CandlestickFinder {
     constructor() {
@@ -2646,6 +2708,52 @@ function bearishengulfingpattern(data) {
     //console.log(data);
     return new BearishEngulfingPattern().hasPattern(data);
 }
+
+class ThreeOutSideDown extends CandlestickFinder {
+    constructor() {
+        super();
+        this.name = 'ThreeOutSideDown';
+        this.requiredCount = 3;
+    }
+    logic(data) {
+        //console.log('********************');
+        let firstdaysOpen = data.open[0];
+        let firstdaysClose = data.close[0];
+        let firstdaysHigh = data.high[0];
+        let firstdaysLow = data.low[0];
+        let seconddaysOpen = data.open[1];
+        let seconddaysClose = data.close[1];
+        let seconddaysHigh = data.high[1];
+        let seconddaysLow = data.low[1];
+        let thirddaysOpen = data.open[2];
+        let thirddaysClose = data.close[2];
+        let thirddaysHigh = data.high[2];
+        let thirddaysLow = data.low[2];
+        
+        data.open.shift();
+        data.close.shift();
+        data.high.shift();
+        data.low.shift();
+        
+        let isBearishEngulfing = bearishengulfingpattern(data);
+        
+        let prom = data.prom;
+        let isthreeooutsidedown = ((seconddaysClose >= thirddaysOpen) &&
+            (seconddaysClose > thirddaysClose) &&
+            (thirddaysOpen > thirddaysClose) &&
+            isBearishEngulfing);
+        return (isthreeooutsidedown);
+        //return false;
+    }
+}
+function threeOutSideDown(data) {
+    /*console.log('INI');
+    console.log(data);*/
+    return new ThreeOutSideDown().hasPattern(data);
+}
+
+
+
 
 class BearishHarami extends CandlestickFinder {
     constructor() {
@@ -2795,7 +2903,8 @@ class BearishMarubozu extends CandlestickFinder {
             this.approximateEqual(daysLow, daysClose) &&
             daysOpen > daysClose &&
             daysOpen > daysLow &&
-            tamVela > data.tamVelas * 5 / 3;
+            tamVela > data.tamVelas * 5 / 3/* &&
+            tamVela < data.tamVelas * 3*/;
         return (isBearishMarbozu);
     }
 }
@@ -2839,7 +2948,7 @@ function threeblackcrows(data) {
     return new ThreeBlackCrows().hasPattern(data);
 }
 
-let bearishPatterns = [new BearishEngulfingPattern(), new BearishHarami(), new BearishHaramiCross(), new EveningDojiStar(),
+let bearishPatterns = [new BearishEngulfingPattern(), new ThreeOutSideDown(), new BearishHarami(), new BearishHaramiCross(), new EveningDojiStar(),
     new EveningStar(), new BearishMarubozu(), new ThreeBlackCrows()];
 class BearishPatterns extends CandlestickFinder {
     constructor() {
@@ -2847,6 +2956,7 @@ class BearishPatterns extends CandlestickFinder {
         this.name = 'Bearish Candlesticks';
     }
     hasPattern(data) {
+        console.log('hhhhhh');
         return bearishPatterns.reduce(function (state, pattern) {
             return state || pattern.hasPattern(data);
         }, false);
@@ -3081,7 +3191,9 @@ function getAvailableIndicators () {
   AvailableIndicators.push('abandonedbaby');
   AvailableIndicators.push('doji');
   AvailableIndicators.push('bearishengulfingpattern');
+  AvailableIndicators.push('threeOutSideDown');
   AvailableIndicators.push('bullishengulfingpattern');
+  AvailableIndicators.push('threeOutSideUp');
   AvailableIndicators.push('darkcloudcover');
   AvailableIndicators.push('downsidetasukigap');
   AvailableIndicators.push('dragonflydoji');
@@ -3161,7 +3273,9 @@ exports.bearish = bearish;
 exports.abandonedbaby = abandonedbaby;
 exports.doji = doji;
 exports.bearishengulfingpattern = bearishengulfingpattern;
+exports.threeOutSideDown = threeOutSideDown;
 exports.bullishengulfingpattern = bullishengulfingpattern;
+exports.threeOutSideUp = threeOutSideUp;
 exports.darkcloudcover = darkcloudcover;
 exports.downsidetasukigap = downsidetasukigap;
 exports.dragonflydoji = dragonflydoji;

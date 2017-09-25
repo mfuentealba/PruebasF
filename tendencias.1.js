@@ -22,9 +22,31 @@ var morningdojistar = require('./technicalindicators.js').morningdojistar;
 var morningstar = require('./technicalindicators.js').morningstar;
 var threeblackcrows = require('./technicalindicators.js').threeblackcrows;
 var threewhitesoldiers = require('./technicalindicators.js').threewhitesoldiers;
+var threeoutsidedown = require('./technicalindicators.js').threeOutSideDown;
+var threeoutsideup = require('./technicalindicators.js').threeOutSideUp;
 
-var cuenta = 1000;
+var BB = require('./technicalindicators.js').BollingerBands;
 
+var period = 14
+
+var ini = {
+period : period, 
+values : [] ,
+stdDev : 2
+    
+}
+
+var bb = new BB(ini);
+var bbGraf;
+var loteMin = 0.01;
+var loteMax = 500;
+var loteFijo = false;
+
+
+
+var cuenta = 100;
+var ponderado = .1;
+var spread = 27;
 
 
 
@@ -78,7 +100,9 @@ var macd = new MACD(macdInput);
 var arrOrdenes = [];
 var arrSMA = [];
 var arrWMA = [];
-
+var arrUpper = [];
+var arrLower = [];
+var arrMiddle = [];
 
 const cluster = require('cluster');
 var arr;
@@ -100,7 +124,11 @@ function fnInicial(dato){
 	arrVelaOperativa.push(vela);
 	arrVelaFuerza.push(vela2);
 	arrVelaReferencia.push(vela3);
-	
+	/*bbGraf = bb.nextValue(Number(vela.close));
+	arrLower.push(bbGraf.lower);
+	arrMiddle.push(bbGraf.middle);
+	arrUpper.push(bbGraf.upper);
+*/
 }
 
 
@@ -330,7 +358,7 @@ var arrEval = [];
 var arrTamVelas = [];
 var tamVelas = 0;
 
-var ponderado = 1;
+
 function fnCalcCuenta(cierre){
 	if(cuenta > 0){
 		let garantia = cuenta / 10;
@@ -338,7 +366,19 @@ function fnCalcCuenta(cierre){
 		if(cuenta < garantia){
 			cuenta = -1;
 		} else {
-			ponderado = cuenta / 1000 > 20 ? 20 : cuenta / 1000; 
+			if(!loteFijo){
+				if(cuenta / 1000 > loteMax){
+					ponderado = loteMax;
+				} else {
+					if(cuenta / 1000 < loteMin){
+						ponderado = loteMin;
+					} else {
+						ponderado = cuenta / 1000;
+					}
+	
+				}
+			}
+						
 		}
 	}
 }
@@ -375,14 +415,22 @@ function fnEvaluaVelas(dato){
 		//console.log(tamVelas);
 		//console.log(input);
 		sw = false;
-		if(abandonedbaby(input)){
+		/*if(abandonedbaby(input)){
 			console.log('abandonedbaby');
 			velaOperativa.markerSize = 1000;
 			velaOperativa.markerColor = "brown";
 			velaOperativa.indexLabel = "1";
-		}
-		
+		}*/
+		//console.log('RES:  ' + threeoutsidedown(input));
+		input = {
+			open: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][0] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][0] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][0] * 100000],
+			high: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][1] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][1] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][1] * 100000],
+			close: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][3] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][3] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][3] * 100000],
+			low: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][2] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][2] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][2] * 100000],
+			tamVelas: tamVelas * 100000
+		  };
 		if(bearishengulfingpattern(input)){
+		//if(threeoutsidedown(input)){
 			/*console.log('****************stoc********************');
 			console.log("vela: " + velaOperativa.x);
 			console.log(stoc);*/
@@ -393,7 +441,15 @@ function fnEvaluaVelas(dato){
 			velaOperativa.markerColor = "brown";
 			velaOperativa.indexLabel = (velaOperativa.indexLabel != null ? '-' : '') + "2";
 		}
+		input = {
+			open: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][0] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][0] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][0] * 100000],
+			high: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][1] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][1] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][1] * 100000],
+			close: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][3] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][3] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][3] * 100000],
+			low: [arrVelaOperativa2[arrVelaOperativa2.length - 3]['y'][2] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 2]['y'][2] * 100000, arrVelaOperativa2[arrVelaOperativa2.length - 1]['y'][2] * 100000],
+			tamVelas: tamVelas * 100000
+		  };
 		if(bullishengulfingpattern(input)){
+		//if(threeoutsideup(input)){
 			sw = true;
 			arrEval.push(3);
 			console.log('bullishengulfingpattern');
@@ -403,10 +459,10 @@ function fnEvaluaVelas(dato){
 		}
 	
 		
-		
+		/*
 		
 		if(orden != null){
-			if((orden.tipo == 'C' && stoc.k > 80 && stoc.d > 80) /*|| arrEval[arrEval.length - 1] == 2*/){
+			if((orden.tipo == 'C' && stoc.k > 80 && stoc.d > 80) ){
 				
 				orden.close = dato[3];
 				//orden.vo.indexLabel = 'C';
@@ -425,7 +481,7 @@ function fnEvaluaVelas(dato){
 				console.log(orden);
 				orden = null;							
 				//sw = true;
-			} else if((orden.tipo == 'V' && stoc.k < 20 && stoc.d < 20) /*|| arrEval[arrEval.length - 1] == 3*/){
+			} else if((orden.tipo == 'V' && stoc.k < 20 && stoc.d < 20)){
 				orden.close = dato[3];
 				//orden.vo.indexLabel = 'v';
 				orden.fin = vela2.date;
@@ -441,12 +497,10 @@ function fnEvaluaVelas(dato){
 				orden = null;
 				//sw = true;
 					
-			}/* else {
-				sw = false;
-			}*/
+			}
 		}
 
-
+		*/
 
 		/*if(darkcloudcover(input)){
 			console.log('darkcloudcover');
@@ -604,15 +658,15 @@ function fnVelaNueva(dato){
 	
 	if(orden != null){
 		if(orden.tipo == 'C'){
-			if((((vela.close - orden.open) * 100000) - 16) * orden.lote < orden.stopLoss){
+			if((((vela.close - orden.open) * 100000) - spread) * orden.lote < orden.stopLoss){
 				orden.close = vela.open;
 				orden.vo.indexLabel = 'C';
 				//orden.fecFin = dato[1];
 				orden.fin = vela.date;
-				orden.obs = ((vela.open - orden.open) * 100000) - 16 < orden.stopLoss ? "stopLoss" : 'señal';
+				orden.obs = ((vela.open - orden.open) * 100000) - spread < orden.stopLoss ? "stopLoss" : 'señal';
 				orden.total = orden.stopLoss;//((vela.open - orden.open) * 100000) - 16;	
 				orden.totalReal = orden.stopLoss;//((vela.open - orden.open) * 100000) - 16;	
-				orden.max = ((vela.high - orden.open) * 100000) - 16;
+				orden.max = ((vela.high - orden.open) * 100000) - spread;
 				fnCalcCuenta(orden.stopLoss);
 				if(orden.total < 0){
 					orden.vo.indexLabel = 'L';
@@ -621,12 +675,12 @@ function fnVelaNueva(dato){
 				//ee.on('orden', fnAbrirOrden);
 				orden = null;
 			} else {
-				if((((vela.close - orden.open) * 100000) - 16) * orden.lote > (40 * orden.lote)){
+				if((((vela.close - orden.open) * 100000) - spread) * orden.lote > (40 * orden.lote)){
 					if(orden.stopLoss < 0){
 						orden.stopLoss = 0;
 					} else {
-						if((((vela.close - orden.open) * 100000) - 16) * orden.lote - (40 * orden.lote) > orden.stopLoss){
-							orden.stopLoss = (((vela.close - orden.open) * 100000) - 16) * orden.lote - (40 * orden.lote);
+						if((((vela.close - orden.open) * 100000) - spread) * orden.lote - (40 * orden.lote) > orden.stopLoss){
+							orden.stopLoss = (((vela.close - orden.open) * 100000) - spread) * orden.lote - (40 * orden.lote);
 						}
 						
 					}
@@ -635,7 +689,7 @@ function fnVelaNueva(dato){
 		} else {
 			//console.log(dato[1] + " - " + orden.open + " = " + ((dato[1] - orden.open) * -100000));
 			
-			if((((vela.close - orden.open) * -100000) - 16) * orden.lote < orden.stopLoss){
+			if((((vela.close - orden.open) * -100000) - spread) * orden.lote < orden.stopLoss){
 				console.log(dato);
 				console.log("eval=" + vela.close + " - " + orden.open + " = " + ((vela.close - orden.open) * -100000));
 				console.log(vela.open + " - " + orden.open + " * -100000= " + ((vela.open - orden.open) * -100000));
@@ -647,7 +701,7 @@ function fnVelaNueva(dato){
 				console.log(vela.open + " - " + orden.open + " = " + ((vela.open - orden.open) * -100000));
 				orden.total = orden.stopLoss;//((vela.open - orden.open) * -100000) - 16;
 				orden.totalReal = orden.stopLoss;//((vela.open - orden.open) * -100000) - 16;
-				orden.max = ((vela.low - orden.open) * -100000) - 16;
+				orden.max = ((vela.low - orden.open) * -100000) - spread;
 				fnCalcCuenta(orden.stopLoss);
 				if(orden.total < 0){
 					orden.vo.indexLabel = 'S';
@@ -656,12 +710,12 @@ function fnVelaNueva(dato){
 				//ee.on('orden', fnAbrirOrden);
 				orden = null;
 			} else {
-				if((((vela.close - orden.open) * -100000) - 16) * orden.lote > (40 * orden.lote)){
+				if((((vela.close - orden.open) * -100000) - spread) * orden.lote > (40 * orden.lote)){
 					if(orden.stopLoss < 0){
 						orden.stopLoss = 0;
 					} else {
-						if((((vela.close - orden.open) * -100000) - 16) * orden.lote - (40 * orden.lote) > orden.stopLoss){
-							orden.stopLoss = (((vela.close - orden.open) * -100000) - 16) * orden.lote - (40 * orden.lote);
+						if((((vela.close - orden.open) * -100000) - spread) * orden.lote - (40 * orden.lote) > orden.stopLoss){
+							orden.stopLoss = (((vela.close - orden.open) * -100000) - spread) * orden.lote - (40 * orden.lote);
 						}
 						
 					}
@@ -671,7 +725,14 @@ function fnVelaNueva(dato){
 	
 	}
 
+	bbGraf = bb.nextValue(Number(vela.close));
+	console.log(bbGraf);
+	if(bbGraf){
+		arrUpper.push({x: vela.date, y: bbGraf.upper});
+		arrLower.push({x: vela.date, y: bbGraf.lower});
+		arrMiddle.push({x: vela.date, y: bbGraf.middle});
 
+	}
 
 
 	fnEvaluaVelas(dato);
@@ -689,7 +750,7 @@ function fnVelaNueva(dato){
 	arrStoc.push(stoc);
 	rsiCalc = rsi.nextValue(vela.close);
 	macdCalc = macd.nextValue(vela.close);
-	////console.log(stochastic.nextValue(input));
+	
 	////console.log(smaProducer.nextValue(vela.close));
 	////console.log(wma.nextValue(vela.close));
 	////console.log(macdCalc);
@@ -843,68 +904,73 @@ objFunciones['fnVelas'] = fnEvaluaVelas;
 
 function fnCompra(close){
 	var dato = close;
-	//if(stoc.k < 20 && stoc.d < 20){
-	if(cuenta > 0){
-		console.log(arrStoc[arrStoc.length - 2]);
-		console.log(arrStoc[arrStoc.length - 1]);
-		
-		orden = {open: close[3], tipo: 'C', ini: vela2.date, velaP1: arrVelaOperativa[arrVelaOperativa.length - 2], velaP2: arrVelaOperativa[arrVelaOperativa.length - 1], vela1: arrStoc[arrStoc.length - 2], vela2: arrStoc[arrStoc.length - 1]};
-		velaOperativa.markerType = "circle";
-		orden.vo = velaOperativa;
-		velaOperativa.markerSize = 1000;
-		velaOperativa.markerColor = "brown";
-		velaOperativa.indexLabel = "C";
-		orden.stopLoss = -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26 < -316 ? -316 : -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26;
-		//orden.stopLoss = -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26;
-		nStopLoss = 0;
-		orden.lote = ponderado;
-		console.log("************************** INICIO ORDEN ****************************");
-		console.log(vela);
-		console.log(stoc);
-		console.log(rsiCalc);
-		console.log(macdCalc);
-		console.log(orden);
-		console.log("\n\n\n");
-		
-		
-		
-		//ee.removeAllListeners('orden');
-		//ee.on('orden', fnCerrarOrdenCompra);
-		arrOrdenes.push(orden);
-	}
+	//if(bbGraf && bbGraf.upper > arrVelaOperativa[arrVelaOperativa.length - 1].close){
+		if(cuenta > 0){
+			console.log(arrStoc[arrStoc.length - 2]);
+			console.log(arrStoc[arrStoc.length - 1]);
+			
+			orden = {open: close[3], tipo: 'C', ini: vela2.date, bollierg: (bbGraf && bbGraf.upper < vela.close ? true : false), valBoll: (bbGraf ? bbGraf.upper : 'none'), vela: arrVelaOperativa[arrVelaOperativa.length - 1], bbGraf: bbGraf};
+			velaOperativa.markerType = "circle";
+			orden.vo = velaOperativa;
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = "C";
+			orden.stopLoss = (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26) * ponderado < -316 * ponderado ? -316 * ponderado : (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - spread - 10) * ponderado;
+			//orden.stopLoss = -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26 < -316 ? -316 : arrVelaOperativa[arrVelaOperativa.length - 2].close - 0.00026;
+			nStopLoss = 0;
+			orden.lote = ponderado;
+			console.log("************************** INICIO ORDEN ****************************");
+			console.log(vela);
+			console.log(stoc);
+			console.log(rsiCalc);
+			console.log(macdCalc);
+			console.log(orden);
+			console.log("\n\n\n");
+			
+			
+			
+			//ee.removeAllListeners('orden');
+			//ee.on('orden', fnCerrarOrdenCompra);
+			arrOrdenes.push(orden);
+		}
+	//}
+	
 	
 }
 
 function fnVenta(close){
 	var dato = close;
 	//if((vela2.close - vela2.open) * 100000 < -11){
-	//if(stoc.k > 80 && stoc.d > 80){
-	if(cuenta > 0){
-		console.log(arrStoc[arrStoc.length - 2]);
-		console.log(arrStoc[arrStoc.length - 1]);
-		//console.log(vela2.close - vela2.open);
-		orden = {open: Number(close[3]), tipo: 'V', ini: vela2.date, velaP1: arrVelaOperativa[arrVelaOperativa.length - 2], velaP2: arrVelaOperativa[arrVelaOperativa.length - 1], vela1: arrStoc[arrStoc.length - 2], vela2: arrStoc[arrStoc.length - 1]};
-		velaOperativa.markerType = "circle";
-		orden.vo = velaOperativa;
-		velaOperativa.markerSize = 1000;
-		velaOperativa.markerColor = "brown";
-		velaOperativa.indexLabel = "V";
-		nStopLoss = 0;
-		orden.lote = ponderado;
-		orden.stopLoss = -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26 < -316 ? -316 : -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26;
-		//orden.stopLoss = -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26;
-		console.log("************************** INICIO ORDEN ****************************");
-		//console.log((vela2.close - vela2.open) * 100000);
-		console.log(vela);
-		console.log(stoc);
-		console.log(rsiCalc);
-		console.log(macdCalc);
-		console.log(orden);
-		console.log("\n\n\n");
-		
-		
-		arrOrdenes.push(orden);	
-	}
+		console.log(bbGraf);
+	//if(bbGraf && bbGraf.lower < arrVelaOperativa[arrVelaOperativa.length - 1].close){
+		if(cuenta > 0){
+			console.log(arrStoc[arrStoc.length - 2]);
+			console.log(arrStoc[arrStoc.length - 1]);
+			//console.log(vela2.close - vela2.open);
+			orden = {open: Number(close[3]), tipo: 'V', ini: vela2.date, bollierg: (bbGraf && bbGraf.lower > vela.close ? true : false), valBoll: (bbGraf ? bbGraf.lower : 'none'), vela: arrVelaOperativa[arrVelaOperativa.length - 1], bbGraf: bbGraf};
+			velaOperativa.markerType = "circle";
+			orden.vo = velaOperativa;
+			velaOperativa.markerSize = 1000;
+			velaOperativa.markerColor = "brown";
+			velaOperativa.indexLabel = "V";
+			nStopLoss = 0;
+			orden.lote = ponderado;
+			orden.stopLoss = (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26) * ponderado < -316 * ponderado ? -316 * ponderado : (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - spread - 10) * ponderado;
+			//orden.stopLoss = -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26;
+			console.log("************************** INICIO ORDEN ****************************");
+			//console.log((vela2.close - vela2.open) * 100000);
+			console.log(vela);
+			console.log(stoc);
+			console.log(rsiCalc);
+			console.log(macdCalc);
+			console.log(orden);
+			console.log("\n\n\n");
+			
+			
+			arrOrdenes.push(orden);	
+		}
+	//}
+	
 	
 }
 
@@ -917,7 +983,10 @@ process.on('message', (msg) => {
 	//console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/DAT_NT_EURUSD_M1_TOTAL.csv", 'utf8', function(err, data) {
+	//fs.readFile("./marketdata/DAT_NT_EURUSD_M1_TOTAL.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/DAT_NT_EURAUD_M1_TOTAL.csv", 'utf8', function(err, data) {
+	//fs.readFile("./marketdata/DAT_NT_EURUSD_M1_2000.csv", 'utf8', function(err, data) {
+	//fs.readFile("./marketdata/DAT_NT_GBPCHF_M1_TOTAL.csv", 'utf8', function(err, data) {
 	//fs.readFile("./marketdata/NZDUSD-2016-04.csv", 'utf8', function(err, data) {
 		/*//console.log(fs);
 		fs.close(2, function(){});
@@ -937,8 +1006,9 @@ process.on('message', (msg) => {
 		arrVelaReferencia2 = [];
 		var cont = 0;
 		objFunciones['ini'](arr[0].split(';'));
+		var anio = '0'
 		//for(let i in arr){
-		for(let i = 0; i < arr.length/(32 * 11) - 1; i++){	
+		for(let i = 0; /*arrVelaOperativa2.length < 400*/i < arr.length/1/*(32 * 11)*/ - 1; i++){	
 			var dato = arr[i].split(';');
 			
 			
@@ -985,11 +1055,20 @@ process.on('message', (msg) => {
 			
 			}*/
 			//objFunciones[dato[0][12] % 5](dato);//--> VELAS DE 5 MIN
-			objFunciones[dato[0][11]](dato);//-->VELAS DE UNA HORA
-			//console.log((dato[0][9] + '' + dato[0][10]) % 4);
+			if(dato[0][3] != anio){
+				anio = dato[0][3];
+				fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "\nCUENTA:: " + cuenta +  "\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
+			}
+			objFunciones[dato[0][11]](dato);//-->VELAS DE UNA HORA			
 			//objFunciones[(dato[0][9] + '' + dato[0][10]) % 4](dato);//-->VELAS DE CUATRO HORA 
 		}
-		
+		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "\nCUENTA:: " + cuenta +  "\n", (err) => {
+			if (err) throw err;
+				//console.log('The "data to append" was appended to file!');
+			});
 		var total = 0;
 		var total2 = 0;
 		var totalPos = 0;
@@ -1058,7 +1137,7 @@ process.on('message', (msg) => {
 		//console.log("FINALIZANDO");
 		//console.log(arrSMA);
 		process.send({ cmd: 'fin proceso', data: process.pid });
-		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrSMA, arrWMA] });
+		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrUpper, arrLower, arrMiddle/*, arrSMA, arrWMA*/] });
 		console.log(arrVelaOperativa2[5834]);
 		console.log(arrVelaOperativa2[5835]);
 		

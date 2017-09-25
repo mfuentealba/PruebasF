@@ -76,6 +76,13 @@ socket.on('fnAdd', function(arrMini){
 			name: "WMA",
 			//axisYType:"secondary",
 			dataPoints: arrMini[4]
+		}, {        
+			type: "line",
+			lineThickness:3,
+			showInLegend: true,           
+			name: "Middle",
+			//axisYType:"secondary",
+			dataPoints: arrMini[5]
 		}/*,
 		{
 			type: "candlestick",
