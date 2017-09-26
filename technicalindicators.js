@@ -211,7 +211,7 @@ class SMA extends Indicator {
                 }
                 else {
                     var ant = list.shift();
-                    //console.log('sum:' + sum + ' - list.shift(): ' + ant + ' + current: ' + current)
+                    ////console.log('sum:' + sum + ' - list.shift(): ' + ant + ' + current: ' + current)
                     sum = sum - ant + current;
                     result = ((sum) / period);
                     list.push(current);
@@ -804,14 +804,14 @@ class BollingerBands extends Indicator {
             var calcSMA;
             var calcsd;
             tick = yield;
-            //console.log('tick');
+            ////console.log('tick');
             
             while (true) {
-                //console.log(tick);
+                ////console.log(tick);
                 calcSMA = sma$$1.nextValue(tick);
-                //console.log('calcSMA : ' + calcSMA + " " + sma$$1.period);
+                ////console.log('calcSMA : ' + calcSMA + " " + sma$$1.period);
                 calcsd = sd$$1.nextValue(tick);
-                //console.log('calcsd : ' + calcsd);
+                ////console.log('calcsd : ' + calcsd);
                 if (calcSMA) {
                     let middle = format(calcSMA);
                     let upper = format(calcSMA + (calcsd * stdDev));
@@ -824,9 +824,9 @@ class BollingerBands extends Indicator {
                         pb: pb
                     };
                 }
-                //console.log('RESULT : ' + result);
+                ////console.log('RESULT : ' + result);
                 tick = yield result;
-                //console.log(tick);
+                ////console.log(tick);
             }
         })();
         this.generator.next();
@@ -1133,7 +1133,7 @@ class ADX extends Indicator {
                     let diSum = (lastPDI + lastMDI);
                     lastDX = (diDiff / diSum) * 100;
                     smoothedDX = emaDX.nextValue(lastDX);
-                    // console.log(tick.high.toFixed(2), tick.low.toFixed(2), tick.close.toFixed(2) , calcTr.toFixed(2), calcPDM.toFixed(2), calcMDM.toFixed(2), lastATR.toFixed(2), lastAPDM.toFixed(2), lastAMDM.toFixed(2), lastPDI.toFixed(2), lastMDI.toFixed(2), diDiff.toFixed(2), diSum.toFixed(2), lastDX.toFixed(2));
+                    // //console.log(tick.high.toFixed(2), tick.low.toFixed(2), tick.close.toFixed(2) , calcTr.toFixed(2), calcPDM.toFixed(2), calcMDM.toFixed(2), lastATR.toFixed(2), lastAPDM.toFixed(2), lastAMDM.toFixed(2), lastPDI.toFixed(2), lastMDI.toFixed(2), diDiff.toFixed(2), diSum.toFixed(2), lastDX.toFixed(2));
                 }
                 tick = yield { adx: smoothedDX, pdi: lastPDI, mdi: lastMDI };
             }
@@ -2211,8 +2211,8 @@ class CandlestickFinder {
     getAllPatternIndex(data) {
         
         if (data.close.length < this.requiredCount) {
-            /*console.log('*************getAllPatternIndex');
-            console.log(this);*/
+            /*//console.log('*************getAllPatternIndex');
+            //console.log(this);*/
             console.warn('Data count less than data required for the strategy ', this.name);
             return [];
         }
@@ -2231,10 +2231,10 @@ class CandlestickFinder {
         });
     }
     hasPattern(data) {
-        //console.log(data);
+        ////console.log(data);
         if (data.close.length < this.requiredCount) {
-            /*console.log(data);
-            console.log(this);*/
+            /*//console.log(data);
+            //console.log(this);*/
             console.warn('Data count less than data required for the strategy ', this.name);
             return false;
         }
@@ -2248,12 +2248,12 @@ class CandlestickFinder {
         return strategyFn.call(this, this._getLastDataForCandleStick(data));
     }
     _getLastDataForCandleStick(data) {
-        /*console.log("_getLastDataForCandleStick");
-        console.log(data);
-        console.log(this);*/
+        /*//console.log("_getLastDataForCandleStick");
+        //console.log(data);
+        //console.log(this);*/
         let requiredCount = this.requiredCount;
         if (data.close.length === requiredCount) {
-            //console.log('OK');
+            ////console.log('OK');
             return data;
         }
         else {
@@ -2279,8 +2279,8 @@ class CandlestickFinder {
     _generateDataForCandleStick(data) {
 
         let requiredCount = this.requiredCount;
-        /*console.log('_generateDataForCandleStick');
-        console.log(this);*/
+        /*//console.log('_generateDataForCandleStick');
+        //console.log(this);*/
         let generatedData = data.close.map(function (currentData, index) {
             let i = 0;
             let returnVal = {
@@ -2363,7 +2363,7 @@ class BullishEngulfingPattern extends CandlestickFinder {
             (firstdaysOpen > seconddaysOpen) &&
             (firstdaysClose > seconddaysOpen) &&
             (firstdaysOpen < seconddaysClose) && isbullishmarubozu);*/
-       // console.log(firstdaysClose  + " >= " +  seconddaysOpen);
+       // //console.log(firstdaysClose  + " >= " +  seconddaysOpen);
         let isBullishEngulfing = ((firstdaysClose < firstdaysOpen) &&
             (firstdaysOpen > seconddaysOpen) &&
             (firstdaysClose >= seconddaysOpen) &&
@@ -2411,7 +2411,7 @@ class ThreeOutSideUp extends CandlestickFinder {
     }
 }
 function threeOutSideUp(data) {
-    //console.log(data);
+    ////console.log(data);
     return new ThreeOutSideUp().hasPattern(data);
 }
 
@@ -2573,7 +2573,7 @@ class BullishMarubozu extends CandlestickFinder {
         let daysHigh = data.high[0];
         let daysLow = data.low[0];
         let tamVela = data.high[0] - data.low[0];
-        // console.log("tamVela: " + tamVela + ", Prom: " + data.tamVelas);
+        // //console.log("tamVela: " + tamVela + ", Prom: " + data.tamVelas);
          
              
         let isBullishMarbozu = this.approximateEqual(daysClose, daysHigh) &&
@@ -2663,7 +2663,7 @@ class BullishPatterns extends CandlestickFinder {
         return bullishPatterns.reduce(function (state, pattern) {
             let result = pattern.hasPattern(data);
             if (result) {
-                console.log('Matched pattern ', pattern.name);
+                //console.log('Matched pattern ', pattern.name);
             }
             return state || result;
         }, false);
@@ -2705,7 +2705,7 @@ class BearishEngulfingPattern extends CandlestickFinder {
     }
 }
 function bearishengulfingpattern(data) {
-    //console.log(data);
+    ////console.log(data);
     return new BearishEngulfingPattern().hasPattern(data);
 }
 
@@ -2716,7 +2716,7 @@ class ThreeOutSideDown extends CandlestickFinder {
         this.requiredCount = 3;
     }
     logic(data) {
-        //console.log('********************');
+        ////console.log('********************');
         let firstdaysOpen = data.open[0];
         let firstdaysClose = data.close[0];
         let firstdaysHigh = data.high[0];
@@ -2747,8 +2747,8 @@ class ThreeOutSideDown extends CandlestickFinder {
     }
 }
 function threeOutSideDown(data) {
-    /*console.log('INI');
-    console.log(data);*/
+    /*//console.log('INI');
+    //console.log(data);*/
     return new ThreeOutSideDown().hasPattern(data);
 }
 
@@ -2898,7 +2898,7 @@ class BearishMarubozu extends CandlestickFinder {
         let daysHigh = data.high[0];
         let daysLow = data.low[0];
         let tamVela = data.high[0] - data.low[0];
-       // console.log("tamVela: " + tamVela + ", Prom: " + data.tamVelas);
+       // //console.log("tamVela: " + tamVela + ", Prom: " + data.tamVelas);
         let isBearishMarbozu = this.approximateEqual(daysOpen, daysHigh) &&
             this.approximateEqual(daysLow, daysClose) &&
             daysOpen > daysClose &&
@@ -2909,7 +2909,7 @@ class BearishMarubozu extends CandlestickFinder {
     }
 }
 function bearishmarubozu(data) {
-    //console.log(data);
+    ////console.log(data);
     return new BearishMarubozu().hasPattern(data);
 }
 
@@ -2956,7 +2956,7 @@ class BearishPatterns extends CandlestickFinder {
         this.name = 'Bearish Candlesticks';
     }
     hasPattern(data) {
-        console.log('hhhhhh');
+        //console.log('hhhhhh');
         return bearishPatterns.reduce(function (state, pattern) {
             return state || pattern.hasPattern(data);
         }, false);

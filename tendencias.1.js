@@ -39,14 +39,14 @@ stdDev : 2
 var bb = new BB(ini);
 var bbGraf;
 var loteMin = 0.01;
-var loteMax = 500;
+var loteMax = 100;
 var loteFijo = false;
 
 
 
-var cuenta = 100;
-var ponderado = .1;
-var spread = 27;
+var cuenta = 500;
+var ponderado = 0.5;
+var spread = 0.00030;
 
 
 
@@ -658,16 +658,21 @@ function fnVelaNueva(dato){
 	
 	if(orden != null){
 		if(orden.tipo == 'C'){
-			if((((vela.close - orden.open) * 100000) - spread) * orden.lote < orden.stopLoss){
-				orden.close = vela.open;
+			//if((((vela.close - orden.open) * 100000) - spread) * orden.lote < orden.stopLoss){
+			console.log(vela);
+			if(vela.close < orden.stopLoss){
+				orden.close = orden.stopLoss;
 				orden.vo.indexLabel = 'C';
 				//orden.fecFin = dato[1];
 				orden.fin = vela.date;
-				orden.obs = ((vela.open - orden.open) * 100000) - spread < orden.stopLoss ? "stopLoss" : 'señal';
-				orden.total = orden.stopLoss;//((vela.open - orden.open) * 100000) - 16;	
-				orden.totalReal = orden.stopLoss;//((vela.open - orden.open) * 100000) - 16;	
-				orden.max = ((vela.high - orden.open) * 100000) - spread;
-				fnCalcCuenta(orden.stopLoss);
+				//orden.obs = ((vela.open - orden.open) * 100000) - spread < orden.stopLoss ? "stopLoss" : 'señal';
+				//orden.total = orden.stopLoss;//((vela.open - orden.open) * 100000) - 16;	
+				orden.total = (orden.open - orden.stopLoss - spread) * -100000;//((vela.open - orden.open) * 100000) - 16;	
+				//orden.totalReal = orden.stopLoss;//((vela.open - orden.open) * 100000) - 16;	
+				orden.totalReal = (orden.open - orden.stopLoss - spread) * -100000 * orden.lote;//((vela.open - orden.open) * 100000) - 16;	
+				
+				fnCalcCuenta(orden.totalReal);
+				orden.cta = cuenta;
 				if(orden.total < 0){
 					orden.vo.indexLabel = 'L';
 					orden.tipo = 'L';
@@ -675,12 +680,15 @@ function fnVelaNueva(dato){
 				//ee.on('orden', fnAbrirOrden);
 				orden = null;
 			} else {
-				if((((vela.close - orden.open) * 100000) - spread) * orden.lote > (40 * orden.lote)){
-					if(orden.stopLoss < 0){
-						orden.stopLoss = 0;
+				//if((((vela.close - orden.open) * 100000) - spread) * orden.lote > (40 * orden.lote)){
+				if(vela.close > orden.open + spread + 0.0004){
+					if(orden.stopLoss < orden.open + spread){
+						orden.stopLoss = orden.open + spread;
 					} else {
-						if((((vela.close - orden.open) * 100000) - spread) * orden.lote - (40 * orden.lote) > orden.stopLoss){
-							orden.stopLoss = (((vela.close - orden.open) * 100000) - spread) * orden.lote - (40 * orden.lote);
+						//if((((vela.close - orden.open) * 100000) - spread) * orden.lote - (40 * orden.lote) > orden.stopLoss){
+						if(vela.close - 0.00040 > orden.stopLoss){
+							//orden.stopLoss = (((vela.close - orden.open) * 100000) - spread) * orden.lote - (40 * orden.lote);
+							orden.stopLoss = vela.close - 0.00040;
 						}
 						
 					}
@@ -689,20 +697,23 @@ function fnVelaNueva(dato){
 		} else {
 			//console.log(dato[1] + " - " + orden.open + " = " + ((dato[1] - orden.open) * -100000));
 			
-			if((((vela.close - orden.open) * -100000) - spread) * orden.lote < orden.stopLoss){
+			if(vela.close > orden.stopLoss){
+				console.log(vela);
 				console.log(dato);
 				console.log("eval=" + vela.close + " - " + orden.open + " = " + ((vela.close - orden.open) * -100000));
 				console.log(vela.open + " - " + orden.open + " * -100000= " + ((vela.open - orden.open) * -100000));
-				orden.close = vela.open;
+				orden.close = orden.stopLoss;
 				//orden.fecFin = dato[1];
 				orden.vo.indexLabel = 'V';
 				orden.fin = vela2.date;
 				orden.obs = "stopLoss";
 				console.log(vela.open + " - " + orden.open + " = " + ((vela.open - orden.open) * -100000));
-				orden.total = orden.stopLoss;//((vela.open - orden.open) * -100000) - 16;
-				orden.totalReal = orden.stopLoss;//((vela.open - orden.open) * -100000) - 16;
-				orden.max = ((vela.low - orden.open) * -100000) - spread;
-				fnCalcCuenta(orden.stopLoss);
+				//orden.total = orden.stopLoss;//((vela.open - orden.open) * -100000) - 16;
+				orden.total = (orden.open - orden.stopLoss + spread) * 100000;//((vela.open - orden.open) * -100000) - 16;
+				orden.totalReal = (orden.open - orden.stopLoss + spread) * 100000 * orden.lote;//((vela.open - orden.open) * -100000) - 16;
+				//orden.max = ((vela.low - orden.open) * 100000) - spread;
+				fnCalcCuenta(orden.totalReal);
+				orden.cta = cuenta;
 				if(orden.total < 0){
 					orden.vo.indexLabel = 'S';
 					orden.tipo = 'S';
@@ -710,12 +721,24 @@ function fnVelaNueva(dato){
 				//ee.on('orden', fnAbrirOrden);
 				orden = null;
 			} else {
-				if((((vela.close - orden.open) * -100000) - spread) * orden.lote > (40 * orden.lote)){
+				/*if((((vela.close - orden.open) * -100000) - spread) * orden.lote > (40 * orden.lote)){
 					if(orden.stopLoss < 0){
 						orden.stopLoss = 0;
 					} else {
 						if((((vela.close - orden.open) * -100000) - spread) * orden.lote - (40 * orden.lote) > orden.stopLoss){
 							orden.stopLoss = (((vela.close - orden.open) * -100000) - spread) * orden.lote - (40 * orden.lote);
+						}
+						
+					}
+				}*/
+				if(vela.close < orden.open - (spread + 0.0004)){
+					if(orden.stopLoss > orden.open - spread){
+						orden.stopLoss = orden.open - spread;
+					} else {
+						//if((((vela.close - orden.open) * 100000) - spread) * orden.lote - (40 * orden.lote) > orden.stopLoss){
+						if(vela.close + 0.00040 < orden.stopLoss){
+							//orden.stopLoss = (((vela.close - orden.open) * 100000) - spread) * orden.lote - (40 * orden.lote);
+							orden.stopLoss = vela.close + 0.00040;
 						}
 						
 					}
@@ -726,7 +749,7 @@ function fnVelaNueva(dato){
 	}
 
 	bbGraf = bb.nextValue(Number(vela.close));
-	console.log(bbGraf);
+	//console.log(bbGraf);
 	if(bbGraf){
 		arrUpper.push({x: vela.date, y: bbGraf.upper});
 		arrLower.push({x: vela.date, y: bbGraf.lower});
@@ -814,12 +837,12 @@ function fnVelaNormal2(dato){
 		}
 	}
 	if(dato[2] > vela3.high){
-		vela.high = dato[2];
+		vela3.high = dato[2];
 		
 	}
 	 
 	if(dato[3] < vela3.low){
-		vela.low = dato[3];
+		vela3.low = dato[3];
 		
 	}
 }//2134068
@@ -853,12 +876,12 @@ function fnVelaNormal(dato){
 		}
 	}
 	if(dato[2] > vela3.high){
-		vela.high = dato[2];
+		vela3.high = dato[2];
 		
 	}
 	 
 	if(dato[3] < vela3.low){
-		vela.low = dato[3];
+		vela3.low = dato[3];
 		
 	}
 }
@@ -906,16 +929,18 @@ function fnCompra(close){
 	var dato = close;
 	//if(bbGraf && bbGraf.upper > arrVelaOperativa[arrVelaOperativa.length - 1].close){
 		if(cuenta > 0){
-			console.log(arrStoc[arrStoc.length - 2]);
-			console.log(arrStoc[arrStoc.length - 1]);
+			/*console.log(arrStoc[arrStoc.length - 2]);
+			console.log(arrStoc[arrStoc.length - 1]);*/
 			
-			orden = {open: close[3], tipo: 'C', ini: vela2.date, bollierg: (bbGraf && bbGraf.upper < vela.close ? true : false), valBoll: (bbGraf ? bbGraf.upper : 'none'), vela: arrVelaOperativa[arrVelaOperativa.length - 1], bbGraf: bbGraf};
+			orden = {open: close[3], tipo: 'C', ini: vela2.date/*, bollierg: (bbGraf && bbGraf.upper < vela.close ? true : false), valBoll: (bbGraf ? bbGraf.upper : 'none'), vela: arrVelaOperativa[arrVelaOperativa.length - 1], bbGraf: bbGraf*/};
 			velaOperativa.markerType = "circle";
 			orden.vo = velaOperativa;
 			velaOperativa.markerSize = 1000;
 			velaOperativa.markerColor = "brown";
 			velaOperativa.indexLabel = "C";
-			orden.stopLoss = (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26) * ponderado < -316 * ponderado ? -316 * ponderado : (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - spread - 10) * ponderado;
+			orden.stopLoss = (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26) < -166 ? orden.open - 0.00166 : arrVelaOperativa[arrVelaOperativa.length - 2].close - spread - 0.00010;
+			//orden.stopLoss = arrVelaOperativa[arrVelaOperativa.length - 2].close - spread - 0.00010;
+			//orden.stopLoss = (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26) * ponderado < -316 * ponderado ? -316 * ponderado : (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - spread - 10) * ponderado;
 			//orden.stopLoss = -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26 < -316 ? -316 : arrVelaOperativa[arrVelaOperativa.length - 2].close - 0.00026;
 			nStopLoss = 0;
 			orden.lote = ponderado;
@@ -941,13 +966,15 @@ function fnCompra(close){
 function fnVenta(close){
 	var dato = close;
 	//if((vela2.close - vela2.open) * 100000 < -11){
-		console.log(bbGraf);
+		console.log(arrVelaOperativa[arrVelaOperativa.length - 3]);
+		console.log(arrVelaOperativa[arrVelaOperativa.length - 2]);
+		console.log(arrVelaOperativa[arrVelaOperativa.length - 1]);
 	//if(bbGraf && bbGraf.lower < arrVelaOperativa[arrVelaOperativa.length - 1].close){
 		if(cuenta > 0){
-			console.log(arrStoc[arrStoc.length - 2]);
-			console.log(arrStoc[arrStoc.length - 1]);
+			/*console.log(arrStoc[arrStoc.length - 2]);
+			console.log(arrStoc[arrStoc.length - 1]);*/
 			//console.log(vela2.close - vela2.open);
-			orden = {open: Number(close[3]), tipo: 'V', ini: vela2.date, bollierg: (bbGraf && bbGraf.lower > vela.close ? true : false), valBoll: (bbGraf ? bbGraf.lower : 'none'), vela: arrVelaOperativa[arrVelaOperativa.length - 1], bbGraf: bbGraf};
+			orden = {open: Number(close[3]), tipo: 'V', ini: vela2.date/*, bollierg: (bbGraf && bbGraf.lower > vela.close ? true : false), valBoll: (bbGraf ? bbGraf.lower : 'none'), vela: arrVelaOperativa[arrVelaOperativa.length - 1], bbGraf: bbGraf*/};
 			velaOperativa.markerType = "circle";
 			orden.vo = velaOperativa;
 			velaOperativa.markerSize = 1000;
@@ -955,7 +982,9 @@ function fnVenta(close){
 			velaOperativa.indexLabel = "V";
 			nStopLoss = 0;
 			orden.lote = ponderado;
-			orden.stopLoss = (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26) * ponderado < -316 * ponderado ? -316 * ponderado : (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - spread - 10) * ponderado;
+			//orden.stopLoss = (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26) * ponderado < -316 * ponderado ? -316 * ponderado : (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - spread - 10) * ponderado;
+			orden.stopLoss = (-Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26) < -166 ? orden.open + 0.00166 : arrVelaOperativa[arrVelaOperativa.length - 2].close + spread + 0.00010;
+			//orden.stopLoss = arrVelaOperativa[arrVelaOperativa.length - 2].close + spread + 0.00010;
 			//orden.stopLoss = -Math.abs(arrVelaOperativa[arrVelaOperativa.length - 2].close - arrVelaOperativa[arrVelaOperativa.length - 1].close) * 100000 - 26;
 			console.log("************************** INICIO ORDEN ****************************");
 			//console.log((vela2.close - vela2.open) * 100000);
@@ -984,9 +1013,9 @@ process.on('message', (msg) => {
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
 	//fs.readFile("./marketdata/DAT_NT_EURUSD_M1_TOTAL.csv", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/DAT_NT_EURAUD_M1_TOTAL.csv", 'utf8', function(err, data) {
+	//fs.readFile("./marketdata/DAT_NT_EURAUD_M1_TOTAL.csv", 'utf8', function(err, data) {
 	//fs.readFile("./marketdata/DAT_NT_EURUSD_M1_2000.csv", 'utf8', function(err, data) {
-	//fs.readFile("./marketdata/DAT_NT_GBPCHF_M1_TOTAL.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/DAT_NT_GBPCHF_M1_TOTAL.csv", 'utf8', function(err, data) {
 	//fs.readFile("./marketdata/NZDUSD-2016-04.csv", 'utf8', function(err, data) {
 		/*//console.log(fs);
 		fs.close(2, function(){});
@@ -1008,7 +1037,7 @@ process.on('message', (msg) => {
 		objFunciones['ini'](arr[0].split(';'));
 		var anio = '0'
 		//for(let i in arr){
-		for(let i = 0; /*arrVelaOperativa2.length < 400*/i < arr.length/1/*(32 * 11)*/ - 1; i++){	
+		for(let i = 0; /*arrVelaOperativa2.length < 106*/i < arr.length/1/*(32 * 11)*/ - 1; i++){	
 			var dato = arr[i].split(';');
 			
 			
@@ -1062,6 +1091,9 @@ process.on('message', (msg) => {
 						//console.log('The "data to append" was appended to file!');
 					});
 			}
+			if(cuenta == -1){
+				break;
+			}
 			objFunciones[dato[0][11]](dato);//-->VELAS DE UNA HORA			
 			//objFunciones[(dato[0][9] + '' + dato[0][10]) % 4](dato);//-->VELAS DE CUATRO HORA 
 		}
@@ -1084,9 +1116,10 @@ process.on('message', (msg) => {
 			orden.close = dato[3];
 			orden.fecFin = dato[1];
 			orden.fin = vela2.date;
-			orden.obs = "stopLoss";
-			orden.total = ((dato[3] - orden.open) * 100000 * (orden.tipo == 'V' ? -1 : 1)) - 16;
-			orden.totalReal = ((dato[3] - orden.open) * 100000 * (orden.tipo == 'V' ? -1 : 1)) - 16;
+			orden.obs = "final";
+			/*orden.total = ((dato[3] - orden.open) * 100000 * (orden.tipo == 'V' ? -1 : 1)) - 16;
+			orden.totalReal = ((dato[3] - orden.open) * 100000 * (orden.tipo == 'V' ? -1 : 1)) - 16;*/
+			
 			
 			//ee.on('orden', fnAbrirOrden);
 			orden = null;
