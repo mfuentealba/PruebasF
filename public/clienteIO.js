@@ -61,7 +61,7 @@ socket.on('fnAdd', function(arrMini){
 			risingColor: "#F79B8E",
 			dataPoints: arrMini[1]
 			
-		}, {        
+		}/*, {        
 			type: "line",
 			lineThickness:3,
 			showInLegend: true,           
@@ -83,7 +83,7 @@ socket.on('fnAdd', function(arrMini){
 			name: "Middle",
 			//axisYType:"secondary",
 			dataPoints: arrMini[5]
-		}/*,
+		}*//*,
 		{
 			type: "candlestick",
 			risingColor: "#f0f0f0",
