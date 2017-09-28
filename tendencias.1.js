@@ -43,6 +43,7 @@ var loteMax = 100;
 var loteFijo = false;
 var ajusteDecimal = 100000;
 var cantOrdenes = 1;
+var desfaseSombra = -0.005;
 
 var total = 0;
 var total2 = 0;
@@ -120,6 +121,7 @@ const cluster = require('cluster');
 var arr;
 
 var vela;
+var velaSombra;
 var velaOperativa;
 var vela2;
 var vela3;
@@ -128,19 +130,25 @@ var cont = 0;
 
 
 function fnInicial(dato){
-	dato[3] = Number(dato[4]);
+	dato[4] = Number(dato[4]);
 	vela = {date: 1, open: dato[4], close: dato[4], low: dato[4], high: dato[4]};
 	vela2 = {date: 1, open: dato[4], close: dato[4], low: dato[4], high: dato[4]};
 	vela3 = {date: 1, open: dato[4], close: dato[4], low: dato[4], high: dato[4]};
 	
 	arrVelaOperativa.push(vela);
-	arrVelaFuerza.push(vela2);
-	arrVelaReferencia.push(vela3);
-	/*bbGraf = bb.nextValue(Number(vela.close));
+/*bbGraf = bb.nextValue(Number(vela.close));
 	arrLower.push(bbGraf.lower);
 	arrMiddle.push(bbGraf.middle);
 	arrUpper.push(bbGraf.upper);
 */
+	fnInicialSombra(dato);
+}
+
+function fnInicialSombra(dato){
+	
+	dato[4] = Number(dato[4]);
+	velaSombra = {date: 1, open: dato[4] + desfaseSombra, close: dato[4] + desfaseSombra, low: dato[4] + desfaseSombra, high: dato[4] + desfaseSombra};	
+	arrVelaOperativaSombra.push(velaSombra);
 }
 
 
@@ -854,6 +862,7 @@ function fnVelaNueva(dato){
 	//arrVelaFuerza.push(vela2)
 	arrVelaOperativa.push(vela);
 	vela.date = arrVelaOperativa.length;
+	objFunciones[((parseInt(dato[0][11]) + 3) % 5) + '_2'](dato);
 	//vela2.date = arrVelaOperativa.length;
 	cont++;
 	/*if(cont == 4){
@@ -865,6 +874,28 @@ function fnVelaNueva(dato){
 	}*/
 	
 	objFunciones['0'] = fnVelaNormal2;
+}
+
+
+
+
+function fnVelaNuevaSombra(dato){
+	//console.log('fnVelaNueva');
+	velaOperativaSombra = {x: velaSombra.date, y:[velaSombra.open, velaSombra.high, velaSombra.low, velaSombra.close]};
+	dato[1] = Number(dato[1]);
+	dato[2] = Number(dato[2]);
+	dato[3] = Number(dato[3]);
+	dato[4] = Number(dato[4]);
+	//arrVelaOperativa2.push([vela.date, vela.low, vela.open, vela.close, vela.high]);
+	////console.log(velaOperativa);
+	arrVelaOperativaSombra2.push(velaOperativaSombra);
+	
+	
+	velaSombra = {open: dato[1] + desfaseSombra, close: dato[4] + desfaseSombra, low: dato[3] + desfaseSombra, high: dato[2] + desfaseSombra};
+	arrVelaOperativaSombra.push(velaSombra);
+	velaSombra.date = arrVelaOperativaSombra.length;
+	
+	objFunciones['0_2'] = fnVelaNormalSombra2;
 }
 
 function fnVelaNormal2(dato){
@@ -884,6 +915,8 @@ function fnVelaNormal2(dato){
 		vela.low = dato[3];
 		
 	}
+	
+	objFunciones[((parseInt(dato[0][11]) + 3) % 5) + '_2'](dato);
 	
 	/*if(vela2.close > vela2.high){
 		
@@ -905,6 +938,25 @@ function fnVelaNormal2(dato){
 	}*/
 }//2134068
 
+
+function fnVelaNormalSombra2(dato){
+	
+	var high = Number(dato[2]) + desfaseSombra;
+	var low = Number(dato[3]) + desfaseSombra;
+	var closeN = Number(dato[4]) + desfaseSombra;
+	velaSombra.close = closeN;
+	if(high > velaSombra.high){
+		velaSombra.high = high;		
+	}
+
+	if(low < velaSombra.low){
+		velaSombra.low = low;		
+	}
+	
+	
+}//2134068
+
+
 function fnVelaNormal(dato){
 	objFunciones['0'] = fnVelaNueva;
 	
@@ -919,10 +971,17 @@ function fnVelaNormal(dato){
 		
 	}*/
 
+	if(dato[2] > vela.high){
+		vela.high = dato[2];
+		
+	}
+
 	if(dato[3] < vela.low){
 		vela.low = dato[3];
 		
 	}
+	
+	objFunciones[((parseInt(dato[0][11]) + 3) % 5) + '_2'](dato);
 	
 	/*if(vela2.close > vela2.high){
 		
@@ -944,14 +1003,31 @@ function fnVelaNormal(dato){
 	}*/
 }
 
+function fnVelaNormalSombra(dato){
+	objFunciones['0_2'] = fnVelaNuevaSombra;
+	
+	var high = Number(dato[2]) + desfaseSombra;
+	var low = Number(dato[3]) + desfaseSombra;
+	var closeN = Number(dato[4]) + desfaseSombra;
+	velaSombra.close = closeN;
+	if(high > velaSombra.high){
+		velaSombra.high = high;		
+	}
+
+	if(low < velaSombra.low){
+		velaSombra.low = low;		
+	}
+}
+
 function fnNo(dato){
 	return 'NO';
 }
 
 var arrVelaOperativa = [];
+var arrVelaOperativaSombra = [];
 var arrVelaReferencia = [];
 var arrVelaFuerza = [];
-var arrVelaOperativa2 = [];
+var arrVelaOperativaSombra2 = [];
 var arrVelaReferencia2 = [];
 var arrVelaFuerza2 = [];
 var arrMedia14 = [];
@@ -965,6 +1041,15 @@ objFunciones['2'] = fnVelaNormal;
 objFunciones['3'] = fnVelaNormal;
 objFunciones['4'] = fnVelaNormal;
 objFunciones['5'] = fnVelaNormal;
+
+objFunciones['ini_2'] = fnInicialSombra;
+objFunciones['0_2'] = fnVelaNuevaSombra;
+objFunciones['1_2'] = fnVelaNormalSombra;
+objFunciones['2_2'] = fnVelaNormalSombra;
+objFunciones['3_2'] = fnVelaNormalSombra;
+objFunciones['4_2'] = fnVelaNormalSombra;
+objFunciones['5_2'] = fnVelaNormalSombra;
+
 
 objFunciones['signalWait'] = fnSignalWait;
 objFunciones['signalEnable'] = fnSignalEnable;
@@ -1070,7 +1155,7 @@ process.on('message', (msg) => {
 	//console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("./marketdata/DAT_NT_EURUSD_M1_TOTAL.csv", 'utf8', function(err, data) {
+	fs.readFile("./marketdata/DAT_NT_EURUSD_M1_2015.csv", 'utf8', function(err, data) {
 	//fs.readFile("./marketdata/DAT_NT_USDJPY_M1_TOTAL.csv", 'utf8', function(err, data) {
 		
 	//fs.readFile("./marketdata/DAT_NT_EURAUD_M1_TOTAL.csv", 'utf8', function(err, data) {
@@ -1097,7 +1182,7 @@ process.on('message', (msg) => {
 		objFunciones['ini'](arr[0].split(';'));
 		var anio = '0'
 		//for(let i in arr){
-		for(let i = 0; /*arrVelaOperativa2.length < 400*/i < arr.length/1 - 1; i++){	
+		for(let i = 0; /*arrVelaOperativa2.length < 400*/i < arr.length/16 - 1; i++){	
 			var dato = arr[i].split(';');
 			
 			
@@ -1225,7 +1310,7 @@ process.on('message', (msg) => {
 		//console.log("FINALIZANDO");
 		//console.log(arrSMA);
 		process.send({ cmd: 'fin proceso', data: process.pid });
-		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrUpper, arrLower, arrMiddle/*, arrSMA, arrWMA*/] });
+		process.send({ cmd: 'enviarMkdt', data: [arrVelaOperativaSombra2, arrVelaOperativa2, arrVelaReferencia, arrUpper, arrLower, arrMiddle/*, arrSMA, arrWMA*/] });
 		/*console.log(arrVelaOperativa2[5834]);
 		console.log(arrVelaOperativa2[5835]);*/
 		
