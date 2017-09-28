@@ -40,7 +40,7 @@ http.createServer(function onRequest(request, response) {
 			
 			//Create a dummy response object
 			var outObj = {
-				value: Math.random()*reqObj.value, //Just some random value to demonstrate
+				value: 1, //Just some random value to demonstrate
 				msg: "test message",
 			}
 			
