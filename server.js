@@ -27,7 +27,7 @@ http.createServer(function onRequest(request, response) {
 		{
 			var msg = ms.toString();	//Parse the ms into string		
 			
-			console.log(msg); // Prints the message in the console
+			//console.log(msg); // Prints the message in the console
 			
 			var reqObj = JSON.parse(msg);	// If the incoming message is in JSON format, you can parse it as JSON.
 			

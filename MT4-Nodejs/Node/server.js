@@ -32,7 +32,7 @@ http.createServer(function onRequest(request, response) {
 			var reqObj = JSON.parse(msg);	// If the incoming message is in JSON format, you can parse it as JSON.
 			
 			
-			console.log(reqObj); 
+			//console.log(reqObj); 
 			
 			/*
 			Here you can have the code to do what you want it to do. You can also use cluster to run a multithreaded app. Or connect to a DB or connect to external web services and collect data, etc
