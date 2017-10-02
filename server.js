@@ -418,8 +418,8 @@ http.createServer(function onRequest(request, response) {
 						
 						value: respuesta, //Just some random value to demonstrate
 						msg: "test message",
-						stopLoss: orden.stopLoss,
-						lote: orden.lote
+						stopLoss: respuesta == "N" ? 0 : orden.stopLoss,
+						lote: respuesta == "N" ? 0 : orden.lote
 					}
 				}
 					
