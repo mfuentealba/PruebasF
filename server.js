@@ -156,6 +156,7 @@ function fnEvaluaCierre(origen, vela){
 				}
 				fnImprimirOperacion();
 				orden = null;
+				return "X";
 			} else {
 				if(vela.close > orden.open + spread + ajusteStop){
 					if(orden.stopLoss < orden.open + spread){
@@ -166,6 +167,7 @@ function fnEvaluaCierre(origen, vela){
 						}
 						
 					}
+					return 'A'; 
 				}
 			}
 			
@@ -182,6 +184,7 @@ function fnEvaluaCierre(origen, vela){
 				}
 				fnImprimirOperacion();
 				orden = null;
+				return "X";
 			} else {
 				if(vela.close < orden.open - (spread + ajusteStop)){
 					if(orden.stopLoss > orden.open - spread){
@@ -192,12 +195,13 @@ function fnEvaluaCierre(origen, vela){
 						}
 						
 					}
+					return 'A'; 
 				}
 			}
 		}
-	
+		
 	}
-
+	return 'N';
 }
 
 function fnImprimirOperacion(){
@@ -313,10 +317,15 @@ function fnVenta(vela, tipo, arrV){
 
 function fnVelaNueva(dato, arrVel, tipo){
 	console.log('fnVelaNueva');
+	var resp;
 	if(orden){
-		fnEvaluaCierre(tipo, dato);
+		resp = fnEvaluaCierre(tipo, dato);
+		
 	}
-	var resp = fnEvaluaVelas(dato, tipo, arrVel);
+	if(resp == "N"){
+		resp = fnEvaluaVelas(dato, tipo, arrVel);
+	}
+	
 	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(arrVel[arrVel.length - 1]) + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
@@ -396,10 +405,24 @@ http.createServer(function onRequest(request, response) {
 				*/
 				
 				//Create a dummy response object
-				var outObj = {
-					value: respuesta, //Just some random value to demonstrate
-					msg: "test message",
+				var outObj
+				if(respuesta == "N"){
+					outObj = {
+						
+						value: respuesta, //Just some random value to demonstrate
+						msg: "test message",
+					}
+				} else {
+					
+					outObj = {
+						
+						value: respuesta, //Just some random value to demonstrate
+						msg: "test message",
+						stopLoss: orden.stopLoss,
+						lote: orden.lote
+					}
 				}
+					
 				
 				response.write(JSON.stringify(outObj));	//Write the response
 				response.end(); //Close the response
