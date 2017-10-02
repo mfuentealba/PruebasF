@@ -25,6 +25,7 @@ var cuenta = 100;
 var ponderado = .1;
 var spread = 0.00030;
 var ajusteStop = 0.0004;
+var objCont = {N: 2, S: 2}
 /*
 var objFunciones = {};
 objFunciones['ini'] = fnInicial;
@@ -66,8 +67,8 @@ var http = require("http");
 
 var _PORT = 8989; //Http port Node.js server will be listening on. Make sure that this is an open port and its the same as the one defined in MT4 indicator/EA.
 	
-var arrVelas = [{date: 1, open: 0, close: 0, high: 0, low: 100}];
-var arrVelasSombra = [{date: 1, open: 0, close: 0, high: 0, low: 100}];	
+var arrVelas = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];
+var arrVelasSombra = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];	
 var arrTamVelas = [];
 var tamVelas = 0;	
 var orden;
@@ -156,7 +157,8 @@ function fnEvaluaCierre(origen, vela){
 				}
 				fnImprimirOperacion();
 				orden = null;
-				return "X";
+				//return "X";
+				return "N";
 			} else {
 				if(vela.close > orden.open + spread + ajusteStop){
 					if(orden.stopLoss < orden.open + spread){
@@ -184,7 +186,8 @@ function fnEvaluaCierre(origen, vela){
 				}
 				fnImprimirOperacion();
 				orden = null;
-				return "X";
+				//return "X";
+				return "N";
 			} else {
 				if(vela.close < orden.open - (spread + ajusteStop)){
 					if(orden.stopLoss > orden.open - spread){
@@ -290,7 +293,11 @@ function fnCompra(vela, tipo, arrV){
 			orden.lote = ponderado;
 			console.log("************************** INICIO ORDEN ****************************");
 			console.log(orden);
-			console.log("\n\n\n");			
+			console.log("\n\n\n");	
+			fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\n", (err) => {
+				if (err) throw err;
+					//console.log('The "data to append" was appended to file!');
+				});			
 		}
 	
 }
@@ -306,7 +313,10 @@ function fnVenta(vela, tipo, arrV){
 			console.log(vela);
 			console.log(orden);
 			console.log("\n\n\n");
-			
+			fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\n", (err) => {
+				if (err) throw err;
+					//console.log('The "data to append" was appended to file!');
+				});
 			
 		}
 	
@@ -317,20 +327,24 @@ function fnVenta(vela, tipo, arrV){
 
 function fnVelaNueva(dato, arrVel, tipo){
 	console.log('fnVelaNueva');
-	var resp;
+	console.log(tipo);
+	var resp = 'N';
 	if(orden){
 		resp = fnEvaluaCierre(tipo, dato);
 		
 	}
 	if(resp == "N"){
-		resp = fnEvaluaVelas(dato, tipo, arrVel);
+		resp = fnEvaluaVelas(dato, arrVel[arrVel.length - 1].origen, arrVel);
 	}
 	
 	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(arrVel[arrVel.length - 1]) + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
-	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: arrVel.length, date: dato.date, origen: dato.opt});	
+	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: objCont[tipo]++, date: dato.date, origen: dato.opt});	
+	if(arrVel.length > 12){
+		arrVel.shift();
+	}
 	return resp;
 }
 
@@ -371,10 +385,10 @@ http.createServer(function onRequest(request, response) {
 				
 				if(reqObj.opt == 'N'){
 					//objFunciones[reqObj.date[5] + ''](dato);
-					arrVelas.push(reqObj);
+					/*arrVelas.push(reqObj);
 					fnEvaluaCierre('N', reqObj);
-					respuesta = fnEvaluaVelas(reqObj.cierre, 'N', arrVelas);
-					//respuesta = 'N';
+					respuesta = fnEvaluaVelas(reqObj.cierre, 'N', arrVelas);*/
+					respuesta = 'N';
 				} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					//console.log(reqObj);
@@ -382,7 +396,7 @@ http.createServer(function onRequest(request, response) {
 			
 						if(newVela == true){
 							newVela = false;
-							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.origen);
+							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
 							
 						} else {
 							fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj);       
@@ -405,7 +419,8 @@ http.createServer(function onRequest(request, response) {
 				*/
 				
 				//Create a dummy response object
-				var outObj
+				var outObj;
+				console.log(respuesta);
 				if(respuesta == "N"){
 					outObj = {
 						
