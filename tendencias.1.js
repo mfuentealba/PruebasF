@@ -39,7 +39,7 @@ stdDev : 2
 var bb = new BB(ini);
 var bbGraf;
 var loteMin = 0.01;
-var loteMax = 100;
+var loteMax = 4000;
 var loteFijo = false;
 var ajusteDecimal = 100000;
 var cantOrdenes = 1;
@@ -55,8 +55,8 @@ var totalBuenas = 0;
 var totalMalas = 0;
 
 
-var cuenta = 500;
-var ponderado = .5;
+var cuenta = 100;
+var ponderado = .1;
 var spread = 0.00030;
 var ajusteStop = 0.0004
 
