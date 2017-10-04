@@ -19,6 +19,9 @@ var totalCompras = 0;
 var totalVentas = 0;
 var totalBuenas = 0;
 var totalMalas = 0;
+var buenas = 0;
+var malas = 0;
+
 
 
 var cuenta = 100;
@@ -100,7 +103,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		
 		if(bearishengulfingpattern(input)){
 			sw = true;
-			opt = 3;
+			opt = 2;
 			console.log('bearishengulfingpattern');
 			
 		}
@@ -124,7 +127,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 			
 			switch(opt){
 				case 2:
-					fnCompra(dato, tipo, arrV);
+					fnVenta(dato, tipo, arrV);
 					return 'V';
 				break;
 				case 3:
@@ -154,7 +157,15 @@ function fnEvaluaCierre(origen, vela){
 				
 				if(orden.total < 0){					
 					orden.tipo = 'L';
+					malas++;
+				} else {
+					if(orden.total > 0){
+						buenas++;
+					}
 				}
+				
+				
+
 				fnImprimirOperacion();
 				orden = null;
 				//return "X";
@@ -169,6 +180,7 @@ function fnEvaluaCierre(origen, vela){
 						}
 						
 					}
+					fnImprimirOperacion();
 					return 'A'; 
 				}
 			}
@@ -183,6 +195,9 @@ function fnEvaluaCierre(origen, vela){
 				orden.cta = cuenta;
 				if(orden.total < 0){
 					orden.tipo = 'S';
+					malas++;
+				} else {
+					buenas++;
 				}
 				fnImprimirOperacion();
 				orden = null;
@@ -198,6 +213,7 @@ function fnEvaluaCierre(origen, vela){
 						}
 						
 					}
+					fnImprimirOperacion();
 					return 'A'; 
 				}
 			}
@@ -208,7 +224,7 @@ function fnEvaluaCierre(origen, vela){
 }
 
 function fnImprimirOperacion(){
-	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
@@ -286,15 +302,15 @@ function fnCalcCuenta(cierre){
 function fnCompra(vela, tipo, arrV){
 	
 		if(cuenta > 0){
-			orden = {origen: tipo, open: vela.close, tipo: 'C', ini: vela.id/*, bollierg: (bbGraf && bbGraf.upper < vela.close ? true : false), valBoll: (bbGraf ? bbGraf.upper : 'none'), vela: arrVelaOperativa[arrVelaOperativa.length - 1], bbGraf: bbGraf*/};
-			console.log(arrV);
+			orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'C', creacion: vela.close - arrV[arrV.length - 1].close > 0 ? "OK" : "NOOK"};
+			//console.log(arrV);
 			orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2].close - spread - 0.00010;
 			nStopLoss = 0;
 			orden.lote = ponderado;
 			console.log("************************** INICIO ORDEN ****************************");
 			console.log(orden);
 			console.log("\n\n\n");	
-			fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\n", (err) => {
+			fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " ......\n", (err) => {
 				if (err) throw err;
 					//console.log('The "data to append" was appended to file!');
 				});			
@@ -305,7 +321,7 @@ function fnCompra(vela, tipo, arrV){
 function fnVenta(vela, tipo, arrV){
 	
 		if(cuenta > 0){
-			orden = {origen: tipo, open: Number(vela.close), tipo: 'V', ini: vela.id/*, bollierg: (bbGraf && bbGraf.lower > vela.close ? true : false), valBoll: (bbGraf ? bbGraf.lower : 'none'), vela: arrVelaOperativa[arrVelaOperativa.length - 1], bbGraf: bbGraf*/};
+			orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'V', creacion: arrV[arrV.length - 1].close - vela.close > 0 ? "OK" : "NOOK"};
 			nStopLoss = 0;
 			orden.lote = ponderado;
 			orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
@@ -313,7 +329,7 @@ function fnVenta(vela, tipo, arrV){
 			console.log(vela);
 			console.log(orden);
 			console.log("\n\n\n");
-			fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\n", (err) => {
+			fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " .....\n", (err) => {
 				if (err) throw err;
 					//console.log('The "data to append" was appended to file!');
 				});
@@ -334,7 +350,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 		
 	}
 	if(resp == "N"){
-		resp = fnEvaluaVelas(dato, arrVel[arrVel.length - 1].origen, arrVel);
+		resp = fnEvaluaVelas(dato, tipo, arrVel);
 	}
 	
 	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(arrVel[arrVel.length - 1]) + "\n", (err) => {
@@ -380,19 +396,37 @@ http.createServer(function onRequest(request, response) {
 				
 				
 				
+				console.log(reqObj);
+				reqObj.close = Number(reqObj.close);
+				reqObj.open = Number(reqObj.open);
+				reqObj.high = Number(reqObj.high);
+				reqObj.low = Number(reqObj.low);
+					
 				
-				
-				
-				if(reqObj.opt == 'N'){
+				//if(reqObj.opt == 'N'){
 					//objFunciones[reqObj.date[5] + ''](dato);
 					/*arrVelas.push(reqObj);
 					fnEvaluaCierre('N', reqObj);
 					respuesta = fnEvaluaVelas(reqObj.cierre, 'N', arrVelas);*/
-					respuesta = 'N';
-				} else {
+					//respuesta = 'N';
+					if(reqObj.date[3] == '0' || reqObj.date[3] == '1' || reqObj.date[3] == '2'){
+			
+						if(newVela == true){
+							newVela = false;
+							respuesta = fnVelaNueva(reqObj, arrVelas, 'N');
+							
+						} else {
+							fnVelaNormal(arrVelas[arrVelas.length - 1], reqObj);       
+						}
+					 
+					} else {
+						newVela = true;
+						fnVelaNormal(arrVelas[arrVelas.length - 1], reqObj);       				 
+				    }
+				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					//console.log(reqObj);
-					if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
+					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
 							newVela = false;
@@ -405,14 +439,14 @@ http.createServer(function onRequest(request, response) {
 					} else {
 						newVela = true;
 						fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj);       				 
-				   }				
+				    }*/			
 					//arrVelasSombra.push(reqObj);
 					//respuesta = fnEvaluaVelas(reqObj.cierre, 'S', arrVelasSombra);
-				}
+				//}
 				
 				
 				
-				console.log(reqObj); 
+				 
 				
 				/*
 				Here you can have the code to do what you want it to do. You can also use cluster to run a multithreaded app. Or connect to a DB or connect to external web services and collect data, etc
@@ -426,15 +460,17 @@ http.createServer(function onRequest(request, response) {
 						
 						value: respuesta, //Just some random value to demonstrate
 						msg: "test message",
+						cta: cuenta
 					}
 				} else {
-					
+					console.log(orden);
 					outObj = {
 						
 						value: respuesta, //Just some random value to demonstrate
 						msg: "test message",
-						stopLoss: respuesta == "N" ? 0 : orden.stopLoss,
-						lote: respuesta == "N" ? 0 : orden.lote
+						stopLoss: orden.stopLoss,
+						lote: orden.lote,
+						cta: cuenta
 					}
 				}
 					
