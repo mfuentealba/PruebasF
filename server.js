@@ -3,6 +3,9 @@
 //Include the node.js modules that you need. Make sure you install them first with npm install
 var bearishengulfingpattern = require('./technicalindicators.js').bearishengulfingpattern;
 var bullishengulfingpattern = require('./technicalindicators.js').bullishengulfingpattern;
+var ATR = require('technicalindicators').ATR;
+var ini = {low:[], high:[], close:[], period: 14};
+var atr = new ATR(ini);
 var fs = require('fs');
 var loteMin = 0.01;
 var loteMax = 4000;
@@ -303,7 +306,7 @@ function fnCompra(vela, tipo, arrV){
 	
 		if(cuenta > 0){
 			//if(vela.close - arrV[arrV.length - 1].close > 0){
-				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'C', creacion: vela.close - arrV[arrV.length - 1].close > 0 ? "OK" : "NOOK", ponderado: (arrV[arrV.length - 2].open - arrV[arrV.length - 2].close) / (arrV[arrV.length - 1].close - arrV[arrV.length - 1].open)};
+				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'C', fecha: vela.fecha, atr: atrGraf};
 				//console.log(arrV);
 				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2].close - spread - 0.00010;
 				nStopLoss = 0;
@@ -327,7 +330,7 @@ function fnVenta(vela, tipo, arrV){
 	
 		if(cuenta > 0){
 			//if(arrV[arrV.length - 1].close - vela.close > 0){
-				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'V', creacion: arrV[arrV.length - 1].close - vela.close > 0 ? "OK" : "NOOK", ponderado: (arrV[arrV.length - 2].close - arrV[arrV.length - 2].open) / (arrV[arrV.length - 1].open - arrV[arrV.length - 1].close)};
+				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'V', fecha: vela.fecha, atr: atrGraf};
 				nStopLoss = 0;
 				orden.lote = ponderado;
 				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
@@ -349,10 +352,12 @@ function fnVenta(vela, tipo, arrV){
 }
 
 
-
+var atrGraf;
 function fnVelaNueva(dato, arrVel, tipo){
 	console.log('fnVelaNueva');
 	console.log(tipo);
+	atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
+	console.log(atrGraf);
 	var resp = 'N';
 	if(orden){
 		resp = fnEvaluaCierre(tipo, dato);
@@ -366,7 +371,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
-	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: objCont[tipo]++, date: dato.date, origen: dato.opt});	
+	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: objCont[tipo]++, date: dato.date, origen: dato.opt, fecha: dato.fecha});	
 	if(arrVel.length > 12){
 		arrVel.shift();
 	}
