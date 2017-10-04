@@ -127,12 +127,12 @@ function fnEvaluaVelas(dato, tipo, arrV){
 			
 			switch(opt){
 				case 2:
-					fnVenta(dato, tipo, arrV);
-					return 'V';
+					
+					return fnVenta(dato, tipo, arrV);
 				break;
 				case 3:
-					fnCompra(dato, tipo, arrV);
-					return 'C';
+					
+					return fnCompra(dato, tipo, arrV);
 				break;
 			}
 		}
@@ -302,41 +302,50 @@ function fnCalcCuenta(cierre){
 function fnCompra(vela, tipo, arrV){
 	
 		if(cuenta > 0){
-			orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'C', creacion: vela.close - arrV[arrV.length - 1].close > 0 ? "OK" : "NOOK"};
-			//console.log(arrV);
-			orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2].close - spread - 0.00010;
-			nStopLoss = 0;
-			orden.lote = ponderado;
-			console.log("************************** INICIO ORDEN ****************************");
-			console.log(orden);
-			console.log("\n\n\n");	
-			fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " ......\n", (err) => {
-				if (err) throw err;
-					//console.log('The "data to append" was appended to file!');
-				});			
+			//if(vela.close - arrV[arrV.length - 1].close > 0){
+				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'C', creacion: vela.close - arrV[arrV.length - 1].close > 0 ? "OK" : "NOOK", ponderado: (arrV[arrV.length - 2].open - arrV[arrV.length - 2].close) / (arrV[arrV.length - 1].close - arrV[arrV.length - 1].open)};
+				//console.log(arrV);
+				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2].close - spread - 0.00010;
+				nStopLoss = 0;
+				orden.lote = ponderado;
+				console.log("************************** INICIO ORDEN ****************************");
+				console.log(orden);
+				console.log("\n\n\n");	
+				fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " ......\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});	
+				return "C";	
+			//}
+					
 		}
+		return "N";
 	
 }
 
 function fnVenta(vela, tipo, arrV){
 	
 		if(cuenta > 0){
-			orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'V', creacion: arrV[arrV.length - 1].close - vela.close > 0 ? "OK" : "NOOK"};
-			nStopLoss = 0;
-			orden.lote = ponderado;
-			orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
-			console.log("************************** INICIO ORDEN ****************************");
-			console.log(vela);
-			console.log(orden);
-			console.log("\n\n\n");
-			fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " .....\n", (err) => {
-				if (err) throw err;
-					//console.log('The "data to append" was appended to file!');
-				});
+			//if(arrV[arrV.length - 1].close - vela.close > 0){
+				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'V', creacion: arrV[arrV.length - 1].close - vela.close > 0 ? "OK" : "NOOK", ponderado: (arrV[arrV.length - 2].close - arrV[arrV.length - 2].open) / (arrV[arrV.length - 1].open - arrV[arrV.length - 1].close)};
+				nStopLoss = 0;
+				orden.lote = ponderado;
+				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
+				console.log("************************** INICIO ORDEN ****************************");
+				console.log(vela);
+				console.log(orden);
+				console.log("\n\n\n");
+				fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " .....\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
+				return "V";
+			//}
+			
 			
 		}
 	
-	
+		return "N";
 }
 
 
@@ -409,7 +418,7 @@ http.createServer(function onRequest(request, response) {
 					fnEvaluaCierre('N', reqObj);
 					respuesta = fnEvaluaVelas(reqObj.cierre, 'N', arrVelas);*/
 					//respuesta = 'N';
-					if(reqObj.date[3] == '0' || reqObj.date[3] == '1' || reqObj.date[3] == '2'){
+					/*if(reqObj.date[3] == '0' || reqObj.date[3] == '1' || reqObj.date[3] == '2'){
 			
 						if(newVela == true){
 							newVela = false;
@@ -422,11 +431,11 @@ http.createServer(function onRequest(request, response) {
 					} else {
 						newVela = true;
 						fnVelaNormal(arrVelas[arrVelas.length - 1], reqObj);       				 
-				    }
+				    }*/
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					//console.log(reqObj);
-					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
+					if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
 							newVela = false;
@@ -439,7 +448,7 @@ http.createServer(function onRequest(request, response) {
 					} else {
 						newVela = true;
 						fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj);       				 
-				    }*/			
+				    }			
 					//arrVelasSombra.push(reqObj);
 					//respuesta = fnEvaluaVelas(reqObj.cierre, 'S', arrVelasSombra);
 				//}
