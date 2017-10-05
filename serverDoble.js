@@ -27,7 +27,7 @@ var malas = 0;
 
 
 
-var cuenta = 100;
+var cuenta = {'S': 100, 'N': 100};
 var ponderado = .1;
 var spread = 0.00030;
 var ajusteStop = 0.0004;
@@ -77,7 +77,7 @@ var arrVelas = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];
 var arrVelasSombra = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];	
 var arrTamVelas = [];
 var tamVelas = 0;	
-var orden;
+var orden = {};
 	
 
 function fnEvaluaVelas(dato, tipo, arrV){
@@ -126,7 +126,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		}
 	
 		
-		if(orden == null && sw){
+		if(orden[tipo] == null && sw){
 			
 			switch(opt){
 				case 2:
@@ -145,24 +145,24 @@ function fnEvaluaVelas(dato, tipo, arrV){
 }	
 
 function fnEvaluaCierre(origen, vela){
-	if(orden != null && origen == orden.origen){
+	if(orden[origen] != null && origen == orden[origen].origen){
 		console.log(orden);
-		if(orden.tipo == 'C'){
-			if(vela.close < orden.stopLoss){
-				orden.close = orden.stopLoss;
+		if(orden[origen].tipo == 'C'){
+			if(vela.close < orden[origen].stopLoss){
+				orden[origen].close = orden[origen].stopLoss;
 				
-				orden.fin = vela.date;
-				orden.total = (orden.close - orden.open - spread) * ajusteDecimal;//((vela.open - orden.open) * ajusteDecimal) - 16;	
-				orden.totalReal = orden.total * orden.lote;//((vela.open - orden.open) * ajusteDecimal) - 16;	
+				orden[origen].fin = vela.date;
+				orden[origen].total = (orden[origen].close - orden[origen].open - spread) * ajusteDecimal;//((vela.open - orden.open) * ajusteDecimal) - 16;	
+				orden[origen].totalReal = orden[origen].total * orden[origen].lote;//((vela.open - orden.open) * ajusteDecimal) - 16;	
 				
-				fnCalcCuenta(orden.totalReal);
-				orden.cta = cuenta;
+				fnCalcCuenta(orden[origen].totalReal, origen);
+				orden[origen].cta = cuenta[origen];
 				
-				if(orden.total < 0){					
-					orden.tipo = 'L';
+				if(orden[origen].total < 0){					
+					orden[origen].tipo = 'L';
 					malas++;
 				} else {
-					if(orden.total > 0){
+					if(orden[origen].total > 0){
 						buenas++;
 					}
 				}
@@ -170,16 +170,16 @@ function fnEvaluaCierre(origen, vela){
 				
 
 				fnImprimirOperacion();
-				orden = null;
+				orden[origen] = null;
 				//return "X";
 				return "N";
 			} else {
-				if(vela.close > orden.open + spread + ajusteStop){
-					if(orden.stopLoss < orden.open + spread){
-						orden.stopLoss = orden.open + spread;
+				if(vela.close > orden[origen].open + spread + ajusteStop){
+					if(orden[origen].stopLoss < orden[origen].open + spread){
+						orden[origen].stopLoss = orden[origen].open + spread;
 					} else {
-						if(vela.close - ajusteStop > orden.stopLoss){
-							orden.stopLoss = vela.close - ajusteStop;
+						if(vela.close - ajusteStop > orden[origen].stopLoss){
+							orden[origen].stopLoss = vela.close - ajusteStop;
 						}
 						
 					}
@@ -189,34 +189,34 @@ function fnEvaluaCierre(origen, vela){
 			}
 			
 		} else {
-			if(vela.close > orden.stopLoss){
-				orden.close = orden.stopLoss;
-				orden.fin = vela.date;
-				orden.total = (orden.open - orden.stopLoss - spread) * ajusteDecimal;//((vela.open - orden.open) * -ajusteDecimal) - 16;
-				orden.totalReal = orden.total * orden.lote;//((vela.open - orden.open) * -ajusteDecimal) - 16;
-				fnCalcCuenta(orden.totalReal);
-				orden.cta = cuenta;
-				if(orden.total < 0){
-					orden.tipo = 'S';
+			if(vela.close > orden[origen].stopLoss){
+				orden[origen].close = orden[origen].stopLoss;
+				orden[origen].fin = vela.date;
+				orden[origen].total = (orden[origen].open - orden[origen].stopLoss - spread) * ajusteDecimal;//((vela.open - orden.open) * -ajusteDecimal) - 16;
+				orden[origen].totalReal = orden[origen].total * orden[origen].lote;//((vela.open - orden.open) * -ajusteDecimal) - 16;
+				fnCalcCuenta(orden[origen].totalReal, origen);
+				orden[origen].cta = cuenta[origen];
+				if(orden[origen].total < 0){
+					orden[origen].tipo = 'S';
 					malas++;
 				} else {
 					buenas++;
 				}
-				fnImprimirOperacion();
-				orden = null;
+				fnImprimirOperacion(origen);
+				orden[origen] = null;
 				//return "X";
 				return "N";
 			} else {
-				if(vela.close < orden.open - (spread + ajusteStop)){
-					if(orden.stopLoss > orden.open - spread){
-						orden.stopLoss = orden.open - spread;
+				if(vela.close < orden[origen].open - (spread + ajusteStop)){
+					if(orden[origen].stopLoss > orden[origen].open - spread){
+						orden[origen].stopLoss = orden[origen].open - spread;
 					} else {
-						if(vela.close + ajusteStop < orden.stopLoss){
-							orden.stopLoss = vela.close + ajusteStop;
+						if(vela.close + ajusteStop < orden[origen].stopLoss){
+							orden[origen].stopLoss = vela.close + ajusteStop;
 						}
 						
 					}
-					fnImprimirOperacion();
+					fnImprimirOperacion(origen);
 					return 'A'; 
 				}
 			}
@@ -226,26 +226,26 @@ function fnEvaluaCierre(origen, vela){
 	return 'N';
 }
 
-function fnImprimirOperacion(){
-	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + "\n", (err) => {
+function fnImprimirOperacion(tipo){
+	fs.appendFileSync('./querysReconstruccion/log' + tipo + '.txt', JSON.stringify(orden[tipo]) + "\nBUENAS: " + buenas + ", MALAS: " + malas + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
 	try{
 		//total += Math.abs(arrOrdenes[i]['total']) > 1 ? arrOrdenes[i]['total'] : 0;
-		total += orden['total'];//arrOrdenes[i]['total'] < -30 ? -30 : arrOrdenes[i]['total'];
-		total2 += orden['totalReal'];
-		if(orden['totalReal'] > 0){
-			totalPos += orden['totalReal'];
+		total += orden[tipo]['total'];//arrOrdenes[i]['total'] < -30 ? -30 : arrOrdenes[i]['total'];
+		total2 += orden[tipo]['totalReal'];
+		if(orden[tipo]['totalReal'] > 0){
+			totalPos += orden[tipo]['totalReal'];
 			totalBuenas++;
 		} else {
-			totalNeg += orden['totalReal'];
+			totalNeg += orden[tipo]['totalReal'];
 			totalMalas++;
 		}
-		if(orden['tipo'] == 'C'){
-			totalCompras += orden['totalReal'];
+		if(orden[tipo]['tipo'] == 'C'){
+			totalCompras += orden[tipo]['totalReal'];
 		} else {
-			totalVentas += orden['totalReal'];
+			totalVentas += orden[tipo]['totalReal'];
 		}
 	} catch(e){
 		
@@ -270,27 +270,27 @@ function fnVelaNormal(vela, dato){
 	
 }//2134068
 
-function fnCalcCuenta(cierre){
-	if(cuenta > 0){
-		let garantia = cuenta / 10;
-		cuenta = cuenta + cierre;
-		if(cuenta < garantia){
-			cuenta = -1;
+function fnCalcCuenta(cierre, origen){
+	if(cuenta[origen] > 0){
+		let garantia = cuenta[origen] / 10;
+		cuenta[origen] = cuenta[origen] + cierre;
+		if(cuenta[origen] < garantia){
+			cuenta[origen] = -1;
 		} else {
 			if(!loteFijo){
-				if(cuenta / 1000 > loteMax){
+				if(cuenta[origen] / 1000 > loteMax){
 					
 					ponderado = parseInt((loteMax * 100) + '');
 					console.log("INT: " + ponderado);
 					ponderado = Number(ponderado) / 100;
 				} else {
-					if(cuenta / 1000 < loteMin){
+					if(cuenta[origen] / 1000 < loteMin){
 						ponderado = parseInt((loteMin * 100) + '');
 						console.log("INT: " + ponderado);
 						ponderado = Number(ponderado) / 100;
 					} else {
-						ponderado = cuenta / 1000;
-						ponderado = parseInt(((cuenta / 1000) * 100) + '');
+						ponderado = cuenta[origen] / 1000;
+						ponderado = parseInt(((cuenta[origen] / 1000) * 100) + '');
 						console.log("INT: " + ponderado);
 						ponderado = Number(ponderado) / 100;
 					}
@@ -304,17 +304,17 @@ function fnCalcCuenta(cierre){
 
 function fnCompra(vela, tipo, arrV){
 	
-		if(cuenta > 0){
+		if(cuenta[tipo] > 0){
 			//if(vela.close - arrV[arrV.length - 1].close > 0){
-				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'C', fecha: vela.fecha, atr: atrGraf};
+				orden[tipo] = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'C', fecha: vela.fecha, atr: atrGraf};
 				//console.log(arrV);
-				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2].close - spread - 0.00010;
+				orden[tipo].stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden[tipo].open - 0.00166 : arrV[arrV.length - 2].close - spread - 0.00010;
 				nStopLoss = 0;
-				orden.lote = ponderado;
+				orden[tipo].lote = ponderado;
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(orden);
 				console.log("\n\n\n");	
-				fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " ......\n", (err) => {
+				fs.appendFileSync('./querysReconstruccion/log' + tipo + '.txt', JSON.stringify(orden[tipo]) + " ......\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});	
@@ -328,17 +328,17 @@ function fnCompra(vela, tipo, arrV){
 
 function fnVenta(vela, tipo, arrV){
 	
-		if(cuenta > 0){
+		if(cuenta[tipo] > 0){
 			//if(arrV[arrV.length - 1].close - vela.close > 0){
-				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'V', fecha: vela.fecha, atr: atrGraf};
+				orden[tipo] = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'V', fecha: vela.fecha, atr: atrGraf};
 				nStopLoss = 0;
-				orden.lote = ponderado;
-				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
+				orden[tipo].lote = ponderado;
+				orden[tipo].stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden[tipo].open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(vela);
 				console.log(orden);
 				console.log("\n\n\n");
-				fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " .....\n", (err) => {
+				fs.appendFileSync('./querysReconstruccion/log' + tipo + '.txt', JSON.stringify(orden[tipo]) + " .....\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
@@ -359,7 +359,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
 	console.log(atrGraf);
 	var resp = 'N';
-	if(orden){
+	if(orden[tipo]){
 		resp = fnEvaluaCierre(tipo, dato);
 		
 	}
@@ -367,7 +367,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 		resp = fnEvaluaVelas(dato, tipo, arrVel);
 	}
 	
-	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(arrVel[arrVel.length - 1]) + "\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/log' + tipo + '.txt', JSON.stringify(arrVel[arrVel.length - 1]) + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
@@ -440,7 +440,7 @@ http.createServer(function onRequest(request, response) {
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					//console.log(reqObj);
-					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
+					if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
 							newVela = false;
@@ -474,17 +474,26 @@ http.createServer(function onRequest(request, response) {
 						
 						value: respuesta, //Just some random value to demonstrate
 						msg: "test message",
-						cta: cuenta
+						cta: cuenta['N'],
+						ctaS: cuenta['S']
 					}
 				} else {
 					console.log(orden);
+					
 					outObj = {
 						
 						value: respuesta, //Just some random value to demonstrate
 						msg: "test message",
-						stopLoss: orden.stopLoss,
-						lote: orden.lote,
-						cta: cuenta
+						cta: cuenta['N'],
+						ctaS: cuenta['S']
+					}
+					if(orden['N']){
+						outObj.stopLoss =  orden['N'].stopLoss;
+						outObj.lote =  orden['N'].lote;
+					}
+					if(orden['S']){
+						outObj.stopLossS =  orden['S'].stopLoss;
+						outObj.loteS =  orden['S'].lote;
 					}
 				}
 					

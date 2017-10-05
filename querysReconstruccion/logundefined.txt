@@ -1,0 +1,2478 @@
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 0, MALAS: 1
+undefined
+BUENAS: 1, MALAS: 1
+undefined
+BUENAS: 2, MALAS: 1
+undefined
+BUENAS: 3, MALAS: 2
+undefined
+BUENAS: 7, MALAS: 3
+undefined
+BUENAS: 7, MALAS: 4
+undefined
+BUENAS: 8, MALAS: 6
+undefined
+BUENAS: 10, MALAS: 6
+undefined
+BUENAS: 10, MALAS: 6
+undefined
+BUENAS: 11, MALAS: 6
+undefined
+BUENAS: 11, MALAS: 8
+undefined
+BUENAS: 13, MALAS: 10
+undefined
+BUENAS: 13, MALAS: 10
+undefined
+BUENAS: 13, MALAS: 10
+undefined
+BUENAS: 13, MALAS: 10
+undefined
+BUENAS: 13, MALAS: 10
+undefined
+BUENAS: 14, MALAS: 10
+undefined
+BUENAS: 14, MALAS: 11
+undefined
+BUENAS: 14, MALAS: 11
+undefined
+BUENAS: 14, MALAS: 11
+undefined
+BUENAS: 14, MALAS: 11
+undefined
+BUENAS: 14, MALAS: 11
+undefined
+BUENAS: 14, MALAS: 11
+undefined
+BUENAS: 14, MALAS: 11
+undefined
+BUENAS: 14, MALAS: 11
+undefined
+BUENAS: 14, MALAS: 11
+undefined
+BUENAS: 15, MALAS: 11
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 15, MALAS: 12
+undefined
+BUENAS: 16, MALAS: 12
+undefined
+BUENAS: 16, MALAS: 13
+undefined
+BUENAS: 16, MALAS: 13
+undefined
+BUENAS: 16, MALAS: 13
+undefined
+BUENAS: 16, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 17, MALAS: 13
+undefined
+BUENAS: 18, MALAS: 13
+undefined
+BUENAS: 18, MALAS: 14
+undefined
+BUENAS: 19, MALAS: 17
+undefined
+BUENAS: 19, MALAS: 17
+undefined
+BUENAS: 20, MALAS: 17
+undefined
+BUENAS: 20, MALAS: 18
+undefined
+BUENAS: 20, MALAS: 18
+undefined
+BUENAS: 21, MALAS: 18
+undefined
+BUENAS: 21, MALAS: 18
+undefined
+BUENAS: 21, MALAS: 18
+undefined
+BUENAS: 21, MALAS: 18
+undefined
+BUENAS: 21, MALAS: 18
+undefined
+BUENAS: 22, MALAS: 18
+undefined
+BUENAS: 22, MALAS: 18
+undefined
+BUENAS: 22, MALAS: 18
+undefined
+BUENAS: 22, MALAS: 18
+undefined
+BUENAS: 22, MALAS: 18
+undefined
+BUENAS: 23, MALAS: 18
+undefined
+BUENAS: 23, MALAS: 18
+undefined
+BUENAS: 23, MALAS: 18
+undefined
+BUENAS: 23, MALAS: 18
+undefined
+BUENAS: 23, MALAS: 18
+undefined
+BUENAS: 23, MALAS: 18
+undefined
+BUENAS: 23, MALAS: 18
+undefined
+BUENAS: 23, MALAS: 18
+undefined
+BUENAS: 23, MALAS: 18
+undefined
+BUENAS: 24, MALAS: 18
+undefined
+BUENAS: 24, MALAS: 18
+undefined
+BUENAS: 24, MALAS: 18
+undefined
+BUENAS: 24, MALAS: 18
+undefined
+BUENAS: 25, MALAS: 18
+undefined
+BUENAS: 25, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 26, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 27, MALAS: 20
+undefined
+BUENAS: 28, MALAS: 20
+undefined
+BUENAS: 28, MALAS: 21
+undefined
+BUENAS: 28, MALAS: 21
+undefined
+BUENAS: 28, MALAS: 21
+undefined
+BUENAS: 28, MALAS: 21
+undefined
+BUENAS: 28, MALAS: 21
+undefined
+BUENAS: 28, MALAS: 21
+undefined
+BUENAS: 28, MALAS: 21
+undefined
+BUENAS: 29, MALAS: 21
+undefined
+BUENAS: 30, MALAS: 24
+undefined
+BUENAS: 30, MALAS: 25
+undefined
+BUENAS: 30, MALAS: 25
+undefined
+BUENAS: 30, MALAS: 25
+undefined
+BUENAS: 31, MALAS: 25
+undefined
+BUENAS: 31, MALAS: 26
+undefined
+BUENAS: 31, MALAS: 29
+undefined
+BUENAS: 31, MALAS: 29
+undefined
+BUENAS: 31, MALAS: 29
+undefined
+BUENAS: 31, MALAS: 29
+undefined
+BUENAS: 31, MALAS: 29
+undefined
+BUENAS: 31, MALAS: 29
+undefined
+BUENAS: 32, MALAS: 29
+undefined
+BUENAS: 32, MALAS: 31
+undefined
+BUENAS: 32, MALAS: 32
+undefined
+BUENAS: 36, MALAS: 33
+undefined
+BUENAS: 36, MALAS: 33
+undefined
+BUENAS: 36, MALAS: 33
+undefined
+BUENAS: 36, MALAS: 33
+undefined
+BUENAS: 36, MALAS: 33
+undefined
+BUENAS: 36, MALAS: 33
+undefined
+BUENAS: 36, MALAS: 33
+undefined
+BUENAS: 36, MALAS: 33
+undefined
+BUENAS: 37, MALAS: 33
+undefined
+BUENAS: 37, MALAS: 33
+undefined
+BUENAS: 37, MALAS: 33
+undefined
+BUENAS: 37, MALAS: 33
+undefined
+BUENAS: 38, MALAS: 33
+undefined
+BUENAS: 39, MALAS: 33
+undefined
+BUENAS: 39, MALAS: 33
+undefined
+BUENAS: 39, MALAS: 33
+undefined
+BUENAS: 40, MALAS: 33
+undefined
+BUENAS: 40, MALAS: 33
+undefined
+BUENAS: 40, MALAS: 33
+undefined
+BUENAS: 41, MALAS: 33
+undefined
+BUENAS: 41, MALAS: 34
+undefined
+BUENAS: 41, MALAS: 34
+undefined
+BUENAS: 41, MALAS: 34
+undefined
+BUENAS: 41, MALAS: 34
+undefined
+BUENAS: 41, MALAS: 34
+undefined
+BUENAS: 41, MALAS: 34
+undefined
+BUENAS: 42, MALAS: 34
+undefined
+BUENAS: 44, MALAS: 36
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 37
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 44, MALAS: 38
+undefined
+BUENAS: 45, MALAS: 38
+undefined
+BUENAS: 45, MALAS: 38
+undefined
+BUENAS: 45, MALAS: 38
+undefined
+BUENAS: 45, MALAS: 38
+undefined
+BUENAS: 46, MALAS: 38
+undefined
+BUENAS: 46, MALAS: 39
+undefined
+BUENAS: 50, MALAS: 39
+undefined
+BUENAS: 50, MALAS: 39
+undefined
+BUENAS: 50, MALAS: 39
+undefined
+BUENAS: 51, MALAS: 39
+undefined
+BUENAS: 51, MALAS: 40
+undefined
+BUENAS: 51, MALAS: 40
+undefined
+BUENAS: 51, MALAS: 40
+undefined
+BUENAS: 51, MALAS: 40
+undefined
+BUENAS: 51, MALAS: 40
+undefined
+BUENAS: 51, MALAS: 40
+undefined
+BUENAS: 51, MALAS: 40
+undefined
+BUENAS: 51, MALAS: 40
+undefined
+BUENAS: 52, MALAS: 40
+undefined
+BUENAS: 52, MALAS: 40
+undefined
+BUENAS: 52, MALAS: 40
+undefined
+BUENAS: 53, MALAS: 40
+undefined
+BUENAS: 54, MALAS: 40
+undefined
+BUENAS: 54, MALAS: 41
+undefined
+BUENAS: 56, MALAS: 41
+undefined
+BUENAS: 56, MALAS: 41
+undefined
+BUENAS: 57, MALAS: 41
+undefined
+BUENAS: 57, MALAS: 42
+undefined
+BUENAS: 57, MALAS: 42
+undefined
+BUENAS: 57, MALAS: 42
+undefined
+BUENAS: 58, MALAS: 42
+undefined
+BUENAS: 58, MALAS: 43
+undefined
+BUENAS: 58, MALAS: 43
+undefined
+BUENAS: 59, MALAS: 43
+undefined
+BUENAS: 59, MALAS: 44
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 62, MALAS: 45
+undefined
+BUENAS: 63, MALAS: 45
+undefined
+BUENAS: 63, MALAS: 46
+undefined
+BUENAS: 66, MALAS: 46
+undefined
+BUENAS: 66, MALAS: 46
+undefined
+BUENAS: 66, MALAS: 46
+undefined
+BUENAS: 66, MALAS: 46
+undefined
+BUENAS: 66, MALAS: 46
+undefined
+BUENAS: 66, MALAS: 46
+undefined
+BUENAS: 66, MALAS: 46
+undefined
+BUENAS: 66, MALAS: 46
+undefined
+BUENAS: 67, MALAS: 46
+undefined
+BUENAS: 67, MALAS: 46
+undefined
+BUENAS: 67, MALAS: 46
+undefined
+BUENAS: 67, MALAS: 46
+undefined
+BUENAS: 68, MALAS: 46
+undefined
+BUENAS: 69, MALAS: 47
+undefined
+BUENAS: 69, MALAS: 48
+undefined
+BUENAS: 69, MALAS: 48
+undefined
+BUENAS: 69, MALAS: 48
+undefined
+BUENAS: 69, MALAS: 48
+undefined
+BUENAS: 69, MALAS: 48
+undefined
+BUENAS: 70, MALAS: 48
+undefined
+BUENAS: 71, MALAS: 48
+undefined
+BUENAS: 71, MALAS: 48
+undefined
+BUENAS: 71, MALAS: 48
+undefined
+BUENAS: 71, MALAS: 48
+undefined
+BUENAS: 71, MALAS: 48
+undefined
+BUENAS: 72, MALAS: 48
+undefined
+BUENAS: 73, MALAS: 49
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 73, MALAS: 50
+undefined
+BUENAS: 74, MALAS: 50
+undefined
+BUENAS: 74, MALAS: 52
+undefined
+BUENAS: 74, MALAS: 52
+undefined
+BUENAS: 74, MALAS: 52
+undefined
+BUENAS: 74, MALAS: 52
+undefined
+BUENAS: 74, MALAS: 52
+undefined
+BUENAS: 74, MALAS: 52
+undefined
+BUENAS: 74, MALAS: 52
+undefined
+BUENAS: 74, MALAS: 52
+undefined
+BUENAS: 75, MALAS: 52
+undefined
+BUENAS: 76, MALAS: 53
+undefined
+BUENAS: 76, MALAS: 53
+undefined
+BUENAS: 76, MALAS: 53
+undefined
+BUENAS: 76, MALAS: 53
+undefined
+BUENAS: 76, MALAS: 53
+undefined
+BUENAS: 77, MALAS: 53
+undefined
+BUENAS: 77, MALAS: 53
+undefined
+BUENAS: 77, MALAS: 54
+undefined
+BUENAS: 77, MALAS: 54
+undefined
+BUENAS: 77, MALAS: 54
+undefined
+BUENAS: 77, MALAS: 54
+undefined
+BUENAS: 78, MALAS: 54
+undefined
+BUENAS: 78, MALAS: 55
+undefined
+BUENAS: 80, MALAS: 55
+undefined
+BUENAS: 80, MALAS: 55
+undefined
+BUENAS: 81, MALAS: 55
+undefined
+BUENAS: 81, MALAS: 56
+undefined
+BUENAS: 82, MALAS: 57
+undefined
+BUENAS: 82, MALAS: 58
+undefined
+BUENAS: 82, MALAS: 59
+undefined
+BUENAS: 82, MALAS: 61
+undefined
+BUENAS: 82, MALAS: 61
+undefined
+BUENAS: 82, MALAS: 61
+undefined
+BUENAS: 82, MALAS: 61
+undefined
+BUENAS: 82, MALAS: 61
+undefined
+BUENAS: 82, MALAS: 61
+undefined
+BUENAS: 82, MALAS: 61
+undefined
+BUENAS: 82, MALAS: 61
+undefined
+BUENAS: 83, MALAS: 61
+undefined
+BUENAS: 83, MALAS: 61
+undefined
+BUENAS: 85, MALAS: 62
+undefined
+BUENAS: 86, MALAS: 63
+undefined
+BUENAS: 86, MALAS: 64
+undefined
+BUENAS: 87, MALAS: 64
+undefined
+BUENAS: 87, MALAS: 64
+undefined
+BUENAS: 87, MALAS: 64
+undefined
+BUENAS: 88, MALAS: 64
+undefined
+BUENAS: 89, MALAS: 65
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 89, MALAS: 66
+undefined
+BUENAS: 90, MALAS: 66
+undefined
+BUENAS: 90, MALAS: 67
+undefined
+BUENAS: 92, MALAS: 68
+undefined
+BUENAS: 94, MALAS: 69
+undefined
+BUENAS: 94, MALAS: 71
+undefined
+BUENAS: 94, MALAS: 72
+undefined
+BUENAS: 95, MALAS: 72
+undefined
+BUENAS: 95, MALAS: 72
+undefined
+BUENAS: 95, MALAS: 72
+undefined
+BUENAS: 96, MALAS: 72
+undefined
+BUENAS: 96, MALAS: 72
+undefined
+BUENAS: 96, MALAS: 72
+undefined
+BUENAS: 96, MALAS: 72
+undefined
+BUENAS: 96, MALAS: 72
+undefined
+BUENAS: 96, MALAS: 72
+undefined
+BUENAS: 97, MALAS: 72
+undefined
+BUENAS: 99, MALAS: 73
+undefined
+BUENAS: 99, MALAS: 73
+undefined
+BUENAS: 99, MALAS: 73
+undefined
+BUENAS: 100, MALAS: 73
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 100, MALAS: 75
+undefined
+BUENAS: 101, MALAS: 75
+undefined
+BUENAS: 101, MALAS: 75
+undefined
+BUENAS: 101, MALAS: 75
+undefined
+BUENAS: 101, MALAS: 75
+undefined
+BUENAS: 101, MALAS: 75
+undefined
+BUENAS: 101, MALAS: 75
+undefined
+BUENAS: 101, MALAS: 75
+undefined
+BUENAS: 101, MALAS: 75
+undefined
+BUENAS: 102, MALAS: 75
+undefined
+BUENAS: 104, MALAS: 77
+undefined
+BUENAS: 104, MALAS: 78
+undefined
+BUENAS: 104, MALAS: 79
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 104, MALAS: 81
+undefined
+BUENAS: 105, MALAS: 81
+undefined
+BUENAS: 105, MALAS: 81
+undefined
+BUENAS: 105, MALAS: 81
+undefined
+BUENAS: 105, MALAS: 81
+undefined
+BUENAS: 105, MALAS: 81
+undefined
+BUENAS: 105, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 106, MALAS: 81
+undefined
+BUENAS: 107, MALAS: 81
+undefined
+BUENAS: 107, MALAS: 84
+undefined
+BUENAS: 109, MALAS: 85
+undefined
+BUENAS: 109, MALAS: 86
+undefined
+BUENAS: 109, MALAS: 87
+undefined
+BUENAS: 110, MALAS: 88
+undefined
+BUENAS: 110, MALAS: 89
+undefined
+BUENAS: 110, MALAS: 90
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 110, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 111, MALAS: 91
+undefined
+BUENAS: 112, MALAS: 91
+undefined
+BUENAS: 112, MALAS: 91
+undefined
+BUENAS: 112, MALAS: 91
+undefined
+BUENAS: 112, MALAS: 91
+undefined
+BUENAS: 113, MALAS: 91
+undefined
+BUENAS: 113, MALAS: 91
+undefined
+BUENAS: 113, MALAS: 92
+undefined
+BUENAS: 113, MALAS: 94
+undefined
+BUENAS: 113, MALAS: 94
+undefined
+BUENAS: 113, MALAS: 94
+undefined
+BUENAS: 113, MALAS: 94
+undefined
+BUENAS: 113, MALAS: 94
+undefined
+BUENAS: 113, MALAS: 94
+undefined
+BUENAS: 113, MALAS: 94
+undefined
+BUENAS: 113, MALAS: 94
+undefined
+BUENAS: 114, MALAS: 94
+undefined
+BUENAS: 114, MALAS: 94
+undefined
+BUENAS: 114, MALAS: 94
+undefined
+BUENAS: 115, MALAS: 94
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 115, MALAS: 95
+undefined
+BUENAS: 116, MALAS: 95
+undefined
+BUENAS: 116, MALAS: 96
+undefined
+BUENAS: 117, MALAS: 96
+undefined
+BUENAS: 117, MALAS: 97
+undefined
+BUENAS: 117, MALAS: 98
+undefined
+BUENAS: 117, MALAS: 98
+undefined
+BUENAS: 117, MALAS: 99
+undefined
+BUENAS: 117, MALAS: 99
+undefined
+BUENAS: 117, MALAS: 99
+undefined
+BUENAS: 117, MALAS: 99
+undefined
+BUENAS: 117, MALAS: 99
+undefined
+BUENAS: 118, MALAS: 99
+undefined
+BUENAS: 118, MALAS: 99
+undefined
+BUENAS: 118, MALAS: 99
+undefined
+BUENAS: 118, MALAS: 99
+undefined
+BUENAS: 118, MALAS: 99
+undefined
+BUENAS: 118, MALAS: 99
+undefined
+BUENAS: 118, MALAS: 99
+undefined
+BUENAS: 119, MALAS: 99
+undefined
+BUENAS: 119, MALAS: 100
+undefined
+BUENAS: 120, MALAS: 101
+undefined
+BUENAS: 120, MALAS: 101
+undefined
+BUENAS: 120, MALAS: 101
+undefined
+BUENAS: 121, MALAS: 101
+undefined
+BUENAS: 121, MALAS: 102
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 122, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 123, MALAS: 103
+undefined
+BUENAS: 124, MALAS: 103
+undefined
+BUENAS: 124, MALAS: 103
+undefined
+BUENAS: 124, MALAS: 104
+undefined
+BUENAS: 125, MALAS: 105
+undefined
+BUENAS: 125, MALAS: 106
+undefined
+BUENAS: 126, MALAS: 107
+undefined
+BUENAS: 126, MALAS: 107
+undefined
+BUENAS: 126, MALAS: 107
+undefined
+BUENAS: 126, MALAS: 107
+undefined
+BUENAS: 126, MALAS: 107
+undefined
+BUENAS: 126, MALAS: 107
+undefined
+BUENAS: 126, MALAS: 107
+undefined
+BUENAS: 126, MALAS: 107
+undefined
+BUENAS: 127, MALAS: 107
+undefined
+BUENAS: 127, MALAS: 108
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 127, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 128, MALAS: 111
+undefined
+BUENAS: 129, MALAS: 111
+undefined
+BUENAS: 129, MALAS: 112
+undefined
+BUENAS: 129, MALAS: 112
+undefined
+BUENAS: 129, MALAS: 112
+undefined
+BUENAS: 129, MALAS: 112
+undefined
+BUENAS: 129, MALAS: 112
+undefined
+BUENAS: 129, MALAS: 112
+undefined
+BUENAS: 129, MALAS: 112
+undefined
+BUENAS: 129, MALAS: 112
+undefined
+BUENAS: 130, MALAS: 112
+undefined
+BUENAS: 130, MALAS: 113
+undefined
+BUENAS: 131, MALAS: 115
+undefined
+BUENAS: 132, MALAS: 115
+undefined
+BUENAS: 132, MALAS: 115
+undefined
+BUENAS: 132, MALAS: 115
+undefined
+BUENAS: 132, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 133, MALAS: 115
+undefined
+BUENAS: 134, MALAS: 115
+undefined
+BUENAS: 136, MALAS: 116
+undefined
+BUENAS: 136, MALAS: 117
+undefined
+BUENAS: 136, MALAS: 118
+undefined
+BUENAS: 136, MALAS: 118
+undefined
+BUENAS: 136, MALAS: 118
+undefined
+BUENAS: 136, MALAS: 118
+undefined
+BUENAS: 136, MALAS: 118
+undefined
+BUENAS: 137, MALAS: 118
+undefined
+BUENAS: 137, MALAS: 118
+undefined
+BUENAS: 137, MALAS: 118
+undefined
+BUENAS: 137, MALAS: 118
+undefined
+BUENAS: 138, MALAS: 118
+undefined
+BUENAS: 140, MALAS: 118
+undefined
+BUENAS: 140, MALAS: 118
+undefined
+BUENAS: 140, MALAS: 118
+undefined
+BUENAS: 140, MALAS: 118
+undefined
+BUENAS: 141, MALAS: 118
+undefined
+BUENAS: 141, MALAS: 118
+undefined
+BUENAS: 141, MALAS: 118
+undefined
+BUENAS: 141, MALAS: 118
+undefined
+BUENAS: 141, MALAS: 118
+undefined
+BUENAS: 141, MALAS: 118
+undefined
+BUENAS: 141, MALAS: 118
+undefined
+BUENAS: 141, MALAS: 118
+undefined
+BUENAS: 141, MALAS: 118
+undefined
+BUENAS: 142, MALAS: 118
+undefined
+BUENAS: 142, MALAS: 119
+undefined
+BUENAS: 142, MALAS: 120
+undefined
+BUENAS: 142, MALAS: 121
+undefined
+BUENAS: 142, MALAS: 121
+undefined
+BUENAS: 142, MALAS: 121
+undefined
+BUENAS: 142, MALAS: 121
+undefined
+BUENAS: 142, MALAS: 121
+undefined
+BUENAS: 142, MALAS: 121
+undefined
+BUENAS: 143, MALAS: 121
+undefined
+BUENAS: 144, MALAS: 122
+undefined
+BUENAS: 144, MALAS: 122
+undefined
+BUENAS: 144, MALAS: 122
+undefined
+BUENAS: 144, MALAS: 122
+undefined
+BUENAS: 145, MALAS: 122
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 145, MALAS: 124
+undefined
+BUENAS: 146, MALAS: 124
+undefined
+BUENAS: 146, MALAS: 126
+undefined
+BUENAS: 146, MALAS: 127
+undefined
+BUENAS: 147, MALAS: 128
+undefined
+BUENAS: 147, MALAS: 128
+undefined
+BUENAS: 147, MALAS: 128
+undefined
+BUENAS: 147, MALAS: 128
+undefined
+BUENAS: 147, MALAS: 128
+undefined
+BUENAS: 147, MALAS: 128
+undefined
+BUENAS: 147, MALAS: 128
+undefined
+BUENAS: 147, MALAS: 128
+undefined
+BUENAS: 147, MALAS: 128
+undefined
+BUENAS: 148, MALAS: 128
+undefined
+BUENAS: 148, MALAS: 128
+undefined
+BUENAS: 148, MALAS: 128
+undefined
+BUENAS: 148, MALAS: 128
+undefined
+BUENAS: 149, MALAS: 128
+undefined
+BUENAS: 149, MALAS: 128
+undefined
+BUENAS: 149, MALAS: 128
+undefined
+BUENAS: 149, MALAS: 128
+undefined
+BUENAS: 149, MALAS: 128
+undefined
+BUENAS: 149, MALAS: 128
+undefined
+BUENAS: 150, MALAS: 128
+undefined
+BUENAS: 150, MALAS: 130
+undefined
+BUENAS: 150, MALAS: 130
+undefined
+BUENAS: 150, MALAS: 130
+undefined
+BUENAS: 150, MALAS: 130
+undefined
+BUENAS: 150, MALAS: 130
+undefined
+BUENAS: 150, MALAS: 130
+undefined
+BUENAS: 151, MALAS: 130
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 151, MALAS: 131
+undefined
+BUENAS: 152, MALAS: 131
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 152, MALAS: 132
+undefined
+BUENAS: 153, MALAS: 132
+undefined
+BUENAS: 153, MALAS: 132
+undefined
+BUENAS: 153, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 154, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 155, MALAS: 133
+undefined
+BUENAS: 156, MALAS: 133
+undefined
+BUENAS: 156, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 157, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 158, MALAS: 134
+undefined
+BUENAS: 159, MALAS: 134
+undefined
+BUENAS: 159, MALAS: 135
+undefined
+BUENAS: 160, MALAS: 136
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 161, MALAS: 138
+undefined
+BUENAS: 162, MALAS: 138
+undefined
+BUENAS: 162, MALAS: 138
+undefined
+BUENAS: 162, MALAS: 138
+undefined
+BUENAS: 162, MALAS: 138
+undefined
+BUENAS: 162, MALAS: 138
+undefined
+BUENAS: 162, MALAS: 138
+undefined
+BUENAS: 162, MALAS: 138
+undefined
+BUENAS: 162, MALAS: 138
+undefined
+BUENAS: 163, MALAS: 138
+undefined
+BUENAS: 163, MALAS: 139
+undefined
+BUENAS: 164, MALAS: 139
+undefined
+BUENAS: 164, MALAS: 139
+undefined
+BUENAS: 164, MALAS: 139
+undefined
+BUENAS: 164, MALAS: 139
+undefined
+BUENAS: 164, MALAS: 139
+undefined
+BUENAS: 165, MALAS: 139
+undefined
+BUENAS: 165, MALAS: 140
+undefined
+BUENAS: 166, MALAS: 141
+undefined
+BUENAS: 166, MALAS: 141
+undefined
+BUENAS: 166, MALAS: 141
+undefined
+BUENAS: 166, MALAS: 141
+undefined
+BUENAS: 166, MALAS: 141
+undefined
+BUENAS: 167, MALAS: 141
+undefined
+BUENAS: 167, MALAS: 143
+undefined
+BUENAS: 167, MALAS: 146
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 167, MALAS: 147
+undefined
+BUENAS: 168, MALAS: 147
+undefined
+BUENAS: 170, MALAS: 149
+undefined
+BUENAS: 170, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 171, MALAS: 151
+undefined
+BUENAS: 172, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 174, MALAS: 151
+undefined
+BUENAS: 175, MALAS: 151
+undefined
+BUENAS: 175, MALAS: 152
+undefined
+BUENAS: 176, MALAS: 154
+undefined
+BUENAS: 176, MALAS: 154
+undefined
+BUENAS: 176, MALAS: 154
+undefined
+BUENAS: 176, MALAS: 154
+undefined
+BUENAS: 176, MALAS: 154
+undefined
+BUENAS: 176, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 177, MALAS: 154
+undefined
+BUENAS: 178, MALAS: 154
+undefined
+BUENAS: 181, MALAS: 157
+undefined
+BUENAS: 181, MALAS: 157
+undefined
+BUENAS: 181, MALAS: 157
+undefined
+BUENAS: 181, MALAS: 157
+undefined
+BUENAS: 181, MALAS: 157
+undefined
+BUENAS: 181, MALAS: 157
+undefined
+BUENAS: 181, MALAS: 157
+undefined
+BUENAS: 182, MALAS: 157
+undefined
+BUENAS: 182, MALAS: 157
+undefined
+BUENAS: 182, MALAS: 157
+undefined
+BUENAS: 182, MALAS: 157
+undefined
+BUENAS: 182, MALAS: 157
+undefined
+BUENAS: 182, MALAS: 157
+undefined
+BUENAS: 182, MALAS: 157
+undefined
+BUENAS: 182, MALAS: 157
+undefined
+BUENAS: 183, MALAS: 157
+undefined
+BUENAS: 183, MALAS: 160
+undefined
+BUENAS: 184, MALAS: 161
+undefined
+BUENAS: 184, MALAS: 161
+undefined
+BUENAS: 184, MALAS: 161
+undefined
+BUENAS: 184, MALAS: 161
+undefined
+BUENAS: 184, MALAS: 161
+undefined
+BUENAS: 184, MALAS: 161
+undefined
+BUENAS: 184, MALAS: 161
+undefined
+BUENAS: 185, MALAS: 161
+undefined
+BUENAS: 185, MALAS: 162
+undefined
+BUENAS: 185, MALAS: 162
+undefined
+BUENAS: 185, MALAS: 162
+undefined
+BUENAS: 185, MALAS: 162
+undefined
+BUENAS: 186, MALAS: 162
+undefined
+BUENAS: 186, MALAS: 162
+undefined
+BUENAS: 186, MALAS: 163
+undefined
+BUENAS: 187, MALAS: 163
+undefined
+BUENAS: 187, MALAS: 163
+undefined
+BUENAS: 187, MALAS: 163
+undefined
+BUENAS: 187, MALAS: 163
+undefined
+BUENAS: 187, MALAS: 163
+undefined
+BUENAS: 187, MALAS: 163
+undefined
+BUENAS: 187, MALAS: 163
+undefined
+BUENAS: 187, MALAS: 163
+undefined
+BUENAS: 187, MALAS: 163
+undefined
+BUENAS: 188, MALAS: 163
+undefined
+BUENAS: 189, MALAS: 165
+undefined
+BUENAS: 189, MALAS: 167
+undefined
+BUENAS: 190, MALAS: 170
+undefined
+BUENAS: 190, MALAS: 172
+undefined
+BUENAS: 190, MALAS: 173
+undefined
+BUENAS: 190, MALAS: 173
+undefined
+BUENAS: 190, MALAS: 173
+undefined
+BUENAS: 191, MALAS: 173
+undefined
+BUENAS: 191, MALAS: 173
+undefined
+BUENAS: 191, MALAS: 173
+undefined
+BUENAS: 191, MALAS: 173
+undefined
+BUENAS: 191, MALAS: 173
+undefined
+BUENAS: 191, MALAS: 173
+undefined
+BUENAS: 192, MALAS: 173
+undefined
+BUENAS: 193, MALAS: 175
+undefined
+BUENAS: 193, MALAS: 175
+undefined
+BUENAS: 193, MALAS: 175
+undefined
+BUENAS: 193, MALAS: 175
+undefined
+BUENAS: 194, MALAS: 175
+undefined
+BUENAS: 195, MALAS: 176
+undefined
+BUENAS: 195, MALAS: 176
+undefined
+BUENAS: 195, MALAS: 176
+undefined
+BUENAS: 196, MALAS: 176
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 197, MALAS: 179
+undefined
+BUENAS: 198, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 199, MALAS: 179
+undefined
+BUENAS: 200, MALAS: 179
+undefined
+BUENAS: 200, MALAS: 180
+undefined
+BUENAS: 200, MALAS: 181
+undefined
+BUENAS: 202, MALAS: 182
+undefined
+BUENAS: 202, MALAS: 182
+undefined
+BUENAS: 202, MALAS: 182
+undefined
+BUENAS: 202, MALAS: 182
+undefined
+BUENAS: 202, MALAS: 182
+undefined
+BUENAS: 202, MALAS: 182
+undefined
+BUENAS: 202, MALAS: 182
+undefined
+BUENAS: 202, MALAS: 182
+undefined
+BUENAS: 203, MALAS: 182
+undefined
+BUENAS: 203, MALAS: 182
+undefined
+BUENAS: 203, MALAS: 183
+undefined
+BUENAS: 205, MALAS: 185
+undefined
+BUENAS: 207, MALAS: 186
+undefined
+BUENAS: 207, MALAS: 187
+undefined
+BUENAS: 207, MALAS: 188
+undefined
+BUENAS: 207, MALAS: 189
+undefined
+BUENAS: 207, MALAS: 189
+undefined
+BUENAS: 208, MALAS: 189
+undefined
+BUENAS: 208, MALAS: 189
+undefined
+BUENAS: 208, MALAS: 189
+undefined
+BUENAS: 208, MALAS: 189
+undefined
+BUENAS: 209, MALAS: 189
+undefined
+BUENAS: 211, MALAS: 190
+undefined
+BUENAS: 211, MALAS: 191
+undefined
+BUENAS: 212, MALAS: 192
+undefined
+BUENAS: 212, MALAS: 194
+undefined
+BUENAS: 212, MALAS: 194
+undefined
+BUENAS: 212, MALAS: 194
+undefined
+BUENAS: 212, MALAS: 194
+undefined
+BUENAS: 212, MALAS: 194
+undefined
+BUENAS: 212, MALAS: 194
+undefined
+BUENAS: 212, MALAS: 194
+undefined
+BUENAS: 212, MALAS: 194
+undefined
+BUENAS: 212, MALAS: 194
+undefined
+BUENAS: 213, MALAS: 194
+undefined
+BUENAS: 213, MALAS: 195
+undefined
+BUENAS: 214, MALAS: 196
+undefined
+BUENAS: 214, MALAS: 197
+undefined
+BUENAS: 215, MALAS: 197
+undefined
+BUENAS: 215, MALAS: 198
+undefined
+BUENAS: 215, MALAS: 199
+undefined
+BUENAS: 216, MALAS: 201
+undefined
+BUENAS: 216, MALAS: 202
+undefined
+BUENAS: 216, MALAS: 202
+undefined
+BUENAS: 216, MALAS: 202
+undefined
+BUENAS: 216, MALAS: 202
+undefined
+BUENAS: 217, MALAS: 202
+undefined
+BUENAS: 218, MALAS: 203
+undefined
+BUENAS: 218, MALAS: 204
