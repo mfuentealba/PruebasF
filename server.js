@@ -7,6 +7,7 @@ var ATR = require('technicalindicators').ATR;
 var ini = {low:[], high:[], close:[], period: 14};
 var atr = new ATR(ini);
 var fs = require('fs');
+var fs2 = require('fs');
 var loteMin = 0.01;
 var loteMax = 4000;
 var loteFijo = false;
@@ -24,6 +25,10 @@ var totalBuenas = 0;
 var totalMalas = 0;
 var buenas = 0;
 var malas = 0;
+var neutras = 0;
+
+var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, marT: 0, mieB: 0, mieM: 0, mieN: 0, mieT: 0, jueB: 0, jueM: 0, jueN: 0, jueT: 0, vieB: 0, vieM: 0, vieN: 0, vieT: 0}
+"lun", "mar", "mie", "jue", "vie"
 
 
 
@@ -147,6 +152,9 @@ function fnEvaluaVelas(dato, tipo, arrV){
 function fnEvaluaCierre(origen, vela){
 	if(orden != null && origen == orden.origen){
 		console.log(orden);
+		var arrFecha = vela.fecha.split('.');				
+		var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
+		var df = dias[dt.getUTCDay()];	
 		if(orden.tipo == 'C'){
 			if(vela.close < orden.stopLoss){
 				orden.close = orden.stopLoss;
@@ -158,16 +166,25 @@ function fnEvaluaCierre(origen, vela){
 				fnCalcCuenta(orden.totalReal);
 				orden.cta = cuenta;
 				
-				if(orden.total < 0){					
+				if(orden.total < -0.01){					
 					orden.tipo = 'L';
 					malas++;
+					objResult[df + 'M']++;
+					
 				} else {
-					if(orden.total > 0){
+					if(orden.total > 0.01){
 						buenas++;
+						objResult[df + 'B']++;
+					} else {
+						neutras++;
+						objResult[df + 'N']++;
 					}
 				}
-				
-				
+				objResult[df + 'T'] += orden.total;
+				fs2.appendFileSync('./querysReconstruccion/logF.txt', JSON.stringify(objResult) + "\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
 
 				fnImprimirOperacion();
 				orden = null;
@@ -196,12 +213,24 @@ function fnEvaluaCierre(origen, vela){
 				orden.totalReal = orden.total * orden.lote;//((vela.open - orden.open) * -ajusteDecimal) - 16;
 				fnCalcCuenta(orden.totalReal);
 				orden.cta = cuenta;
-				if(orden.total < 0){
+				if(orden.total < -0.01){
 					orden.tipo = 'S';
 					malas++;
+					objResult[df + 'M']++;
 				} else {
-					buenas++;
+					if(orden.total > 0.01){
+						buenas++;
+						objResult[df + 'B']++;
+					} else {
+						neutras++;
+						objResult[df + 'N']++;
+					}
 				}
+				objResult[df + 'T'] += orden.total;
+				fs2.appendFileSync('./querysReconstruccion/logF.txt', JSON.stringify(objResult) + "\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
 				fnImprimirOperacion();
 				orden = null;
 				//return "X";
@@ -227,7 +256,7 @@ function fnEvaluaCierre(origen, vela){
 }
 
 function fnImprimirOperacion(){
-	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + "\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
@@ -308,9 +337,14 @@ function fnCompra(vela, tipo, arrV){
 			//if(vela.close - arrV[arrV.length - 1].close > 0){
 				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'C', fecha: vela.fecha, atr: atrGraf};
 				//console.log(arrV);
+				var arrFecha = vela.fecha.split('.');				
+				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
+				
 				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2].close - spread - 0.00010;
 				nStopLoss = 0;
 				orden.lote = ponderado;
+				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
+				orden.dia = dias[dt.getUTCDay()];
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(orden);
 				console.log("\n\n\n");	
@@ -331,9 +365,12 @@ function fnVenta(vela, tipo, arrV){
 		if(cuenta > 0){
 			//if(arrV[arrV.length - 1].close - vela.close > 0){
 				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'V', fecha: vela.fecha, atr: atrGraf};
+				var arrFecha = vela.fecha.split('.');
+				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				nStopLoss = 0;
 				orden.lote = ponderado;
 				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
+				orden.dia = dias[dt.getUTCDay()];
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(vela);
 				console.log(orden);
@@ -379,7 +416,8 @@ function fnVelaNueva(dato, arrVel, tipo){
 }
 
 var newVela = true;
-
+var dias=["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
+    
 	
 //Create the server and listening to the request
 http.createServer(function onRequest(request, response) {
