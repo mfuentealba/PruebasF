@@ -40,7 +40,7 @@ function fnProcesa(i){
 	var sw = true;
 	var objReq = '{"open": "' + dato[2] + '", "close": "' + dato[5] + '", "high": "' + dato[3] + '", "low": "' + dato[4] + '", "spread": "' + 0.0003 + '", "opt": "S", "date": "' + (/*dato[0] + ',' + */dato[1]) + '", "fecha": "' + (dato[0]) + '", "cierre": "' + cierre + '"}';
 	
-	request.post({url: 'http://localhost:8989', form: objReq}, fnRecepcion);
+	request.post({url: 'http://localhost:9090', form: objReq}, fnRecepcion);
 	
 }
 

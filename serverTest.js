@@ -76,7 +76,7 @@ objFunciones['fnVelas'] = fnEvaluaVelas;
 
 var http = require("http");
 
-var _PORT = 8989; //Http port Node.js server will be listening on. Make sure that this is an open port and its the same as the one defined in MT4 indicator/EA.
+var _PORT = 9090; //Http port Node.js server will be listening on. Make sure that this is an open port and its the same as the one defined in MT4 indicator/EA.
 	
 var arrVelas = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];
 var arrVelasSombra = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];	
@@ -256,7 +256,7 @@ function fnEvaluaCierre(origen, vela){
 }
 
 function fnImprimirOperacion(){
-	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/log_.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
@@ -348,7 +348,7 @@ function fnCompra(vela, tipo, arrV){
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(orden);
 				console.log("\n\n\n");	
-				fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " ......\n", (err) => {
+				fs.appendFileSync('./querysReconstruccion/log_.txt', JSON.stringify(orden) + " ......\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});	
@@ -375,7 +375,7 @@ function fnVenta(vela, tipo, arrV){
 				console.log(vela);
 				console.log(orden);
 				console.log("\n\n\n");
-				fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " .....\n", (err) => {
+				fs.appendFileSync('./querysReconstruccion/log_.txt', JSON.stringify(orden) + " .....\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
@@ -404,7 +404,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 		resp = fnEvaluaVelas(dato, tipo, arrVel);
 	}
 	
-	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(arrVel[arrVel.length - 1]) + "\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/log_.txt', JSON.stringify(arrVel[arrVel.length - 1]) + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
