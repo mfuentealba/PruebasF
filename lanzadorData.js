@@ -44,7 +44,7 @@ function fnProcesa(i){
 	
 }
 
-fs.readFile("./marketdata/EURUSD1.csv", 'utf8', function(err, data) {
+fs.readFile("./marketdata/USDJPY1_2000_2005.csv", 'utf8', function(err, data) {
 	if(err){
 		console.log(err);
 		return;

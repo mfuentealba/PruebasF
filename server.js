@@ -8,6 +8,7 @@ var ini = {low:[], high:[], close:[], period: 14};
 var atr = new ATR(ini);
 var fs = require('fs');
 var fs2 = require('fs');
+var fs3 = require('fs');
 var loteMin = 0.01;
 var loteMax = 4000;
 var loteFijo = false;
@@ -438,6 +439,8 @@ http.createServer(function onRequest(request, response) {
 			//console.log(ms);
 			if(ms.toString() != "")
 			{
+				
+				
 				var msg = ms.toString();	//Parse the ms into string		
 				
 				//console.log(msg); // Prints the message in the console
@@ -446,6 +449,10 @@ http.createServer(function onRequest(request, response) {
 				
 				var respuesta = "N";
 				
+				fs3.appendFileSync('./querysReconstruccion/data.txt', reqObj['fecha'] + ',' + reqObj['date'] + ',' + reqObj['open'] + ',' + reqObj['high'] + ',' + reqObj['low'] + ',' + reqObj['close'] + ',' + reqObj['vol'] + "\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
 				
 				
 				console.log(reqObj);

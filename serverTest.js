@@ -8,10 +8,12 @@ var ini = {low:[], high:[], close:[], period: 14};
 var atr = new ATR(ini);
 var fs = require('fs');
 var fs2 = require('fs');
+var fs3 = require('fs');
+var fsGraf = require('fs');
 var loteMin = 0.01;
 var loteMax = 4000;
 var loteFijo = false;
-var ajusteDecimal = 100000;
+var ajusteDecimal = 1000;
 var cantOrdenes = 1;
 var desfaseSombra = -0.005;
 
@@ -181,7 +183,7 @@ function fnEvaluaCierre(origen, vela){
 					}
 				}
 				objResult[df + 'T'] += orden.total;
-				fs2.appendFileSync('./querysReconstruccion/logF.txt', JSON.stringify(objResult) + "\n", (err) => {
+				fs2.appendFileSync('./querysReconstruccion/_logF.txt', JSON.stringify(objResult) + "\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
@@ -227,7 +229,7 @@ function fnEvaluaCierre(origen, vela){
 					}
 				}
 				objResult[df + 'T'] += orden.total;
-				fs2.appendFileSync('./querysReconstruccion/logF.txt', JSON.stringify(objResult) + "\n", (err) => {
+				fs2.appendFileSync('./querysReconstruccion/_logF.txt', JSON.stringify(objResult) + "\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
@@ -256,7 +258,7 @@ function fnEvaluaCierre(origen, vela){
 }
 
 function fnImprimirOperacion(){
-	fs.appendFileSync('./querysReconstruccion/log_.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/_log.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
@@ -348,7 +350,7 @@ function fnCompra(vela, tipo, arrV){
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(orden);
 				console.log("\n\n\n");	
-				fs.appendFileSync('./querysReconstruccion/log_.txt', JSON.stringify(orden) + " ......\n", (err) => {
+				fs.appendFileSync('./querysReconstruccion/_log.txt', JSON.stringify(orden) + " ......\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});	
@@ -375,7 +377,7 @@ function fnVenta(vela, tipo, arrV){
 				console.log(vela);
 				console.log(orden);
 				console.log("\n\n\n");
-				fs.appendFileSync('./querysReconstruccion/log_.txt', JSON.stringify(orden) + " .....\n", (err) => {
+				fs.appendFileSync('./querysReconstruccion/_log.txt', JSON.stringify(orden) + " .....\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
@@ -394,6 +396,11 @@ function fnVelaNueva(dato, arrVel, tipo){
 	console.log('fnVelaNueva');
 	console.log(tipo);
 	atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
+	var vela = arrVel[arrVel.length - 1];
+	velaOperativa = {x: vela.date, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
+	
+	
+	
 	console.log(atrGraf);
 	var resp = 'N';
 	if(orden){
@@ -404,7 +411,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 		resp = fnEvaluaVelas(dato, tipo, arrVel);
 	}
 	
-	fs.appendFileSync('./querysReconstruccion/log_.txt', JSON.stringify(arrVel[arrVel.length - 1]) + "\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/_log.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
@@ -438,6 +445,8 @@ http.createServer(function onRequest(request, response) {
 			//console.log(ms);
 			if(ms.toString() != "")
 			{
+				
+				
 				var msg = ms.toString();	//Parse the ms into string		
 				
 				//console.log(msg); // Prints the message in the console
@@ -446,6 +455,10 @@ http.createServer(function onRequest(request, response) {
 				
 				var respuesta = "N";
 				
+				fs3.appendFileSync('./querysReconstruccion/_data.txt', reqObj['fecha'] + ',' + reqObj['date'] + ',' + reqObj['open'] + ',' + reqObj['high'] + ',' + reqObj['low'] + ',' + reqObj['close'] + ',' + reqObj['vol'] + "\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
 				
 				
 				console.log(reqObj);
