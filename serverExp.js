@@ -1,6 +1,69 @@
-/* This is example code. Modify it accordingly. For questions, please visit http://penguintraders.com */
+var fsLauncher = require('fs');
+var secNum = [];
+var objSec = {};
+var contador = 1;
 
-//Include the node.js modules that you need. Make sure you install them first with npm install
+var request = require('request');
+var EventEmitter = require('events').EventEmitter;
+
+var ee = new EventEmitter();
+ee.on("exec", fnProcesa);
+
+for(var i = 0; i < 10; i++){	
+	secNum.push("0" + i);
+	objSec["0" + i] = i - 1;
+}
+
+for(var i = 10; i < 60; i++){	
+	secNum.push("" + i);
+	objSec["" + i] = i - 1;
+}
+
+function fnRecepcion(err,httpResponse,body){
+	
+	console.log(body);
+	body = JSON.parse(body)
+	contador++;
+	if(Number(body.cta) > 0){
+		ee.emit('exec', contador);
+	}
+	
+}
+
+function fnProcesa(i){
+	if(contador == arr.length){
+		return;
+	}
+	var dato = arr[i - 1].split(',');
+	var cierre = arr[i].split(',')[2];
+	//var arrFecha = dato[0].split(".");	
+	var sw = true;
+	var objReq = '{"open": "' + dato[2] + '", "close": "' + dato[5] + '", "high": "' + dato[3] + '", "low": "' + dato[4] + '", "spread": "' + 0.0003 + '", "opt": "S", "date": "' + (/*dato[0] + ',' + */dato[1]) + '", "fecha": "' + (dato[0]) + '", "vol": "' + Number(dato[6]) + '"}';
+	
+	request.post({url: 'http://localhost:9191', form: objReq}, fnRecepcion);
+	
+}
+
+//fs.readFile("./marketdata/USDJPY1_2000_2005.csv", 'utf8', function(err, data) {
+fsLauncher.readFile("./querysReconstruccion/_dataExp.txt", 'utf8', function(err, data) {
+//fs.readFile("./marketdata/DAT_MT_GBPUSD_M1_2016.csv", 'utf8', function(err, data) {
+	if(err){
+		console.log(err);
+		return;
+	}
+	
+	arr = data.split("\n");
+	
+	
+	ee.emit('exec', contador);
+});		
+
+
+
+
+
+
+
 var bearishengulfingpattern = require('./technicalindicators.js').bearishengulfingpattern;
 var bullishengulfingpattern = require('./technicalindicators.js').bullishengulfingpattern;
 var ATR = require('technicalindicators').ATR;
@@ -11,7 +74,7 @@ var fs2 = require('fs');
 var fs3 = require('fs');
 var fsGraf = require('fs');
 var fsOrdenes = require('fs');
-var loteMin = 0.1;
+var loteMin = 0.01;
 var loteMax = 100;
 var loteFijo = false;
 var ajusteDecimal = 100000;
@@ -37,7 +100,7 @@ var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, 
 
 var cuenta = 100;
 var ponderado = .1;
-var spread = 0.00030;
+var spread = 0.00020;
 var ajusteStop = 0.0004;
 var objCont = {N: 2, S: 2}
 
@@ -94,7 +157,7 @@ function fnSi(dato){
 
 var http = require("http");
 
-var _PORT = 8989; //Http port Node.js server will be listening on. Make sure that this is an open port and its the same as the one defined in MT4 indicator/EA.
+var _PORT = 9191; //Http port Node.js server will be listening on. Make sure that this is an open port and its the same as the one defined in MT4 indicator/EA.
 	
 var arrVelas = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];
 var arrVelasSombra = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];	
@@ -151,27 +214,27 @@ function fnEvaluaVelas(dato, tipo, arrV){
 			
 		}
 	
-		/*
+		
 		if(orden == null && sw){
 			var arrFecha = dato.fecha.split('.');
 			var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				
-			//if(dias[dt.getUTCDay()] == 'jue'){			
+			if(dias[dt.getUTCDay()] == 'jue'){			
 								
 				switch(evaluacion){
 					case 2:
-						
+						evaluacion = 0;
 						return fnVenta(dato, tipo, arrV, 'open');
-					break;
+					
 					case 3:
-						
+						evaluacion = 0;
 						return fnCompra(dato, tipo, arrV, 'open');
-					break;
+					
 				}
-				evaluacion = 0;
-			//}
+				
+			}
 			
-		}*/
+		}
 		
 	}
 	return "N";
@@ -184,7 +247,7 @@ function fnEvaluaCierre(origen, vela){
 		var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 		var df = dias[dt.getUTCDay()];	
 		if(orden.tipo == 'C'){
-			if(vela.close < orden.stopLoss){
+			if(vela.low < orden.stopLoss){
 				orden.close = orden.stopLoss;
 				
 				orden.fin = vela.date;
@@ -209,11 +272,14 @@ function fnEvaluaCierre(origen, vela){
 					}
 				}
 				objResult[df + 'T'] += orden.total;
-				fs2.appendFileSync('./querysReconstruccion/logF.txt', JSON.stringify(objResult) + "\n", (err) => {
+				fs2.appendFileSync('./querysReconstruccion/_logExpF.txt', JSON.stringify(objResult) + "\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
-
+                fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(vela) + "\n", (err) => {
+                if (err) throw err;
+                    //console.log('The "data to append" was appended to file!');
+                });
 				fnImprimirOperacion();
 				orden = null;
 				//return "X";
@@ -234,7 +300,8 @@ function fnEvaluaCierre(origen, vela){
 			}
 			
 		} else {
-			if(vela.close > orden.stopLoss){
+            console.log('velaClose: ' + vela.close + ' < ' + (orden.open - (ajusteStop + spread)));
+			if(vela.high > orden.stopLoss){
 				orden.close = orden.stopLoss;
 				orden.fin = vela.date;
 				orden.total = (orden.open - orden.stopLoss - spread) * ajusteDecimal;//((vela.open - orden.open) * -ajusteDecimal) - 16;
@@ -255,15 +322,20 @@ function fnEvaluaCierre(origen, vela){
 					}
 				}
 				objResult[df + 'T'] += orden.total;
-				fs2.appendFileSync('./querysReconstruccion/logF.txt', JSON.stringify(objResult) + "\n", (err) => {
+				fs2.appendFileSync('./querysReconstruccion/_logExpF.txt', JSON.stringify(objResult) + "\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
+                fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(vela) + "\n", (err) => {
+                    if (err) throw err;
+                        //console.log('The "data to append" was appended to file!');
+                    });
 				fnImprimirOperacion();
 				orden = null;
 				//return "X";
 				return "N";
 			} else {
+                
 				if(vela.close < orden.open - (ajusteStop + spread)){
 					if(orden.stopLoss > orden.open - spread){
 						orden.stopLoss = orden.open - spread;
@@ -284,11 +356,11 @@ function fnEvaluaCierre(origen, vela){
 }
 
 function fnImprimirOperacion(){
-	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
-	fsOrdenes.appendFileSync('./querysReconstruccion/logOrdenes.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
+	fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});	
@@ -329,6 +401,10 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 		vela.low = dato.low;		
 	}	
 	console.log(evaluacion + '_' + cont);
+    if(orden){
+		resp = fnEvaluaCierre(tipo, dato);
+		
+	}
 	return objFunciones[evaluacion + '_' + cont](vela, tipo, arrVel);
 	
 }//2134068
@@ -381,7 +457,8 @@ function fnCompra(vela, tipo, arrV, param){
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 3].close - spread - 0.00010;
-				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2 - pos].close - spread - 0.00010;
+				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2 - pos].close - spread - 0.00010;
+                orden.stopLoss = arrV[arrV.length - 2 - pos].close - spread - 0.00010;
 				nStopLoss = 0;
 				orden.lote = ponderado;
 				
@@ -389,11 +466,11 @@ function fnCompra(vela, tipo, arrV, param){
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(orden);
 				console.log("\n\n\n");	
-				fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " ......\n", (err) => {
+				fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + " ......\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
-				fsOrdenes.appendFileSync('./querysReconstruccion/logOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
+				fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
@@ -422,17 +499,18 @@ function fnVenta(vela, tipo, arrV, param){
 				nStopLoss = 0;
 				orden.lote = ponderado;
 				//orden.stopLoss = -Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - spread - 26 - 0.00010 < -166 ? orden.open + 0.00166 : arrV[arrV.length - 3].close + spread + 0.00010;
-				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2 - pos].close + spread + 0.00010;
+				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2 - pos].close + spread + 0.00010;
+                orden.stopLoss = arrV[arrV.length - 2 - pos].close + spread + 0.00010;
 				orden.dia = dias[dt.getUTCDay()];
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(vela);
 				console.log(orden);
 				console.log("\n\n\n");
-				fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(orden) + " .....\n", (err) => {
+				fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + " .....\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
-				fsOrdenes.appendFileSync('./querysReconstruccion/logOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
+				fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
@@ -454,7 +532,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	var vela = arrVel[arrVel.length - 1];
 	velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
 	
-	fs.appendFileSync('./querysReconstruccion/log.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
@@ -516,13 +594,13 @@ http.createServer(function onRequest(request, response) {
 				
 				var respuesta = "N";
 				
-				fs3.appendFileSync('./querysReconstruccion/data.txt', reqObj['fecha'] + ',' + reqObj['date'] + ',' + reqObj['open'] + ',' + reqObj['high'] + ',' + reqObj['low'] + ',' + reqObj['close'] + ',' + reqObj['vol'] + ',' + reqObj['spread'] + "\n", (err) => {
+				fs3.appendFileSync('./querysReconstruccion/_dataExp.txt', reqObj['fecha'] + ',' + reqObj['date'] + ',' + reqObj['open'] + ',' + reqObj['high'] + ',' + reqObj['low'] + ',' + reqObj['close'] + ',' + reqObj['vol'] + ',' + reqObj['spread'] + "\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
 				
 				
-				console.log(reqObj);
+				console.log(reqObj.fecha);
 				reqObj.close = Number(reqObj.close);
 				reqObj.open = Number(reqObj.open);
 				reqObj.high = Number(reqObj.high);
@@ -536,20 +614,20 @@ http.createServer(function onRequest(request, response) {
 					fnEvaluaCierre('N', reqObj);
 					respuesta = fnEvaluaVelas(reqObj.cierre, 'N', arrVelas);*/
 					//respuesta = 'N';
-					/*if(reqObj.date[3] == '0' || reqObj.date[3] == '1' || reqObj.date[3] == '2'){
+					if(reqObj.date[3] == '0' || reqObj.date[3] == '1' || reqObj.date[3] == '2'){
 			
 						if(newVela == true){
 							newVela = false;
-							respuesta = fnVelaNueva(reqObj, arrVelas, 'N');
+							respuesta = fnVelaNueva(reqObj, arrVelas, reqObj.opt);
 							
 						} else {
-							fnVelaNormal(arrVelas[arrVelas.length - 1], reqObj);       
+							fnVelaNormal(arrVelas[arrVelas.length - 1], reqObj, arrVelas, reqObj.opt);       
 						}
 					 
 					} else {
 						newVela = true;
-						fnVelaNormal(arrVelas[arrVelas.length - 1], reqObj);       				 
-				    }*/
+						fnVelaNormal(arrVelas[arrVelas.length - 1], reqObj, arrVelas, reqObj.opt);       				 
+				    }
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					//console.log(reqObj);
@@ -569,7 +647,7 @@ http.createServer(function onRequest(request, response) {
 					}*/
 
 					/************************************-  20 min -****************************************/
-					if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+					/*if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
 							newVela = false;
@@ -582,7 +660,7 @@ http.createServer(function onRequest(request, response) {
 					} else {
 						newVela = true;
 						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
-					}
+					}*/
 
 					/************************************-  FIN 20 min -****************************************/
 					//arrVelasSombra.push(reqObj);

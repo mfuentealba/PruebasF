@@ -10,10 +10,11 @@ var fs = require('fs');
 var fs2 = require('fs');
 var fs3 = require('fs');
 var fsGraf = require('fs');
+var fsOrdenes = require('fs');
 var loteMin = 0.01;
-var loteMax = 4000;
+var loteMax = 100;
 var loteFijo = false;
-var ajusteDecimal = 1000;
+var ajusteDecimal = 100000;
 var cantOrdenes = 1;
 var desfaseSombra = -0.005;
 
@@ -34,47 +35,62 @@ var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, 
 
 
 
-var cuenta = 100;
-var ponderado = .1;
+var cuenta = 10;
+var ponderado = .01;
 var spread = 0.00030;
 var ajusteStop = 0.0004;
 var objCont = {N: 2, S: 2}
-/*
+
 var objFunciones = {};
-objFunciones['ini'] = fnInicial;
-objFunciones['0'] = fnVelaNueva;
-objFunciones['1'] = fnVelaNormal;
-objFunciones['2'] = fnVelaNormal;
-objFunciones['3'] = fnVelaNormal;
-objFunciones['4'] = fnVelaNormal;
-objFunciones['5'] = fnVelaNormal;
-
-objFunciones['ini_2'] = fnInicialSombra;
-objFunciones['0_2'] = fnVelaNuevaSombra;
-objFunciones['1_2'] = fnVelaNormalSombra;
-objFunciones['2_2'] = fnVelaNormalSombra;
-objFunciones['3_2'] = fnVelaNormalSombra;
-objFunciones['4_2'] = fnVelaNormalSombra;
-objFunciones['5_2'] = fnVelaNormalSombra;
+objFunciones['0_1'] = fnNo;
+objFunciones['2_1'] = fnSi;
+objFunciones['2_2'] = fnSi;
+objFunciones['2_3'] = fnSi;
+objFunciones['2_4'] = fnSi;
+objFunciones['2_5'] = fnVentaEval;
+objFunciones['3_1'] = fnSi;
+objFunciones['3_2'] = fnSi;
+objFunciones['3_3'] = fnSi;
+objFunciones['3_4'] = fnSi;
+objFunciones['3_5'] = fnCompraEval;
 
 
-objFunciones['signalWait'] = fnSignalWait;
-objFunciones['signalEnable'] = fnSignalEnable;
-objFunciones['fnArrCruceSMAWMA1'] = fnArrCruceSMAWMA1;
-objFunciones['fnArrCruceSMAWMA2'] = fnArrCruceSMAWMA2;
-objFunciones['fnCompra'] = fnCompra;
-objFunciones['fnVenta'] = fnVenta;
-objFunciones['fnEvaluaCompraEstocastico'] = fnEvaluaCompraEstocastico;
-objFunciones['fnEvaluaVentaEstocastico'] = fnEvaluaVentaEstocastico;
-objFunciones['fnEvaluaEstocastico'] = fnEvaluaEstocastico;
-objFunciones['fnEvaluaCompraRSI'] = fnEvaluaCompraRSI;
-objFunciones['fnEvaluaVentaRSI'] = fnEvaluaVentaRSI;
-objFunciones['fnEvaluaCompraMACD'] = fnEvaluaCompraMACD;
-objFunciones['fnEvaluaVentaMACD'] = fnEvaluaVentaMACD;
-objFunciones['NO'] = fnNo;
-objFunciones['fnVelas'] = fnEvaluaVelas;
+var velaEval = {};
 
-*/
+function fnVentaEval(vela, tipo, arrVel){
+	//console.log(fnVentaEval);
+	evaluacion = 0;
+	cont = 1;
+	if(vela.open > vela.close){
+		return fnVenta(vela, tipo, arrVel, 'close');
+		
+	}
+	return 'N';
+}
+
+function fnCompraEval(vela, tipo, arrVel){
+	//console.log(fnCompraEval);
+	evaluacion = 0;
+	cont = 1;
+	if(vela.open < vela.close){
+		return fnCompra(vela, tipo, arrVel, 'close');
+		
+	}
+	return 'N';
+}
+
+
+
+function fnNo(dato){
+	//console.log(fnCompraEval);
+	return 'N';
+}
+
+function fnSi(dato){
+	//console.log(fnVentaEval);
+	cont ++;
+	return 'N';
+}
 
 var http = require("http");
 
@@ -86,7 +102,10 @@ var arrTamVelas = [];
 var tamVelas = 0;	
 var orden;
 	
-
+var evaluacion = 0;
+var cont = 1;
+	
+	
 function fnEvaluaVelas(dato, tipo, arrV){
 	var vela = arrV[arrV.length - 1];
 	arrTamVelas.push((vela.high - vela.low) / 10);
@@ -113,7 +132,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		
 		if(bearishengulfingpattern(input)){
 			sw = true;
-			opt = 2;
+			evaluacion = 2;
 			console.log('bearishengulfingpattern');
 			
 		}
@@ -127,25 +146,32 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		if(bullishengulfingpattern(input)){
 		//if(threeoutsideup(input)){
 			sw = true;
-			opt = 3;
+			evaluacion = 3;
 			console.log('bullishengulfingpattern');
 			
 		}
 	
 		
-		if(orden == null && sw){
+		/*if(orden == null && sw){
+			var arrFecha = dato.fecha.split('.');
+			var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
+				
+			//if(dias[dt.getUTCDay()] == 'jue'){			
+								
+				switch(evaluacion){
+					case 2:
+						
+						return fnVenta(dato, tipo, arrV, 'open');
+					break;
+					case 3:
+						
+						return fnCompra(dato, tipo, arrV, 'open');
+					break;
+				}
+				evaluacion = 0;
+			//}
 			
-			switch(opt){
-				case 2:
-					
-					return fnVenta(dato, tipo, arrV);
-				break;
-				case 3:
-					
-					return fnCompra(dato, tipo, arrV);
-				break;
-			}
-		}
+		}*/
 		
 	}
 	return "N";
@@ -193,11 +219,11 @@ function fnEvaluaCierre(origen, vela){
 				//return "X";
 				return "N";
 			} else {
-				if(vela.close > orden.open + spread + ajusteStop){
+				if(vela.close > orden.open + ajusteStop + spread){
 					if(orden.stopLoss < orden.open + spread){
 						orden.stopLoss = orden.open + spread;
 					} else {
-						if(vela.close - ajusteStop > orden.stopLoss){
+						if(vela.close > ajusteStop + orden.stopLoss){
 							orden.stopLoss = vela.close - ajusteStop;
 						}
 						
@@ -238,11 +264,11 @@ function fnEvaluaCierre(origen, vela){
 				//return "X";
 				return "N";
 			} else {
-				if(vela.close < orden.open - (spread + ajusteStop)){
+				if(vela.close < orden.open - (ajusteStop + spread)){
 					if(orden.stopLoss > orden.open - spread){
 						orden.stopLoss = orden.open - spread;
 					} else {
-						if(vela.close + ajusteStop < orden.stopLoss){
+						if(vela.close < orden.stopLoss - ajusteStop){
 							orden.stopLoss = vela.close + ajusteStop;
 						}
 						
@@ -262,6 +288,10 @@ function fnImprimirOperacion(){
 		if (err) throw err;
 			//console.log('The "data to append" was appended to file!');
 		});
+	fsOrdenes.appendFileSync('./querysReconstruccion/_logOrdenes.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
+		if (err) throw err;
+			//console.log('The "data to append" was appended to file!');
+		});	
 	try{
 		//total += Math.abs(arrOrdenes[i]['total']) > 1 ? arrOrdenes[i]['total'] : 0;
 		total += orden['total'];//arrOrdenes[i]['total'] < -30 ? -30 : arrOrdenes[i]['total'];
@@ -283,12 +313,13 @@ function fnImprimirOperacion(){
 	}	
 }
 
-function fnVelaNormal(vela, dato){
+function fnVelaNormal(vela, dato, arrVel, tipo){
 	
 	/*dato[2] = Number(dato[2]);
 	dato[3] = Number(dato[3]);
 	dato[4] = Number(dato[4]);*/
 	vela.close = dato.close;
+	vela.vol += dato.vol;
 	if(dato.high > vela.high){
 		vela.high = dato.high;
 		
@@ -297,7 +328,8 @@ function fnVelaNormal(vela, dato){
 	if(dato.low < vela.low){
 		vela.low = dato.low;		
 	}	
-	
+	console.log(evaluacion + '_' + cont);
+	return objFunciones[evaluacion + '_' + cont](vela, tipo, arrVel);
 	
 }//2134068
 
@@ -333,19 +365,26 @@ function fnCalcCuenta(cierre){
 	}
 }
 
-function fnCompra(vela, tipo, arrV){
+function fnCompra(vela, tipo, arrV, param){
 	
 		if(cuenta > 0){
 			//if(vela.close - arrV[arrV.length - 1].close > 0){
-				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'C', fecha: vela.fecha, atr: atrGraf};
+				var pos;
+				if(param == 'open'){
+					pos = 0;
+				} else {
+					pos = 1;
+				}
+				orden = {ini: vela.id, origen: tipo, open: vela[param], tipo: 'C', fecha: vela.fecha, atr: atrGraf};
 				//console.log(arrV);
 				var arrFecha = vela.fecha.split('.');				
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				
-				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2].close - spread - 0.00010;
+				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 3].close - spread - 0.00010;
+				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2 - pos].close - spread - 0.00010;
 				nStopLoss = 0;
 				orden.lote = ponderado;
-				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
+				
 				orden.dia = dias[dt.getUTCDay()];
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(orden);
@@ -353,7 +392,11 @@ function fnCompra(vela, tipo, arrV){
 				fs.appendFileSync('./querysReconstruccion/_log.txt', JSON.stringify(orden) + " ......\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
-					});	
+					});
+				fsOrdenes.appendFileSync('./querysReconstruccion/_logOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
 				return "C";	
 			//}
 					
@@ -362,22 +405,34 @@ function fnCompra(vela, tipo, arrV){
 	
 }
 
-function fnVenta(vela, tipo, arrV){
+function fnVenta(vela, tipo, arrV, param){
 	
 		if(cuenta > 0){
 			//if(arrV[arrV.length - 1].close - vela.close > 0){
-				orden = {ini: arrV[arrV.length - 1].id, origen: tipo, open: vela.open, tipo: 'V', fecha: vela.fecha, atr: atrGraf};
+				var pos;
+				if(param == 'open'){
+					pos = 0;
+				} else {
+					pos = 1;
+				}
+				
+				orden = {ini: vela.id, origen: tipo, open: vela[param], tipo: 'V', fecha: vela.fecha, atr: atrGraf};
 				var arrFecha = vela.fecha.split('.');
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				nStopLoss = 0;
 				orden.lote = ponderado;
-				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2].close - arrV[arrV.length - 1].close) * ajusteDecimal - 26) < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2].close + spread + 0.00010;
+				//orden.stopLoss = -Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - spread - 26 - 0.00010 < -166 ? orden.open + 0.00166 : arrV[arrV.length - 3].close + spread + 0.00010;
+				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2 - pos].close + spread + 0.00010;
 				orden.dia = dias[dt.getUTCDay()];
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(vela);
 				console.log(orden);
 				console.log("\n\n\n");
 				fs.appendFileSync('./querysReconstruccion/_log.txt', JSON.stringify(orden) + " .....\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
+				fsOrdenes.appendFileSync('./querysReconstruccion/_logOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
@@ -397,9 +452,12 @@ function fnVelaNueva(dato, arrVel, tipo){
 	console.log(tipo);
 	atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
 	var vela = arrVel[arrVel.length - 1];
-	velaOperativa = {x: vela.date, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
+	velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
 	
-	
+	fs.appendFileSync('./querysReconstruccion/_log.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
+		if (err) throw err;
+			//console.log('The "data to append" was appended to file!');
+		});
 	
 	console.log(atrGraf);
 	var resp = 'N';
@@ -407,15 +465,13 @@ function fnVelaNueva(dato, arrVel, tipo){
 		resp = fnEvaluaCierre(tipo, dato);
 		
 	}
-	if(resp == "N"){
+	if(resp == "N" && orden == null){
+		console.log(orden);
 		resp = fnEvaluaVelas(dato, tipo, arrVel);
 	}
 	
-	fs.appendFileSync('./querysReconstruccion/_log.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
-		if (err) throw err;
-			//console.log('The "data to append" was appended to file!');
-		});
-	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: objCont[tipo]++, date: dato.date, origen: dato.opt, fecha: dato.fecha});	
+	
+	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: objCont[tipo]++, date: dato.date, origen: dato.opt, fecha: dato.fecha, vol: dato.vol});	
 	if(arrVel.length > 12){
 		arrVel.shift();
 	}
@@ -427,6 +483,11 @@ var dias=["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
     
 	
 //Create the server and listening to the request
+
+
+//var arrSec = ['0', '1', '2', '3', '4', '5'];
+var sec = -1;
+var prueba = 0;
 http.createServer(function onRequest(request, response) {
 	request.setEncoding("utf8");
 	var content = [];
@@ -452,13 +513,18 @@ http.createServer(function onRequest(request, response) {
 				//console.log(msg); // Prints the message in the console
 				
 				var reqObj = JSON.parse(msg);	// If the incoming message is in JSON format, you can parse it as JSON.
-				
+				//var reqObj = arrCod[index++];
 				var respuesta = "N";
 				
-				fs3.appendFileSync('./querysReconstruccion/_data.txt', reqObj['fecha'] + ',' + reqObj['date'] + ',' + reqObj['open'] + ',' + reqObj['high'] + ',' + reqObj['low'] + ',' + reqObj['close'] + ',' + reqObj['vol'] + "\n", (err) => {
+				/*fs3.appendFileSync('./querysReconstruccion/_data.txt', '{"fecha": "' + reqObj['fecha'] + '", "date": "' + reqObj['date'] + '", "open": "' + reqObj['open'] + '", "high": "' + reqObj['high'] + '", "low": "' + reqObj['low'] + '", "close": "' + reqObj['close'] + '", "vol": "' + reqObj['vol'] + '", "spread": "' + reqObj['spread'] + '"}\n', (err) => {
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
-					});
+					});*/
+
+				fs3.appendFileSync('./querysReconstruccion/_data.txt', reqObj['fecha'] + ',' + reqObj['date'] + ',' + reqObj['open'] + ',' + reqObj['high'] + ',' + reqObj['low'] + ',' + reqObj['close'] + ',' + reqObj['vol'] + ',' + reqObj['spread'] + "\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});	
 				
 				
 				console.log(reqObj);
@@ -466,7 +532,8 @@ http.createServer(function onRequest(request, response) {
 				reqObj.open = Number(reqObj.open);
 				reqObj.high = Number(reqObj.high);
 				reqObj.low = Number(reqObj.low);
-					
+				reqObj.vol = Number(reqObj.vol);
+				spread = Number(reqObj.spread)
 				
 				//if(reqObj.opt == 'N'){
 					//objFunciones[reqObj.date[5] + ''](dato);
@@ -491,20 +558,38 @@ http.createServer(function onRequest(request, response) {
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					//console.log(reqObj);
-					if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
+					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
 							newVela = false;
 							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
 							
 						} else {
-							fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj);       
+							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
 						}
 					 
 					} else {
 						newVela = true;
-						fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj);       				 
-				    }			
+						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+					}*/
+
+					/************************************-  20 min -****************************************/
+					if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+			
+						if(newVela == true){
+							newVela = false;
+							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
+							
+						} else {
+							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
+						}
+					 
+					} else {
+						newVela = true;
+						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+					}
+
+					/************************************-  FIN 20 min -****************************************/
 					//arrVelasSombra.push(reqObj);
 					//respuesta = fnEvaluaVelas(reqObj.cierre, 'S', arrVelasSombra);
 				//}
@@ -539,8 +624,44 @@ http.createServer(function onRequest(request, response) {
 					}
 				}
 					
+				/*if(prueba % 3 == 0){
+					prueba++;
+					outObj = {
+						
+						value: "V", //Just some random value to demonstrate
+						msg: "test message",
+						stopLoss: (reqObj.close + 0.0003),
+						lote: 0.01,
+						cta: 100
+					}
+				} else {
+					if(prueba % 3 == 1){
+						prueba++;
+						outObj = {
+							
+							value: "A", //Just some random value to demonstrate
+							msg: "test message",
+							stopLoss: (reqObj.close + 0.0013),
+							lote: 0.01,
+							cta: 100
+						}
+					} else {
+						prueba++;
+						outObj = {
+							
+							value: "X", //Just some random value to demonstrate
+							msg: "test message",
+							stopLoss: (reqObj.close + 0.0013),
+							lote: 0.01,
+							cta: 100
+						}
+					}	
+				}*/
 				
+
+
 				response.write(JSON.stringify(outObj));	//Write the response
+				//response.write(JSON.stringify(arrCod[]));	//Write the response
 				response.end(); //Close the response
 
 			}

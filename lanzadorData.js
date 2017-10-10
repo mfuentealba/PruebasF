@@ -38,13 +38,15 @@ function fnProcesa(i){
 	var cierre = arr[i].split(',')[2];
 	//var arrFecha = dato[0].split(".");	
 	var sw = true;
-	var objReq = '{"open": "' + dato[2] + '", "close": "' + dato[5] + '", "high": "' + dato[3] + '", "low": "' + dato[4] + '", "spread": "' + 0.0003 + '", "opt": "S", "date": "' + (/*dato[0] + ',' + */dato[1]) + '", "fecha": "' + (dato[0]) + '", "cierre": "' + cierre + '"}';
+	var objReq = '{"open": "' + dato[2] + '", "close": "' + dato[5] + '", "high": "' + dato[3] + '", "low": "' + dato[4] + '", "spread": "' + 0.00015 + '", "opt": "S", "date": "' + (/*dato[0] + ',' + */dato[1]) + '", "fecha": "' + (dato[0]) + '", "vol": "' + Number(dato[6]) + '"}';
 	
-	request.post({url: 'http://localhost:9090', form: objReq}, fnRecepcion);
+	request.post({url: 'http://localhost:9191', form: objReq}, fnRecepcion);
 	
 }
 
-fs.readFile("./marketdata/USDJPY1_2000_2005.csv", 'utf8', function(err, data) {
+//fs.readFile("./marketdata/USDJPY1_2000_2005.csv", 'utf8', function(err, data) {
+fs.readFile("./marketdata/EURUSD1.csv", 'utf8', function(err, data) {
+//fs.readFile("./marketdata/DAT_MT_GBPUSD_M1_2016.csv", 'utf8', function(err, data) {
 	if(err){
 		console.log(err);
 		return;

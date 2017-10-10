@@ -1,0 +1,1 @@
+{"lunB":0,"lunM":0,"lunN":0,"lunT":0,"marB":0,"marM":0,"marN":0,"marT":0,"mieB":0,"mieM":0,"mieN":0,"mieT":0,"jueB":0,"jueM":0,"jueN":0,"jueT":0,"vieB":0,"vieM":0,"vieN":0,"vieT":0,"undefinedB":null,"undefinedT":null}
