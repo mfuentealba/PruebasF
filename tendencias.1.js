@@ -703,7 +703,7 @@ function fnEvaluaCierre(origen){
 		if(orden.tipo == 'C'){
 			//if((((vela.close - orden.open) * ajusteDecimal) - spread) * orden.lote < orden.stopLoss){
 			console.log(vela);
-			if(vela.close < orden.stopLoss){
+			if(vela.low < orden.stopLoss){
 				orden.close = orden.stopLoss;
 				orden.vo.indexLabel = 'C';
 				//orden.fecFin = dato[1];
@@ -745,7 +745,7 @@ function fnEvaluaCierre(origen){
 		} else {
 			//console.log(dato[1] + " - " + orden.open + " = " + ((dato[1] - orden.open) * -ajusteDecimal));
 			
-			if(vela.close > orden.stopLoss){
+			if(vela.high > orden.stopLoss){
 				/*console.log(vela);
 				console.log(dato);
 				console.log("eval=" + vela.close + " - " + orden.open + " = " + ((vela.close - orden.open) * -ajusteDecimal));
