@@ -703,8 +703,8 @@ function fnEvaluaCierre(origen){
 		if(orden.tipo == 'C'){
 			//if((((vela.close - orden.open) * ajusteDecimal) - spread) * orden.lote < orden.stopLoss){
 			console.log(vela);
-			if(vela.low < orden.stopLoss){
-				orden.close = orden.stopLoss;
+			if(vela.close < orden.stopLoss){
+				orden.close = vela.close;
 				orden.vo.indexLabel = 'C';
 				//orden.fecFin = dato[1];
 				orden.fin = vela.date;
@@ -745,19 +745,19 @@ function fnEvaluaCierre(origen){
 		} else {
 			//console.log(dato[1] + " - " + orden.open + " = " + ((dato[1] - orden.open) * -ajusteDecimal));
 			
-			if(vela.high > orden.stopLoss){
+			if(vela.close > orden.stopLoss){
 				/*console.log(vela);
 				console.log(dato);
 				console.log("eval=" + vela.close + " - " + orden.open + " = " + ((vela.close - orden.open) * -ajusteDecimal));
 				console.log(vela.open + " - " + orden.open + " * -ajusteDecimal= " + ((vela.open - orden.open) * -ajusteDecimal));*/
-				orden.close = orden.stopLoss;
+				orden.close = vela.close;
 				//orden.fecFin = dato[1];
 				orden.vo.indexLabel = 'V';
 				orden.fin = vela.date;
 				orden.obs = "stopLoss";
 				//console.log(vela.open + " - " + orden.open + " = " + ((vela.open - orden.open) * -ajusteDecimal));
 				//orden.total = orden.stopLoss;//((vela.open - orden.open) * -ajusteDecimal) - 16;
-				orden.total = (orden.open - orden.stopLoss - spread) * ajusteDecimal;//((vela.open - orden.open) * -ajusteDecimal) - 16;
+				orden.total = (orden.open - orden.close - spread) * ajusteDecimal;//((vela.open - orden.open) * -ajusteDecimal) - 16;
 				orden.totalReal = orden.total * orden.lote;//((vela.open - orden.open) * -ajusteDecimal) - 16;
 				//orden.max = ((vela.low - orden.open) * ajusteDecimal) - spread;
 				fnCalcCuenta(orden.totalReal);
