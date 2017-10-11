@@ -683,23 +683,7 @@ http.createServer(function onRequest(request, response) {
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					//console.log(reqObj);
-					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
-			
-						if(newVela == true){
-							newVela = false;
-							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
-							
-						} else {
-							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
-						}
-					 
-					} else {
-						newVela = true;
-						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
-					}*/
-
-					/************************************-  20 min -****************************************/
-					if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+					if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
 							newVela = false;
@@ -713,6 +697,22 @@ http.createServer(function onRequest(request, response) {
 						newVela = true;
 						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
 					}
+
+					/************************************-  20 min -****************************************/
+					/*if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+			
+						if(newVela == true){
+							newVela = false;
+							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
+							
+						} else {
+							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
+						}
+					 
+					} else {
+						newVela = true;
+						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+					}*/
 
 					/************************************-  FIN 20 min -****************************************/
 					//arrVelasSombra.push(reqObj);
