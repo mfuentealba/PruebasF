@@ -97,7 +97,7 @@ process.on('message', (msg) => {
 	console.log(msg + ' ' + process.pid);
 	
 	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile("FIX.4.4-ORDERROUTER-TOMADOR_DE_ORDENES.messages_20170908.log", 'utf8', function(err, data) {
+	fs.readFile("./querysReconstruccion/FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20171012.log", 'utf8', function(err, data) {
 		arr = data.split("\n");
 		for(let i in arr){
 			/*var h = arr[i][arr[i].length - 1];//[arr[i].length - 1] + '';//arr[i].substring(arr[i].length - 1, 1);
