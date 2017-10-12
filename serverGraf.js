@@ -257,10 +257,10 @@ function fnEvaluaSubVelas(dato, arrV, tipo){
 		switch(evaluacion){
 			case 2:
 				return 'V1';				
-			break;
+			
 			case 3:
 				return 'C1';
-			break;
+			
 		}	
 		
 	}
