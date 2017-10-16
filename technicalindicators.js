@@ -2580,7 +2580,7 @@ class BullishMarubozu extends CandlestickFinder {
             this.approximateEqual(daysLow, daysOpen) &&
             daysOpen < daysClose &&
             daysOpen < daysHigh &&
-            tamVela > data.tamVelas * 5 / 3/* &&
+            tamVela > data.tamVelas * 4 / 3/* &&
             tamVela < data.tamVelas * 3*/;
         return (isBullishMarbozu);
     }
@@ -2903,7 +2903,7 @@ class BearishMarubozu extends CandlestickFinder {
             this.approximateEqual(daysLow, daysClose) &&
             daysOpen > daysClose &&
             daysOpen > daysLow &&
-            tamVela > data.tamVelas * 5 / 3/* &&
+            tamVela > data.tamVelas * 4 / 3/* &&
             tamVela < data.tamVelas * 3*/;
         return (isBearishMarbozu);
     }

@@ -75,7 +75,40 @@ var arrSubVela = [];
 var contSubVela = 5;
 
 
+function fnGenerarNiveles(x){
+	fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(objNiveles) + ",\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
+	for(var str in objNiveles){
+		
+		if(objNiveles[str]){
+			
+			if(objNiveles[str]['cont'] > 1){
+				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',"[\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
+				for(var i = objNiveles[str]['ini']; i < x; i++){
+					var obj = {x: i, y: Number(str)};
+					fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(obj) + ",\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
+				}
+				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',"],\n", (err) => {
+					if (err) throw err;
+						//console.log('The "data to append" was appended to file!');
+					});
+				
+				
+			}
+			
+		}				
+	}
+	contadorNivel = x;
 	
+}
 	
 function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
 	var vela = arrV[arrV.length - 1];
@@ -134,6 +167,7 @@ function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
+				fnGenerarNiveles(velaOperativa.x);	
 				ind++;	
 				
 			break;
@@ -143,6 +177,7 @@ function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
 					if (err) throw err;
 						//console.log('The "data to append" was appended to file!');
 					});
+				fnGenerarNiveles(velaOperativa.x);
 				ind++;
 				
 			break;
@@ -279,15 +314,15 @@ function fnMaxMin(opt, velaAnt, vela){
 	if(opt == 'min'){
 		
 		var arr = String(vela.low).split('.');
-		var lowV = Number(arr[0] + '.' + arr[0].substring(0, arr[0].length - 1 > 4 ? 4 : arr[0].length - 1);
+		var lowV = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
 		arr = String(velaAnt.low).split('.');
-		var lowVA = Number(arr[0] + '.' + arr[0].substring(0, arr[0].length - 1 > 4 ? 4 : arr[0].length - 1);
+		var lowVA = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
 		return Math.min(lowVA, lowV);	
 	} else {
 		arr = String(vela.high).split('.');
-		var highV = Number(arr[0] + '.' + arr[0].substring(0, arr[0].length - 1 > 4 ? 4 : arr[0].length - 1);
+		var highV = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
 		arr = String(velaAnt.high).split('.');
-		var highVA = Number(arr[0] + '.' + arr[0].substring(0, arr[0].length - 1 > 4 ? 4 : arr[0].length - 1);
+		var highVA = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
 		return Math.max(highVA, highV);	
 	}
 	
@@ -296,6 +331,10 @@ function fnMaxMin(opt, velaAnt, vela){
 var objNiveles = {};
 var objMin = {};
 var objMax = {};
+var arrMin = [];
+var arrMax = [];
+var arrElim = [];
+var contadorNivel = 1;
 
 function fnVelaNueva(dato, arrVel, tipo){
 	console.log('fnVelaNueva');
@@ -307,22 +346,52 @@ function fnVelaNueva(dato, arrVel, tipo){
 	
 	
 	/**************************-NIVELES-*********************************/
-	if(velaAnt.close <= velaAnt.open && vela.close >= vela.open){
-		var val = fnMaxMin('min', velaAnt, vela);
-		if(objNiveles[val]){
-			objNiveles[val]++;
-		} else {
-			objNiveles[val] = 1;
-		}
-		
-	} else if(velaAnt.close >= velaAnt.open && vela.close <= vela.open){
-		val = fnMaxMin('max', velaAnt, vela);
-		if(objNiveles[val]){
-			objNiveles[val]++;
-		} else {
-			objNiveles[val] = 1;
-		}
+	console.log(velaAnt);
+	console.log(vela);
+	if(velaAnt){
+		if(velaAnt.close <= velaAnt.open && vela.close >= vela.open){
+				var val = fnMaxMin('min', velaAnt, vela);
+				console.log("EL VAL = " + val);
+				if(objNiveles[val]){
+					objNiveles[val]['cont']++;
+				} else {
+					objNiveles[val] = {ini: vela.id, cont: 1};
+				}
+				
+			} else if(velaAnt.close >= velaAnt.open && vela.close <= vela.open){
+				val = fnMaxMin('max', velaAnt, vela);
+				console.log("EL VAL = " + val);
+				if(objNiveles[val]){
+					objNiveles[val]['cont']++;
+				} else {
+					objNiveles[val] = {ini: vela.id, cont: 1};
+				}
+			} else {
+				for(var num in objNiveles){
+					if(num < vela.high && num > vela.low){
+						objNiveles[num]['cont']--;
+						if(objNiveles[num]['cont'] < 1){
+							delete objNiveles[num];
+						}
+					}
+				}
+			}
+
+			var objNuevo = {num: vela['Close'] < velaAnt['Close'] ? vela.id : velaAnt.id,  valor: vela['Close'] < velaAnt['Close'] ? vela['Close'] : velaAnt['Close']};
+			var n  = arrMin.length;
+			for(var j = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
+				a = arrMin[j];
+				if(a.ptoInicial['valor'] > objNuevo['valor']){
+					ptoElim = arrMin.splice(j, 0)['ptoInicial'];
+					arrElim.push(ptoElim);
+					j--;
+					n--;
+				} 	
+			}
+
 	}
+	
+
 	/**************************-FIN NIVELES-*********************************/
 	
 	/****************************************-NIVELES-**********************************/
@@ -380,8 +449,6 @@ function fnVelaNueva(dato, arrVel, tipo){
 					
 					
 					
-					modelApp.arrDataGrafOrdExec.source.forEach(fnRecalculaOrden3);
-					modelApp.arrDataGrafOrdExec.refresh();
 					
 					var tendencia:int = fnEvaluaTendencia(velaAnterior, vela);
 					
