@@ -100,11 +100,11 @@ function fnEvaluaTendencia(velaAnt, vela){
 
 
 function fnGenerarNiveles(x){
-	fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(objNiveles) + ",\n", (err) => {
+	/*fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(objNiveles) + ",\n", (err) => {
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
-					});
-	/*for(var str in objNiveles){
+					});*/
+	for(var str in objNiveles){
 		
 		if(objNiveles[str]){
 			
@@ -113,8 +113,8 @@ function fnGenerarNiveles(x){
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
 					});
-				for(var i = objNiveles[str]['ini']; i < x; i++){
-					var obj = {x: i, y: Number(str)};
+				for(var i = objNiveles[str]['ini']  > contadorNivel ? objNiveles[str]['ini'] : contadorNivel; i < x; i++){
+					var obj = {x: i, y: Number(str), tipo: "N"};
 					fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(obj) + ",\n", (err) => {
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
@@ -129,7 +129,7 @@ function fnGenerarNiveles(x){
 			}
 			
 		}				
-	}*/
+	}
 
 	
 	for(var k = 0; k < arrTendencias.length; k++){
@@ -138,7 +138,7 @@ function fnGenerarNiveles(x){
 				////console.log('The "data to append" was appended to file!');
 			});
 		for(i = contadorNivel; i < x; i++){
-			var obj = {x: i, y: Number(i * arrTendencias[k].pendiente + arrTendencias[k].coefCorte)};
+			var obj = {x: i, y: Number(i * arrTendencias[k].pendiente + arrTendencias[k].coefCorte), tipo: "T"};
 				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(obj) + ",\n", (err) => {
 				if (err) throw err;
 					////console.log('The "data to append" was appended to file!');
@@ -215,18 +215,32 @@ function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
 					});
+				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',"],\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});
 				fnGenerarNiveles(velaOperativa.x);	
 				ind++;	
-				
+				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',"[\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});
 			break;
 			case 3:
-				velaOperativa.indexLabel = resp;
 				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(velaOperativa) + ",\n", (err) => {
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
 					});
-				fnGenerarNiveles(velaOperativa.x);
-				ind++;
+				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',"],\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});
+				fnGenerarNiveles(velaOperativa.x);	
+				ind++;	
+				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',"[\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});
 				
 			break;
 		}	
