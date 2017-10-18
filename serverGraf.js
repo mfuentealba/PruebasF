@@ -24,7 +24,18 @@ var threewhitesoldiers = require('./technicalindicators.js').threewhitesoldiers;
 var threeoutsidedown = require('./technicalindicators.js').threeOutSideDown;
 var threeoutsideup = require('./technicalindicators.js').threeOutSideUp;
 
+const TENDENCIA_ALCISTA = 1;
+const TENDENCIA_BAJISTA = -1;
 
+var ar = ['g'];
+
+var obj1 = {data: 'hola'};
+ar.push(obj1);
+
+//console.log(ar.indexOf(obj1));
+
+ar.splice(1, 1);
+//console.log(ar.indexOf(obj1));
 
 var period = 14
 
@@ -75,10 +86,23 @@ var arrSubVela = [];
 var contSubVela = 5;
 
 
+
+function fnEvaluaTendencia(velaAnt, vela){
+	if(velaAnt.open < velaAnt.close && vela.open > vela.close){
+		return TENDENCIA_ALCISTA;
+	} else if(velaAnt.open > velaAnt.close && vela.open < vela.close){
+		return TENDENCIA_BAJISTA;
+	}
+	return 0;
+}
+
+
+
+
 function fnGenerarNiveles(x){
 	fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(objNiveles) + ",\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 	for(var str in objNiveles){
 		
@@ -87,18 +111,18 @@ function fnGenerarNiveles(x){
 			if(objNiveles[str]['cont'] > 1){
 				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',"[\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				for(var i = objNiveles[str]['ini']; i < x; i++){
 					var obj = {x: i, y: Number(str)};
 					fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(obj) + ",\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				}
 				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',"],\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				
 				
@@ -140,7 +164,7 @@ function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
 		//if(threeblackcrows(input)){
 			sw = true;
 			evaluacion = 2;
-			console.log('bearishengulfingpattern');
+			//console.log('bearishengulfingpattern');
 			
 		}
 		input = {
@@ -155,7 +179,7 @@ function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
 		//if(threewhitesoldiers(input)){
 			sw = true;
 			evaluacion = 3;
-			console.log('bullishengulfingpattern');
+			//console.log('bullishengulfingpattern');
 			
 		}
 	
@@ -165,7 +189,7 @@ function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
 				velaOperativa.indexLabel = resp;
 				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(velaOperativa) + ",\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				fnGenerarNiveles(velaOperativa.x);	
 				ind++;	
@@ -175,7 +199,7 @@ function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
 				velaOperativa.indexLabel = resp;
 				fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(velaOperativa) + ",\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				fnGenerarNiveles(velaOperativa.x);
 				ind++;
@@ -186,7 +210,7 @@ function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
 	}
 	fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(velaOperativa) + ",\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 	return "N";
 }	
@@ -210,7 +234,7 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 	}	
 	j++;
 	if(j <= contSubVela && arrSubVela.length > 0){
-		console.log('fnVelaNormal');
+		//console.log('fnVelaNormal');
 		if(dato.high > arrSubVela[arrSubVela.length - 1].high){
 			arrSubVela[arrSubVela.length - 1].high = dato.high;
 			
@@ -221,7 +245,7 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 		}	
 	} else {
 		j = 1;
-		console.log('fnVelaNormal++');
+		//console.log('fnVelaNormal++');
 		arrSubVela.push(vela);
 	}
 	
@@ -240,10 +264,10 @@ var tamSubVelas = 0;
 
 function fnEvaluaSubVelas(dato, arrV, tipo){
 	if(arrV.length == 0){
-		console.log('fnEvaluaSubVelasNOOK');
+		//console.log('fnEvaluaSubVelasNOOK');
 		return "N";
 	}	
-	console.log('fnEvaluaSubVelasOK');
+	//console.log('fnEvaluaSubVelasOK');
 	var vela = arrV[arrV.length - 1];
 	arrTamSubVelas.push((vela.high - vela.low) / 4);
 	if(arrTamSubVelas.length > 4){
@@ -270,7 +294,7 @@ function fnEvaluaSubVelas(dato, arrV, tipo){
 		if(bearishengulfingpattern(input)){
 			sw = true;
 			evaluacion = 2;
-			console.log('bearishengulfingpattern');
+			//console.log('bearishengulfingpattern');
 			
 		}
 		input = {
@@ -284,7 +308,7 @@ function fnEvaluaSubVelas(dato, arrV, tipo){
 		//if(threeoutsideup(input)){
 			sw = true;
 			evaluacion = 3;
-			console.log('bullishengulfingpattern');
+			//console.log('bullishengulfingpattern');
 			
 		}
 	
@@ -299,8 +323,8 @@ function fnEvaluaSubVelas(dato, arrV, tipo){
 		}	
 		
 	}
-	console.log(arrV[arrV.length - 1].open);
-	console.log(arrV[arrV.length - 1].close);
+	//console.log(arrV[arrV.length - 1].open);
+	//console.log(arrV[arrV.length - 1].close);
 	if(arrV[arrV.length - 1].open - arrV[arrV.length - 1].close > 0){
 		return 'V2';
 	} else if(arrV[arrV.length - 1].open - arrV[arrV.length - 1].close < 0){
@@ -328,6 +352,29 @@ function fnMaxMin(opt, velaAnt, vela){
 	
 }
 
+
+function fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMinimo){
+	var linea = {};
+	linea.pendiente = proyeccionAlcista;
+	linea.coefCorte = corteMinAlcista;
+	
+	linea.arrPtos = [];
+	linea.arrPtos.push(valorInicial);
+	linea.arrPtos.push(arrMinimo.pop());
+	linea.arrPtos.push(arrMinimo.pop());
+	
+	
+	
+	//Graf(FlexGlobals.topLevelApplication).removeEventListener(GeneraDataEvent.AUTOGENERACION, Graf(FlexGlobals.topLevelApplication).fnCicloGenerador);
+
+	arrTendencias.push(linea);
+	
+		
+		
+}
+
+
+
 var objNiveles = {};
 var objMin = {};
 var objMax = {};
@@ -335,10 +382,13 @@ var arrMin = [];
 var arrMax = [];
 var arrElim = [];
 var contadorNivel = 1;
+var arrTendencias = [];
+var proyeccionAlcista;
+var corteMinAlcista;
 
 function fnVelaNueva(dato, arrVel, tipo){
-	console.log('fnVelaNueva');
-	console.log(tipo);
+	//console.log('fnVelaNueva');
+	//console.log(tipo);
 	atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
 	
 	var vela = arrVel[arrVel.length - 1];
@@ -346,57 +396,234 @@ function fnVelaNueva(dato, arrVel, tipo){
 	
 	
 	/**************************-NIVELES-*********************************/
-	console.log(velaAnt);
-	console.log(vela);
+	//console.log(velaAnt);
+	//console.log(vela);
 	if(velaAnt){
 		if(velaAnt.close <= velaAnt.open && vela.close >= vela.open){
-				var val = fnMaxMin('min', velaAnt, vela);
-				console.log("EL VAL = " + val);
-				if(objNiveles[val]){
-					objNiveles[val]['cont']++;
-				} else {
-					objNiveles[val] = {ini: vela.id, cont: 1};
-				}
-				
-			} else if(velaAnt.close >= velaAnt.open && vela.close <= vela.open){
-				val = fnMaxMin('max', velaAnt, vela);
-				console.log("EL VAL = " + val);
-				if(objNiveles[val]){
-					objNiveles[val]['cont']++;
-				} else {
-					objNiveles[val] = {ini: vela.id, cont: 1};
-				}
+			var val = fnMaxMin('min', velaAnt, vela);
+			//console.log("EL VAL = " + val);
+			if(objNiveles[val]){
+				objNiveles[val]['cont']++;
 			} else {
-				for(var num in objNiveles){
-					if(num < vela.high && num > vela.low){
-						objNiveles[num]['cont']--;
-						if(objNiveles[num]['cont'] < 1){
-							delete objNiveles[num];
-						}
+				objNiveles[val] = {ini: vela.id, cont: 1};
+			}
+			
+		} else if(velaAnt.close >= velaAnt.open && vela.close <= vela.open){
+			val = fnMaxMin('max', velaAnt, vela);
+			//console.log("EL VAL = " + val);
+			if(objNiveles[val]){
+				objNiveles[val]['cont']++;
+			} else {
+				objNiveles[val] = {ini: vela.id, cont: 1};
+			}
+		} else {
+			for(var num in objNiveles){
+				if(num < vela.high && num > vela.low){
+					objNiveles[num]['cont']--;
+					if(objNiveles[num]['cont'] < 1){
+						delete objNiveles[num];
 					}
 				}
 			}
+		}
 
-			var objNuevo = {num: vela['Close'] < velaAnt['Close'] ? vela.id : velaAnt.id,  valor: vela['Close'] < velaAnt['Close'] ? vela['Close'] : velaAnt['Close']};
-			var n  = arrMin.length;
-			for(var j = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
-				a = arrMin[j];
-				if(a.ptoInicial['valor'] > objNuevo['valor']){
-					ptoElim = arrMin.splice(j, 0)['ptoInicial'];
-					arrElim.push(ptoElim);
-					j--;
-					n--;
-				} 	
+		var objNuevo = {num: vela['close'] < velaAnt['close'] ? vela.id : velaAnt.id,  valor: vela['close'] < velaAnt['close'] ? vela['close'] : velaAnt['close']};
+		var n  = arrMin.length;
+		for(var j = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
+			a = arrMin[j];
+			if(a.ptoInicial['valor'] > objNuevo['valor']){
+				ptoElim = arrMin.splice(j, 1)['ptoInicial'];
+				arrElim.push(ptoElim);
+				j--;
+				n--;
+			} 	
+		}
+		
+		for(ptoElim in arrElim){//EN LAS PROYECCIONES DE CADA PUNTO SOBREVIVIENTE ELIMINO LOS PUNTOS ELIMINADOS
+			for(var nodo in arrMin){
+				
+				for(var arrPuntos in nodo.arrayPosibles){
+					var ind = arrPuntos.indexOf(ptoElim);
+					if(ind > -1){
+						arrPuntos.splice(ind, 1);
+						if(arrPuntos.length == 0){
+							nodo.arrayPosibles.splice(nodo.arrayPosibles.indexOf(arrPuntos), 1);
+						}	
+					}	
+				}	
+			}	
+			
+		}
+		var tendencia = fnEvaluaTendencia(velaAnt, vela);
+					
+		if(tendencia == TENDENCIA_ALCISTA){//verde-roja => PUNTA
+			
+			
+			/*var nivel = vela['high'] <= velaAnt['high'] ? velaAnt['high'] : vela['high'];
+			if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
+				var i:int = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
+				item = modelApp.arrDataNiveles.getItemAt(i);
+				item.mov = 'Resistencia';
+				item.cant++;						
+				var dist:int = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'] - item.arrSec[item.arrSec.length - 1]['sec']; 
+				item.arrSec.addItem({sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: dist, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'});
+				modelApp.arrDataNiveles.setItemAt(item, i);
+			} else {
+				item = {};			
+				item.movIni = 'EURUSD|' + nivel;
+				item.divisa = 'EURUSD';
+				item.mov = 'Resistencia';
+				item.cant = 1;
+				item.arrSec = new ArrayCollection([{sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: 0, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'}]);
+				modelApp.arrDataNiveles.addItem(item);
+				modelApp.objDataNiveles[item.movIni] = item;
 			}
+			*/
+			
+			
+			
+		} else if(tendencia == TENDENCIA_BAJISTA){//roja-verde => VALLE
+			
+		
+			
+			objNuevo.vela = vela;
+			if(n == 0){
+				a = {};
+				a.ptoInicial = objNuevo;
+				a.arrayPosibles = [];
+				arrMin.push(a);
+				objMin[objNuevo.num] = a;
+			} else {
+				/*//console.log(a);
+				return 'X';*/
+				n = arrMin.length;
+				for(var jj = 0; jj < n; jj++){//UNA VEZ ELIMINADO DE TODOS LOS ARRAY LOS VALORES MAYORES PROCEDO A INSERTAR EL VALOR NUEVO
+					nodo = arrMin[jj];
+					if(!nodo.arrayPosibles){
+						nodo.arrayPosibles = [];
+					}
+					
+					if(nodo.arrayPosibles.length > 0){
+						var m = nodo.arrayPosibles.length;
+						for(var s = 0; s < m; s++){
+							arrPuntos = nodo.arrayPosibles[s];
+							var arrMinimo = [nodo.ptoInicial];
+							try{
+								for(var gg of arrPuntos){
+									
+									arrMinimo.push(gg);		
+								}	
+							} catch(e){
+								//console.log(nodo);
+								//console.log(j);
+								//console.log(nodo.arrayPosibles[s]);
+								//console.log(arrPuntos);
+								//return 'X';
+							}
+							
+							
+							var swPerteneceTendencia = false;
+							for(var lin of arrTendencias){
+								var res = lin.pendiente * objNuevo['num'] + lin.coefCorte;
+								if(objNuevo['valor'] >= res && objNuevo['valor'] - 10 <= res){
+									//lin.arrPtos.addItem(objNuevo);//COSUME RAM
+									swPerteneceTendencia = true;
+								}
+							}
+							
+							if(!swPerteneceTendencia){
+								
+								var valorAnterior = arrMinimo[arrMinimo.length - 1];
+								arrMinimo.push(objNuevo);
+								//Crea orden y saca proyeccion segun pendiente
+								var valorInicial = nodo.ptoInicial;
+								proyeccionAlcista = Number(valorInicial['valor'] - valorAnterior['valor']) / (valorInicial['num'] - valorAnterior['num']);
+								corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * proyeccionAlcista;
+	//											
+								var valorEsperado = proyeccionAlcista * objNuevo['num'] + corteMinAlcista;
+								console.log("/********************************************************************************/");
+								console.log(objNuevo['valor']);
+								console.log(valorEsperado);
+								console.log(objNuevo['valor']);
+								console.log(valorEsperado);
+								console.log("/********************************************************************************/");
+								
+								//console.log(arrMin);
+								//return 'X';
+								if(objNuevo['valor'] >= valorEsperado && objNuevo['valor'] - proyeccionAlcista <= valorEsperado){
+									
+										
+										
+										
+									fnGeneraLineaTendencia_y_orden(jj, valorInicial, objNuevo, arrMinimo);
+									console.log(arrTendencias);
+									return 'X';
+									
+									
+									nodo.arrayPosibles.splice(nodo.arrayPosibles.indexOf(arrPuntos));
+									m--;
+									s--;	
+									
+									
+									
+								} else {
+									if(objNuevo['valor'] < valorEsperado){
+										arrMin.splice(arrMin.indexOf(valorAnterior), 1);
+										arrPuntos.shift();
+										arrPuntos.push(objNuevo);
+										//nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
+									} else {
+										arrMin.pop();											
+										if(!objMin.hasOwnProperty(valorAnterior.num)){
+											a = {};
+											a.ptoInicial = valorAnterior;
+											a.arrayPosibles = [];
+											a.arrayPosibles[0] = []
+											a.arrayPosibles[0].push(objNuevo);
+											arrMin.push(a);
+											objMin[valorAnterior.num] = valorAnterior;
+										}
+										
+										
+									}
+								}									
+							}	
+						}		
+					} else {
+						nodo.arrayPosibles[0] = []
+						nodo.arrayPosibles[0].push(objNuevo);
+						
+					}
+				}	
+			}		
+			
+		}
+		
+		var velaAux = vela;
+		var ext = 1;
+		for(var ec in arrTendencias){					
+			velaAux[ec.id] = (contVela) * ec.pendiente + ec.coefCorte;
+			if(velaAux[ec.id] > velaAux['close'] || ec.ordAsoc['ganancia'] < ec.ordAsoc['sl']){
+				
+				arrTendencias.splice(arrTendencias.indexOf(ec));
+		
+			} 
+			ext++;
+		}
 
 	}
 	
 
+	
+	
+	
+	
+	
 	/**************************-FIN NIVELES-*********************************/
 	
 	/****************************************-NIVELES-**********************************/
 					/*vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];
-					var velaAnterior:VelaVO = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 2];
+					var velaAnt:VelaVO = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 2];
 					
 					
 				
@@ -406,31 +633,31 @@ function fnVelaNueva(dato, arrVel, tipo){
 						modelApp.contVela = 372;
 					}
 					
-					var objNuevo:Object = {num: vela['Close'] < velaAnterior['Close'] ? modelApp.contVela : modelApp.contVela - 1,  valor: vela['Close'] < velaAnterior['Close'] ? vela['Close'] : velaAnterior['Close']};
-					if(modelApp.arrMinimos.length > 10){
-						trace("tiene " + modelApp.arrMinimos.length + "NODOS DE MINIMOS" );
+					var objNuevo:Object = {num: vela['close'] < velaAnt['close'] ? modelApp.contVela : modelApp.contVela - 1,  valor: vela['close'] < velaAnt['close'] ? vela['close'] : velaAnt['close']};
+					if(arrMin.length > 10){
+						trace("tiene " + arrMin.length + "NODOS DE MINIMOS" );
 					}
 					
 					var arrElim:Array = [];
 					var ptoElim:Object;
 					var a:NodoPendientes;
-					var n:int = modelApp.arrMinimos.length;
+					var n:int = arrMin.length;
 					
 					
 					
 					
 					
 					for(var j:int = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
-						a = NodoPendientes(modelApp.arrMinimos.getItemAt(j));
+						a = NodoPendientes(arrMin.getItemAt(j));
 						if(a.ptoInicial['valor'] > objNuevo['valor']){
-							ptoElim = modelApp.arrMinimos.removeItemAt(j)['ptoInicial'];
+							ptoElim = arrMin.removeItemAt(j)['ptoInicial'];
 							arrElim.push(ptoElim);
 							j--;
 							n--;
 						} 	
 					}
 					for each(ptoElim in arrElim){//EN LAS PROYECCIONES DE CADA PUNTO SOBREVIVIENTE ELIMINO LOS PUNTOS ELIMINADOS
-						for each(var nodo:NodoPendientes in modelApp.arrMinimos){
+						for each(var nodo:NodoPendientes in arrMin){
 							
 							for each(var arrPuntos:ArrayCollection in nodo.arrayPosibles){
 								var ind:int = arrPuntos.getItemIndex(ptoElim);
@@ -450,12 +677,12 @@ function fnVelaNueva(dato, arrVel, tipo){
 					
 					
 					
-					var tendencia:int = fnEvaluaTendencia(velaAnterior, vela);
+					var tendencia:int = fnEvaluaTendencia(velaAnt, vela);
 					
 					if(tendencia == TENDENCIA_ALCISTA){//verde-roja => PUNTA
 						
 						
-						var nivel:int = vela['High'] <= velaAnterior['High'] ? velaAnterior['High'] : vela['High'];
+						var nivel:int = vela['high'] <= velaAnt['high'] ? velaAnt['high'] : vela['high'];
 						if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
 							var i:int = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
 							item = modelApp.arrDataNiveles.getItemAt(i);
@@ -486,12 +713,12 @@ function fnVelaNueva(dato, arrVel, tipo){
 						if(n == 0){
 							a = new NodoPendientes();
 							a.ptoInicial = objNuevo;
-							modelApp.arrMinimos.addItem(a);
+							arrMin.addItem(a);
 							modelApp.objMin[objNuevo.num] = a;
 						} else {
-							n = modelApp.arrMinimos.length;
+							n = arrMin.length;
 							for(j = 0; j < n; j++){//UNA VEZ ELIMINADO DE TODOS LOS ARRAY LOS VALORES MAYORES PROCEDO A INSERTAR EL VALOR NUEVO
-								nodo = NodoPendientes(modelApp.arrMinimos.getItemAt(j));
+								nodo = NodoPendientes(arrMin.getItemAt(j));
 								if(nodo.arrayPosibles.length > 0){
 									var m:int = nodo.arrayPosibles.length;
 									for(var s:int = 0; s < m; s++){
@@ -543,7 +770,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 														a = new NodoPendientes();
 														a.ptoInicial = valorAnterior;
 														a.arrayPosibles.addItem(new ArrayCollection([objNuevo]));
-														modelApp.arrMinimos.addItem(a);
+														arrMin.addItem(a);
 														modelApp.objMin[valorAnterior.num] = valorAnterior;
 													}
 													
@@ -564,7 +791,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 					var ext:int = 1;
 					for each(var ec:EcuacionRectaVO in modelApp.arrTendencias){					
 						velaAux[ec.id] = (modelApp.contVela) * ec.pendiente + ec.coefCorte;
-						if(velaAux[ec.id] > velaAux['Close'] || ec.ordAsoc['ganancia'] < ec.ordAsoc['sl']){
+						if(velaAux[ec.id] > velaAux['close'] || ec.ordAsoc['ganancia'] < ec.ordAsoc['sl']){
 							if(ec.ordAsoc){
 								ec.ordAsoc['estado'] = 'Cerrado';
 								ec.resultado = ec.ordAsoc.ganancia; 
@@ -595,7 +822,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	
 	
 	bbGraf = bb.nextValue(Number(vela.close));
-	console.log(bbGraf);
+	//console.log(bbGraf);
 	velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
 	
 	
@@ -605,7 +832,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	
 	
 	
-	console.log(atrGraf);
+	//console.log(atrGraf);
 	
 	arrSubVela = [];
 	j = 1;
@@ -644,14 +871,14 @@ http.createServer(function onRequest(request, response) {
 		response.writeHead( 200, {"Content-Type": "text/plain"} );
 		//try{
 			ms = content[0];
-			//console.log(ms);
+			////console.log(ms);
 			if(ms.toString() != "")
 			{
 				
 				
 				var msg = ms.toString();	//Parse the ms into string		
 				
-				//console.log(msg); // Prints the message in the console
+				////console.log(msg); // Prints the message in the console
 				
 				var reqObj = JSON.parse(msg);	// If the incoming message is in JSON format, you can parse it as JSON.
 				
@@ -660,12 +887,14 @@ http.createServer(function onRequest(request, response) {
 				
 				
 				
-				console.log(reqObj.fecha);
+				//console.log(reqObj.fecha);
 				reqObj.close = Number(reqObj.close);
 				reqObj.open = Number(reqObj.open);
 				reqObj.high = Number(reqObj.high);
 				reqObj.low = Number(reqObj.low);
 				reqObj.vol = Number(reqObj.vol);
+				reqObj.Ask = Number(reqObj.Ask);
+				reqObj.Bid = Number(reqObj.Bid);
 				spread = Number(reqObj.spread)
 				
 				//if(reqObj.opt == 'N'){
@@ -690,7 +919,7 @@ http.createServer(function onRequest(request, response) {
 				    }*/
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
-					//console.log(reqObj);
+					////console.log(reqObj);
 					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
@@ -737,7 +966,7 @@ http.createServer(function onRequest(request, response) {
 				
 				//Create a dummy response object
 				var outObj;
-				console.log(respuesta);
+				//console.log(respuesta);
 				if(respuesta == "N"){
 					outObj = {
 						
@@ -745,8 +974,10 @@ http.createServer(function onRequest(request, response) {
 						msg: "test message",
 						cta: 100
 					}
+				} else if(respuesta == "X"){
+					exit();
 				} else {
-					console.log(orden);
+					//console.log(orden);
 					outObj = {
 						
 						value: respuesta, //Just some random value to demonstrate
@@ -759,11 +990,11 @@ http.createServer(function onRequest(request, response) {
 					
 				
 				response.write(JSON.stringify(outObj));	//Write the response
-				response.end(); //Close the response
+				response.end(); //close the response
 
 			}
 		/*} catch(e) {
-			console.log("ERROR");
+			//console.log("ERROR");
 		}*/
 		
 
@@ -773,5 +1004,5 @@ http.createServer(function onRequest(request, response) {
 	
 }).listen(_PORT);
 
-console.log("Node.js server listening on port "+ _PORT);
+//console.log("Node.js server listening on port "+ _PORT);
 

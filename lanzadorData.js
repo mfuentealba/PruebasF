@@ -38,7 +38,7 @@ function fnProcesa(i){
 	var cierre = arr[i].split(',')[2];
 	//var arrFecha = dato[0].split(".");	
 	var sw = true;
-	var objReq = '{"open": "' + dato[2] + '", "close": "' + dato[5] + '", "high": "' + dato[3] + '", "low": "' + dato[4] + '", "spread": "' + 0.00015 + '", "opt": "S", "date": "' + (/*dato[0] + ',' + */dato[1]) + '", "fecha": "' + (dato[0]) + '", "vol": "' + Number(dato[6]) + '"}';
+	var objReq = '{"open": "' + dato[2] + '", "close": "' + dato[5] + '", "high": "' + dato[3] + '", "low": "' + dato[4] + '", "spread": "' + 0.00015 + '", "opt": "S", "date": "' + (/*dato[0] + ',' + */dato[1]) + '", "fecha": "' + (dato[0]) + '", "vol": "' + Number(dato[6]) + '", "Bid": "' + dato[5] + '", "Ask": "' + (Number(dato[5]) + 0.00015) + '"}';
 	
 	request.post({url: 'http://localhost:9292', form: objReq}, fnRecepcion);
 	

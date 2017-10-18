@@ -617,7 +617,7 @@ var dias=["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
 
 //var arrSec = ['0', '1', '2', '3', '4', '5'];
 var sec = -1;
-
+var reqObj;
 http.createServer(function onRequest(request, response) {
 	request.setEncoding("utf8");
 	var content = [];
@@ -642,7 +642,7 @@ http.createServer(function onRequest(request, response) {
 				
 				//console.log(msg); // Prints the message in the console
 				
-				var reqObj = JSON.parse(msg);	// If the incoming message is in JSON format, you can parse it as JSON.
+				reqObj = JSON.parse(msg);	// If the incoming message is in JSON format, you can parse it as JSON.
 				
 				var respuesta = "N";
 				
@@ -658,7 +658,9 @@ http.createServer(function onRequest(request, response) {
 				reqObj.high = Number(reqObj.high);
 				reqObj.low = Number(reqObj.low);
 				reqObj.vol = Number(reqObj.vol);
-				spread = Number(reqObj.spread)
+				spread = Number(reqObj.spread);
+				reqObj.Ask = Number(reqObj.Ask);
+				reqObj.Bid = Number(reqObj.Bid);
 				
 				//if(reqObj.opt == 'N'){
 					//objFunciones[reqObj.date[5] + ''](dato);
