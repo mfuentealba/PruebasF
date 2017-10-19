@@ -114,7 +114,7 @@ function fnGenerarNiveles(x){
 						////console.log('The "data to append" was appended to file!');
 					});
 				for(var i = objNiveles[str]['ini']  > contadorNivel ? objNiveles[str]['ini'] : contadorNivel; i < x; i++){
-					var obj = {x: i, y: Number(str), tipo: "N"};
+					var obj = {x: i, y: Number(str), tipo: "N", ini: objNiveles[str]['ini'], ptos: objNiveles[str]['ptos']};
 					fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt', JSON.stringify(obj) + ",\n", (err) => {
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
@@ -379,13 +379,32 @@ function fnMaxMin(opt, velaAnt, vela){
 		var lowV = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
 		arr = String(velaAnt.low).split('.');
 		var lowVA = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
-		return Math.min(lowVA, lowV);	
+			
+		var objRes = {res : Math.min(lowVA, lowV), ptos: []};
+		
+		if(objRes.res == lowVA){
+			objRes.ptos.push(lowVA);
+		}
+		if(objRes.res == lowV){
+			objRes.ptos.push(lowV);
+		}
+		return objRes;
 	} else {
 		arr = String(vela.high).split('.');
 		var highV = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
 		arr = String(velaAnt.high).split('.');
 		var highVA = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
-		return Math.max(highVA, highV);	
+
+		var objRes = {res : Math.max(highVA, highV), ptos: []};
+		
+		if(objRes.res == lowVA){
+			objRes.ptos.push(lowVA);
+		}
+		if(objRes.res == lowV){
+			objRes.ptos.push(lowV);
+		}
+		return objRes;
+
 	}
 	
 }
@@ -437,22 +456,30 @@ function fnVelaNueva(dato, arrVel, tipo){
 	//console.log(velaAnt);
 	//console.log(vela);
 	if(velaAnt){
+		
 		if(velaAnt.close <= velaAnt.open && vela.close >= vela.open){
 			var val = fnMaxMin('min', velaAnt, vela);
 			//console.log("EL VAL = " + val);
-			if(objNiveles[val]){
-				objNiveles[val]['cont']++;
+			if(objNiveles[val.res]){
+				if(objNiveles[val.res]['ptos'].indexOf(velaAnt.id) > -1){
+					objNiveles[val.res]['cont']++;
+					objNiveles[val.res]['ptos'] = objNiveles[val.res]['ptos'].concat(val.ptos);
+				}
+				
 			} else {
-				objNiveles[val] = {ini: vela.id, cont: 1};
+				objNiveles[val] = {ini: vela.id, cont: 1, ptos: [vela.id]};
 			}
 			
 		} else if(velaAnt.close >= velaAnt.open && vela.close <= vela.open){
 			val = fnMaxMin('max', velaAnt, vela);
 			//console.log("EL VAL = " + val);
-			if(objNiveles[val]){
-				objNiveles[val]['cont']++;
+			if(objNiveles[val.res]){
+				if(objNiveles[val.res]['ptos'].indexOf(velaAnt.id) > -1){
+					objNiveles[val.res]['cont']++;
+					objNiveles[val.res]['ptos'].push(vela.id);
+				}
 			} else {
-				objNiveles[val] = {ini: vela.id, cont: 1};
+				objNiveles[val] = {ini: vela.id, cont: 1, ptos: [vela.id]};
 			}
 		} else {
 			for(var num in objNiveles){

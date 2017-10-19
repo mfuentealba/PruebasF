@@ -664,11 +664,11 @@ function addMessage(e) {
 			arrTodo[0] = arrTodo[0].concat(arrTodo[i]);
 		} else {
 			if(objLineas[arrTodo[i][0].tipo + arrTodo[i][0].y]){
-				data[objLineas[arrTodo[i][0].tipo + arrTodo[i][0].y]].dataPoints = data[objLineas[arrTodo[i][0].tipo + arrTodo[i][0].y]].dataPoints.concat(arrTodo[i]);
+				data[objLineas[arrTodo[i][0].tipo + arrTodo[i][0].y] - 1].dataPoints = data[objLineas[arrTodo[i][0].tipo + arrTodo[i][0].y] - 1].dataPoints.concat(arrTodo[i]);
 					
 				
 			} else {
-				objLineas[arrTodo[i][0].tipo + arrTodo[i][0].y] = data.length;
+				
 				data.push(
 				{        
 					type: "line",
@@ -678,6 +678,7 @@ function addMessage(e) {
 					//axisYType:"secondary",
 					dataPoints: arrTodo[i]
 				});	
+				objLineas[arrTodo[i][0].tipo + arrTodo[i][0].y] = data.length;
 			}
 			
 		}
