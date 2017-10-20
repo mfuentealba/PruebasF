@@ -2,10 +2,10 @@ var fsLauncher = require('fs');
 var secNum = [];
 var objSec = {};
 var contador = 1;
-
+var ind = 1;
 var request = require('request');
 var EventEmitter = require('events').EventEmitter;
-
+var arrOrdenGraf = [];
 var ee = new EventEmitter();
 ee.on("exec", fnProcesa);
 
@@ -21,7 +21,7 @@ for(var i = 10; i < 60; i++){
 
 function fnRecepcion(err,httpResponse,body){
 	
-	console.log(body);
+	//console.log(body);
 	body = JSON.parse(body)
 	contador++;
 	if(Number(body.cta) > 0){
@@ -48,7 +48,7 @@ function fnProcesa(i){
 fsLauncher.readFile("./querysReconstruccion/_dataExp.txt", 'utf8', function(err, data) {
 //fs.readFile("./marketdata/DAT_MT_GBPUSD_M1_2016.csv", 'utf8', function(err, data) {
 	if(err){
-		console.log(err);
+		//console.log(err);
 		return;
 	}
 	
@@ -89,6 +89,7 @@ var fsGraf = require('fs');
 var fsOrdenes = require('fs');
 var fsOrdMalas = require('fs');
 var fsOrdBuenas = require('fs');
+var fsGrafOrden = require('fs');
 var loteMin = 0.01;
 var loteMax = 100;
 var loteFijo = false;
@@ -136,7 +137,7 @@ objFunciones['3_5'] = fnCompraEval;
 var velaEval = {};
 
 function fnVentaEval(vela, tipo, arrVel){
-	//console.log(fnVentaEval);
+	////console.log(fnVentaEval);
 	evaluacion = 0;
 	cont = 1;
 	if(vela.open > vela.close){
@@ -147,7 +148,7 @@ function fnVentaEval(vela, tipo, arrVel){
 }
 
 function fnCompraEval(vela, tipo, arrVel){
-	//console.log(fnCompraEval);
+	////console.log(fnCompraEval);
 	evaluacion = 0;
 	cont = 1;
 	if(vela.open < vela.close){
@@ -160,12 +161,12 @@ function fnCompraEval(vela, tipo, arrVel){
 
 
 function fnNo(dato){
-	//console.log(fnCompraEval);
+	////console.log(fnCompraEval);
 	return 'N';
 }
 
 function fnSi(dato){
-	//console.log(fnVentaEval);
+	////console.log(fnVentaEval);
 	cont ++;
 	return 'N';
 }
@@ -211,7 +212,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		if(bearishengulfingpattern(input)){
 			sw = true;
 			evaluacion = 2;
-			console.log('bearishengulfingpattern');
+			//console.log('bearishengulfingpattern');
 			
 		}
 		input = {
@@ -225,11 +226,11 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		//if(threeoutsideup(input)){
 			sw = true;
 			evaluacion = 3;
-			console.log('bullishengulfingpattern');
+			//console.log('bullishengulfingpattern');
 			
 		}
 	
-		
+		resp = fnEvaluaCierre(tipo, dato);
 		if(orden == null && sw){
 			var arrFecha = dato.fecha.split('.');
 			var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
@@ -257,12 +258,19 @@ function fnEvaluaVelas(dato, tipo, arrV){
 
 function fnEvaluaCierre(origen, vela){
 	if(orden != null && origen == orden.origen){
-		console.log(orden);
+		//console.log(orden);
 		var arrFecha = vela.fecha.split('.');				
 		var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 		var df = dias[dt.getUTCDay()];	
 		if(orden.tipo == 'C'){
-			if(vela.low < orden.stopLoss){
+			if(vela.low < orden.stopLoss || (evaluacion == 2 && orden.stopLoss - orden.open < 0)){
+				
+				fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});
+				arrOrdenGraf = [];
+				exit();
 				orden.close = orden.stopLoss;
 				
 				orden.fin = vela.date;
@@ -278,7 +286,7 @@ function fnEvaluaCierre(origen, vela){
 					objResult[df + 'M']++;
 					fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 						if (err) throw err;
-							//console.log('The "data to append" was appended to file!');
+							////console.log('The "data to append" was appended to file!');
 						});
 					
 				} else {
@@ -287,7 +295,7 @@ function fnEvaluaCierre(origen, vela){
 						objResult[df + 'B']++;
 						fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 						if (err) throw err;
-							//console.log('The "data to append" was appended to file!');
+							////console.log('The "data to append" was appended to file!');
 						});
 					} else {
 						neutras++;
@@ -297,11 +305,11 @@ function fnEvaluaCierre(origen, vela){
 				objResult[df + 'T'] += orden.total;
 				fs2.appendFileSync('./querysReconstruccion/_logExpF.txt', JSON.stringify(objResult) + "\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
                 fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(vela) + "\n", (err) => {
                 if (err) throw err;
-                    //console.log('The "data to append" was appended to file!');
+                    ////console.log('The "data to append" was appended to file!');
                 });
 				fnImprimirOperacion();
 				orden = null;
@@ -322,9 +330,16 @@ function fnEvaluaCierre(origen, vela){
 				}
 			}
 			
-		} else {
-            console.log('velaClose: ' + vela.close + ' < ' + (orden.open - (ajusteStop + spread)));
-			if(vela.high > orden.stopLoss){
+		} else if(orden && orden.tipo == 'V'){
+            //console.log('velaClose: ' + vela.close + ' < ' + (orden.open - (ajusteStop + spread)));
+			if(vela.high > orden.stopLoss || (evaluacion == 3 && orden.stopLoss - orden.open > 0)){
+				
+				fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});
+				arrOrdenGraf = [];
+				exit();
 				orden.close = orden.stopLoss;
 				orden.fin = vela.date;
 				orden.total = (orden.open - orden.stopLoss - spread) * ajusteDecimal;//((vela.open - orden.open) * -ajusteDecimal) - 16;
@@ -338,7 +353,7 @@ function fnEvaluaCierre(origen, vela){
 					objResult[df + 'M']++;
 					fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 						if (err) throw err;
-							//console.log('The "data to append" was appended to file!');
+							////console.log('The "data to append" was appended to file!');
 						});
 				} else {
 					if(orden.total > 0.01){
@@ -346,7 +361,7 @@ function fnEvaluaCierre(origen, vela){
 						objResult[df + 'B']++;
 						fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 						if (err) throw err;
-							//console.log('The "data to append" was appended to file!');
+							////console.log('The "data to append" was appended to file!');
 						});
 					} else {
 						neutras++;
@@ -356,11 +371,11 @@ function fnEvaluaCierre(origen, vela){
 				objResult[df + 'T'] += orden.total;
 				fs2.appendFileSync('./querysReconstruccion/_logExpF.txt', JSON.stringify(objResult) + "\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
                 fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(vela) + "\n", (err) => {
                     if (err) throw err;
-                        //console.log('The "data to append" was appended to file!');
+                        ////console.log('The "data to append" was appended to file!');
                     });
 				fnImprimirOperacion();
 				orden = null;
@@ -390,11 +405,11 @@ function fnEvaluaCierre(origen, vela){
 function fnImprimirOperacion(){
 	fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
 		if (err) throw err;
-			//console.log('The "data to append" was appended to file!');
+			////console.log('The "data to append" was appended to file!');
 		});
 	fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
 		if (err) throw err;
-			//console.log('The "data to append" was appended to file!');
+			////console.log('The "data to append" was appended to file!');
 		});	
 	try{
 		//total += Math.abs(arrOrdenes[i]['total']) > 1 ? arrOrdenes[i]['total'] : 0;
@@ -432,7 +447,7 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 	if(dato.low < vela.low){
 		vela.low = dato.low;		
 	}	
-	console.log(evaluacion + '_' + cont);
+	//console.log(evaluacion + '_' + cont);
     if(orden){
 		if(dato.high > orden.max){
 			orden.max = dato.high;
@@ -442,11 +457,11 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 		if(dato.low < orden.min){
 			orden.min = dato.low;		
 		}	
-		resp = fnEvaluaCierre(tipo, dato);
+		//resp = fnEvaluaCierre(tipo, dato);
 		
 	}
 	if(resp == "N" && orden == null){
-		//console.log(orden);
+		////console.log(orden);
 		resp = objFunciones[evaluacion + '_' + cont](vela, tipo, arrVel);
 	}
 	
@@ -465,17 +480,17 @@ function fnCalcCuenta(cierre){
 				if(cuenta / 1000 > loteMax){
 					
 					ponderado = parseInt((loteMax * 100) + '');
-					console.log("INT: " + ponderado);
+					//console.log("INT: " + ponderado);
 					ponderado = Number(ponderado) / 100;
 				} else {
 					if(cuenta / 1000 < loteMin){
 						ponderado = parseInt((loteMin * 100) + '');
-						console.log("INT: " + ponderado);
+						//console.log("INT: " + ponderado);
 						ponderado = Number(ponderado) / 100;
 					} else {
 						ponderado = cuenta / 1000;
 						ponderado = parseInt(((cuenta / 1000) * 100) + '');
-						console.log("INT: " + ponderado);
+						//console.log("INT: " + ponderado);
 						ponderado = Number(ponderado) / 100;
 					}
 	
@@ -491,13 +506,14 @@ function fnCompra(vela, tipo, arrV, param){
 		if(cuenta > 0){
 			//if(vela.close - arrV[arrV.length - 1].close > 0){
 				var pos;
+				var velaOp = arrV[arrV.length - 1];
 				if(param == 'open'){
 					pos = 0;
 				} else {
 					pos = 1;
 				}
-				orden = {ini: velaOperativa.id, origen: tipo, open: vela[param], tipo: 'C', fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf};
-				//console.log(arrV);
+				orden = {ini: velaOp.id, origen: tipo, open: vela[param], tipo: 'C', fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf};
+				////console.log(arrV);
 				var arrFecha = vela.fecha.split('.');				
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				
@@ -514,13 +530,25 @@ function fnCompra(vela, tipo, arrV, param){
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(orden);
 				console.log("\n\n\n");	
+				
+				arrOrdenGraf.push(velaOperativa);
+				
+				/*fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind) + '.txt', "[\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});
+				fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind) + '.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});*/
+				
 				fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + " ......\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				return "C";	
 			//}
@@ -534,6 +562,7 @@ function fnVenta(vela, tipo, arrV, param){
 	
 		if(cuenta > 0){
 			//if(arrV[arrV.length - 1].close - vela.close > 0){
+				var velaOp = arrV[arrV.length - 1];
 				var pos;
 				if(param == 'open'){
 					pos = 0;
@@ -541,7 +570,7 @@ function fnVenta(vela, tipo, arrV, param){
 					pos = 1;
 				}
 				
-				orden = {ini: velaOperativa.id, origen: tipo, open: vela[param], tipo: 'V', fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf};
+				orden = {ini: velaOp.id, origen: tipo, open: vela[param], tipo: 'V', fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf};
 				var arrFecha = vela.fecha.split('.');
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				nStopLoss = 0;
@@ -557,13 +586,26 @@ function fnVenta(vela, tipo, arrV, param){
 				console.log(vela);
 				console.log(orden);
 				console.log("\n\n\n");
+				
+				
+				arrOrdenGraf.push(velaOperativa);
+				/*fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind) + '.txt', "[\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});
+				fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind) + '.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
+					if (err) throw err;
+						////console.log('The "data to append" was appended to file!');
+					});
+				*/
+				
 				fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + " .....\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				return "V";
 			//}
@@ -577,30 +619,48 @@ function fnVenta(vela, tipo, arrV, param){
 
 var atrGraf;
 function fnVelaNueva(dato, arrVel, tipo){
-	console.log('fnVelaNueva');
-	console.log(tipo);
+	//console.log('fnVelaNueva');
+	//console.log(tipo);
 	atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
 	
 	var vela = arrVel[arrVel.length - 1];
 	bbGraf = bb.nextValue(Number(vela.close));
-	console.log(bbGraf);
+	//console.log(bbGraf);
 	velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
 	
 	fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
 		if (err) throw err;
-			//console.log('The "data to append" was appended to file!');
+			////console.log('The "data to append" was appended to file!');
 		});
 	
-	console.log(atrGraf);
+	////console.log(atrGraf);
 	var resp = 'N';
-	if(orden){
+	/*if(orden){
 		resp = fnEvaluaCierre(tipo, dato);
 		
 	}
 	if(resp == "N" && orden == null){
-		console.log(orden);
+		//console.log(orden);
 		resp = fnEvaluaVelas(dato, tipo, arrVel);
+	}*/
+	
+	console.log(orden);
+	if(orden != null){	
+		console.log("////////////////////////////////////////");
+		console.log(velaOperativa);
+		console.log("////////////////////////////////////////");
+		arrOrdenGraf.push(velaOperativa);
+		/*fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind) + '.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
+			if (err) throw err;
+				////console.log('The "data to append" was appended to file!');
+			});*/
+		
 	}
+	
+	resp = fnEvaluaVelas(dato, tipo, arrVel);
+	
+	
+	
 	
 	
 	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: objCont[tipo]++, date: dato.date, origen: dato.opt, fecha: dato.fecha, vol: dato.vol});	
@@ -635,14 +695,14 @@ http.createServer(function onRequest(request, response) {
 		response.writeHead( 200, {"Content-Type": "text/plain"} );
 		//try{
 			ms = content[0];
-			//console.log(ms);
+			////console.log(ms);
 			if(ms.toString() != "")
 			{
 				
 				
 				var msg = ms.toString();	//Parse the ms into string		
 				
-				//console.log(msg); // Prints the message in the console
+				////console.log(msg); // Prints the message in the console
 				
 				reqObj = JSON.parse(msg);	// If the incoming message is in JSON format, you can parse it as JSON.
 				
@@ -650,11 +710,11 @@ http.createServer(function onRequest(request, response) {
 				
 				fs3.appendFileSync('./querysReconstruccion/_dataExp.txt', reqObj['fecha'] + ',' + reqObj['date'] + ',' + reqObj['open'] + ',' + reqObj['high'] + ',' + reqObj['low'] + ',' + reqObj['close'] + ',' + reqObj['vol'] + ',' + reqObj['spread'] + "\n", (err) => {
 					if (err) throw err;
-						//console.log('The "data to append" was appended to file!');
+						////console.log('The "data to append" was appended to file!');
 					});
 				
 				
-				console.log(reqObj.fecha);
+				//console.log(reqObj.fecha);
 				reqObj.close = Number(reqObj.close);
 				reqObj.open = Number(reqObj.open);
 				reqObj.high = Number(reqObj.high);
@@ -686,7 +746,7 @@ http.createServer(function onRequest(request, response) {
 				    }*/
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
-					//console.log(reqObj);
+					////console.log(reqObj);
 					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
@@ -733,7 +793,7 @@ http.createServer(function onRequest(request, response) {
 				
 				//Create a dummy response object
 				var outObj;
-				console.log(respuesta);
+				//console.log(respuesta);
 				if(respuesta == "N"){
 					outObj = {
 						
@@ -742,7 +802,7 @@ http.createServer(function onRequest(request, response) {
 						cta: cuenta
 					}
 				} else {
-					console.log(orden);
+					//console.log(orden);
 					outObj = {
 						
 						value: respuesta, //Just some random value to demonstrate
@@ -759,7 +819,7 @@ http.createServer(function onRequest(request, response) {
 
 			}
 		/*} catch(e) {
-			console.log("ERROR");
+			//console.log("ERROR");
 		}*/
 		
 
@@ -769,5 +829,5 @@ http.createServer(function onRequest(request, response) {
 	
 }).listen(_PORT);
 
-console.log("Node.js server listening on port "+ _PORT);
+//console.log("Node.js server listening on port "+ _PORT);
 
