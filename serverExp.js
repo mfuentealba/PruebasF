@@ -116,7 +116,7 @@ var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, 
 var cuenta = 100;
 var ponderado = .1;
 var spread = 0.00020;
-var ajusteStop = 0.0004;
+var ajusteStop = 0.0008;
 var objCont = {N: 2, S: 2}
 
 var objFunciones = {};
@@ -229,12 +229,12 @@ function fnEvaluaVelas(dato, tipo, arrV){
 			
 		}
 	
-		/*
+		
 		if(orden == null && sw){
 			var arrFecha = dato.fecha.split('.');
 			var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				
-			if(dias[dt.getUTCDay()] == 'jue'){			
+			//if(dias[dt.getUTCDay()] == 'jue'){			
 								
 				switch(evaluacion){
 					case 2:
@@ -247,10 +247,10 @@ function fnEvaluaVelas(dato, tipo, arrV){
 					
 				}
 				
-			}
+			//}
 			
 		}
-		*/
+		
 	}
 	return "N";
 }	
@@ -310,7 +310,7 @@ function fnEvaluaCierre(origen, vela){
 			} else {
 				if(vela.close > orden.open + ajusteStop/2 + spread){
 					if(orden.stopLoss < orden.open + spread){
-						orden.stopLoss = orden.open + spread;
+						orden.stopLoss = orden.open + spread + 0.00010;
 					} else {
 						if(vela.close > ajusteStop + orden.stopLoss){
 							orden.stopLoss = vela.close - ajusteStop;
@@ -370,7 +370,7 @@ function fnEvaluaCierre(origen, vela){
                 
 				if(vela.close < orden.open - (ajusteStop/2 + spread)){
 					if(orden.stopLoss > orden.open - spread){
-						orden.stopLoss = orden.open - spread;
+						orden.stopLoss = orden.open - spread - 0.00010;
 					} else {
 						if(vela.close < orden.stopLoss - ajusteStop){
 							orden.stopLoss = vela.close + ajusteStop;
@@ -496,16 +496,17 @@ function fnCompra(vela, tipo, arrV, param){
 				} else {
 					pos = 1;
 				}
-				orden = {ini: vela.id, origen: tipo, open: vela[param], tipo: 'C', fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf};
+				orden = {ini: velaOperativa.id, origen: tipo, open: vela[param], tipo: 'C', fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf};
 				//console.log(arrV);
 				var arrFecha = vela.fecha.split('.');				
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 3].close - spread - 0.00010;
-				orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2 - pos].close - spread - 0.00010;
-                orden.stopLoss = arrV[arrV.length - 2 - pos].close - spread - 0.00010;
+				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2 - pos].close - spread - 0.00010;
+                //orden.stopLoss = arrV[arrV.length - 2 - pos].close - spread - 0.00010;
+				orden.stopLoss = vela[param] - 0.00450 + spread;
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
-				orden.stopLoss = orden.open - (orden.stopLossIni * 3 / 4) / ajusteDecimal;
+				//orden.stopLoss = orden.open - (orden.stopLossIni * 3 / 4) / ajusteDecimal;
 				nStopLoss = 0;
 				orden.lote = ponderado;
 				
@@ -540,14 +541,15 @@ function fnVenta(vela, tipo, arrV, param){
 					pos = 1;
 				}
 				
-				orden = {ini: vela.id, origen: tipo, open: vela[param], tipo: 'V', fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf};
+				orden = {ini: velaOperativa.id, origen: tipo, open: vela[param], tipo: 'V', fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf};
 				var arrFecha = vela.fecha.split('.');
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				nStopLoss = 0;
 				orden.lote = ponderado;
 				//orden.stopLoss = -Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - spread - 26 - 0.00010 < -166 ? orden.open + 0.00166 : arrV[arrV.length - 3].close + spread + 0.00010;
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2 - pos].close + spread + 0.00010;
-                orden.stopLoss = arrV[arrV.length - 2 - pos].close + spread + 0.00010;
+                //orden.stopLoss = arrV[arrV.length - 2 - pos].close + spread + 0.00010;
+				orden.stopLoss = vela[param] + 0.00450 - spread;
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
 				orden.stopLoss = orden.open + (orden.stopLossIni * 3 / 4) / ajusteDecimal;
 				orden.dia = dias[dt.getUTCDay()];
@@ -685,23 +687,7 @@ http.createServer(function onRequest(request, response) {
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					//console.log(reqObj);
-					if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
-			
-						if(newVela == true){
-							newVela = false;
-							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
-							
-						} else {
-							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
-						}
-					 
-					} else {
-						newVela = true;
-						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
-					}
-
-					/************************************-  20 min -****************************************/
-					/*if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
 							newVela = false;
@@ -715,6 +701,22 @@ http.createServer(function onRequest(request, response) {
 						newVela = true;
 						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
 					}*/
+
+					/************************************-  20 min -****************************************/
+					if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+			
+						if(newVela == true){
+							newVela = false;
+							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
+							
+						} else {
+							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
+						}
+					 
+					} else {
+						newVela = true;
+						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+					}
 
 					/************************************-  FIN 20 min -****************************************/
 					//arrVelasSombra.push(reqObj);

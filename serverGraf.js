@@ -37,6 +37,10 @@ ar.push(obj1);
 ar.splice(1, 1);
 //console.log(ar.indexOf(obj1));
 
+var p = "12344";
+console.log(p.substr(0, 10));
+console.log(Math.round(Number(p) * Math.pow(10, 4 - p.length)));
+
 var period = 14
 
 var ini = {
@@ -382,9 +386,9 @@ function fnMaxMin(opt, velaAnt, vela){
 	if(opt == 'min'){
 		
 		var arr = String(vela.low).split('.');
-		var lowV = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
+		var lowV = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
 		arr = String(velaAnt.low).split('.');
-		var lowVA = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
+		var lowVA= Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
 		console.log("*****************************************************");
 		console.log(lowVA);
 		console.log(lowV);
@@ -402,9 +406,11 @@ function fnMaxMin(opt, velaAnt, vela){
 		return objRes;
 	} else {
 		arr = String(vela.high).split('.');
-		var highV = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
+
+		 
+		var highV= Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
 		arr = String(velaAnt.high).split('.');
-		var highVA = Number(arr[0] + '.' + arr[1].substring(0, arr[1].length - 1 > 4 ? 4 : arr[1].length - 1));
+		var highVA= Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
 		console.log("*****************************************************");
 		console.log(highVA);
 		console.log(highV);
@@ -471,7 +477,10 @@ function fnVelaNueva(dato, arrVel, tipo){
 	//console.log(velaAnt);
 	//console.log(vela);
 	if(velaAnt){
-		
+		/*if(vela.id == 200){
+			exit();
+
+		}*/
 		if(velaAnt.close <= velaAnt.open && vela.close >= vela.open){
 			var val = fnMaxMin('min', velaAnt, vela);
 			//console.log("EL VAL = " + val);
@@ -803,212 +812,6 @@ function fnVelaNueva(dato, arrVel, tipo){
 	}
 	
 
-	
-	
-	
-	
-	
-	/**************************-FIN NIVELES-*********************************/
-	
-	/****************************************-NIVELES-**********************************/
-					/*vela = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 1];
-					var velaAnt:VelaVO = modelApp.arrDataGrafVelas.source[modelApp.arrDataGrafVelas.length - 2];
-					
-					
-				
-					var item:Object;
-					
-					if(modelApp.contVela == 372){//1883
-						modelApp.contVela = 372;
-					}
-					
-					var objNuevo:Object = {num: vela['close'] < velaAnt['close'] ? modelApp.contVela : modelApp.contVela - 1,  valor: vela['close'] < velaAnt['close'] ? vela['close'] : velaAnt['close']};
-					if(arrMin.length > 10){
-						trace("tiene " + arrMin.length + "NODOS DE MINIMOS" );
-					}
-					
-					var arrElim:Array = [];
-					var ptoElim:Object;
-					var a:NodoPendientes;
-					var n:int = arrMin.length;
-					
-					
-					
-					
-					
-					for(var j:int = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
-						a = NodoPendientes(arrMin.getItemAt(j));
-						if(a.ptoInicial['valor'] > objNuevo['valor']){
-							ptoElim = arrMin.removeItemAt(j)['ptoInicial'];
-							arrElim.push(ptoElim);
-							j--;
-							n--;
-						} 	
-					}
-					for each(ptoElim in arrElim){//EN LAS PROYECCIONES DE CADA PUNTO SOBREVIVIENTE ELIMINO LOS PUNTOS ELIMINADOS
-						for each(var nodo:NodoPendientes in arrMin){
-							
-							for each(var arrPuntos:ArrayCollection in nodo.arrayPosibles){
-								var ind:int = arrPuntos.getItemIndex(ptoElim);
-								if(ind > -1){
-									arrPuntos.removeItemAt(ind);
-									if(arrPuntos.length == 0){
-										nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
-									}	
-								}	
-							}	
-						}	
-						
-					}
-					
-					
-					
-					
-					
-					
-					var tendencia:int = fnEvaluaTendencia(velaAnt, vela);
-					
-					if(tendencia == TENDENCIA_ALCISTA){//verde-roja => PUNTA
-						
-						
-						var nivel:int = vela['high'] <= velaAnt['high'] ? velaAnt['high'] : vela['high'];
-						if(modelApp.objDataNiveles.hasOwnProperty('EURUSD|' + nivel)){
-							var i:int = modelApp.arrDataNiveles.getItemIndex(modelApp.objDataNiveles['EURUSD|' + nivel]);
-							item = modelApp.arrDataNiveles.getItemAt(i);
-							item.mov = 'Resistencia';
-							item.cant++;						
-							var dist:int = modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'] - item.arrSec[item.arrSec.length - 1]['sec']; 
-							item.arrSec.addItem({sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: dist, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'});
-							modelApp.arrDataNiveles.setItemAt(item, i);
-						} else {
-							item = {};			
-							item.movIni = 'EURUSD|' + nivel;
-							item.divisa = 'EURUSD';
-							item.mov = 'Resistencia';
-							item.cant = 1;
-							item.arrSec = new ArrayCollection([{sec: modelApp.arrDataGraf.source[modelApp.arrDataGraf.length - 1]['sec'], dist: 0, vela: modelApp.arrDataGrafVelas.length - 1, accion: 'resistencia'}]);
-							modelApp.arrDataNiveles.addItem(item);
-							modelApp.objDataNiveles[item.movIni] = item;
-						}
-						
-						
-						
-						
-					} else if(tendencia == TENDENCIA_BAJISTA){//roja-verde => VALLE
-						
-					
-						
-						objNuevo.vela = vela;
-						if(n == 0){
-							a = new NodoPendientes();
-							a.ptoInicial = objNuevo;
-							arrMin.addItem(a);
-							modelApp.objMin[objNuevo.num] = a;
-						} else {
-							n = arrMin.length;
-							for(j = 0; j < n; j++){//UNA VEZ ELIMINADO DE TODOS LOS ARRAY LOS VALORES MAYORES PROCEDO A INSERTAR EL VALOR NUEVO
-								nodo = NodoPendientes(arrMin.getItemAt(j));
-								if(nodo.arrayPosibles.length > 0){
-									var m:int = nodo.arrayPosibles.length;
-									for(var s:int = 0; s < m; s++){
-										arrPuntos = ArrayCollection(nodo.arrayPosibles.getItemAt(s));
-										var arrMin:ArrayCollection = new ArrayCollection([nodo.ptoInicial]);
-										arrMin.addAll(arrPuntos);	
-										var swPerteneceTendencia:Boolean = false;
-										for each(var lin:EcuacionRectaVO in modelApp.arrTendencias){
-											var res:Number = lin.pendiente * objNuevo['num'] + lin.coefCorte;
-											if(objNuevo['valor'] >= res && objNuevo['valor'] - 10 <= res){
-												//lin.arrPtos.addItem(objNuevo);//COSUME RAM
-												swPerteneceTendencia = true;
-											}
-										}
-										
-										if(!swPerteneceTendencia){
-											var valorAnterior:Object = arrMin.getItemAt(arrMin.length - 1);
-											arrMin.addItem(objNuevo);
-											//Crea orden y saca proyeccion segun pendiente
-											var valorInicial:Object = nodo.ptoInicial;
-											modelApp.proyeccionAlcista = (valorInicial['valor'] - valorAnterior['valor']) / (valorInicial['num'] - valorAnterior['num']);
-											modelApp.corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * modelApp.proyeccionAlcista;
-//											if(objNuevo['valor'] >= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista && objNuevo['valor'] - modelApp.proyeccionAlcista <= modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista){
-											var valorEsperado:Number = modelApp.proyeccionAlcista * objNuevo['num'] + modelApp.corteMinAlcista;
-											if(objNuevo['valor'] >= valorEsperado && objNuevo['valor'] - modelApp.proyeccionAlcista <= valorEsperado){
-												
-													
-													
-													
-												fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMin);
-												
-												
-												
-												nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
-												m--;
-												s--;	
-												
-												
-												
-											} else {
-												if(objNuevo['valor'] < valorEsperado){
-													arrMin.removeItemAt(arrMin.getItemIndex(valorAnterior));
-													arrPuntos.removeItemAt(0);
-													arrPuntos.addItem(objNuevo);
-													//nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
-												} else {
-													arrMin.removeItemAt(arrMin.length - 1);											
-													if(!modelApp.objMin.hasOwnProperty(valorAnterior.num)){
-														a = new NodoPendientes();
-														a.ptoInicial = valorAnterior;
-														a.arrayPosibles.addItem(new ArrayCollection([objNuevo]));
-														arrMin.addItem(a);
-														modelApp.objMin[valorAnterior.num] = valorAnterior;
-													}
-													
-													
-												}
-											}									
-										}	
-									}		
-								} else {
-									nodo.arrayPosibles.addItem(new ArrayCollection([objNuevo]));
-								}
-							}	
-						}		
-						
-					}
-					
-					var velaAux:VelaVO = modelApp.arrDataGrafVelas.getItemAt(modelApp.arrDataGrafVelas.length - 1) as VelaVO;
-					var ext:int = 1;
-					for each(var ec:EcuacionRectaVO in modelApp.arrTendencias){					
-						velaAux[ec.id] = (modelApp.contVela) * ec.pendiente + ec.coefCorte;
-						if(velaAux[ec.id] > velaAux['close'] || ec.ordAsoc['ganancia'] < ec.ordAsoc['sl']){
-							if(ec.ordAsoc){
-								ec.ordAsoc['estado'] = 'Cerrado';
-								ec.resultado = ec.ordAsoc.ganancia; 
-								ec.velaSalida = velaAux;
-								velaAux.num = modelApp.contVela;
-								modelApp.arrDataGrafOrdExec.setItemAt(ec.ordAsoc, modelApp.arrDataGrafOrdExec.getItemIndex(ec.ordAsoc)); 
-								modelApp.proyeccionAlcistaBL = false;
-								
-								
-							}
-							modelApp.arrTendencias.removeItemAt(modelApp.arrTendencias.getItemIndex(ec));
-					
-						} else {
-							if(ec.ordAsoc['ganancia'] > 0){
-								if(ec.ordAsoc.sl < ec.ordAsoc['ganancia'] - 30){
-									ec.ordAsoc.sl = ec.ordAsoc['ganancia'] - 30;
-								}
-							}
-							
-						}
-						ext++;
-					}
-					*/
-					/**************************************************************/
-					
-	
-	
-	
 	
 	bbGraf = bb.nextValue(Number(vela.close));
 	//console.log(bbGraf);
