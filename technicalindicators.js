@@ -267,13 +267,14 @@ class Ichimoku extends Indicator {
             var current = yield;
             var result;
             list.push(0);
+			var rapida;
             while (true) {
                 if (counter < this.periodoLargo) {
                     counter++;
                     list.push(current);
                     sum = sum + current;
                     if(counter > this.periodoCorto){
-
+						 
                     }
                 }
                 else {
