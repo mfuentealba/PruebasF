@@ -21,7 +21,7 @@ for(var i = 10; i < 60; i++){
 
 function fnRecepcion(err,httpResponse,body){
 	
-	//console.log(body);
+	console.log(body);
 	body = JSON.parse(body)
 	contador++;
 	if(Number(body.cta) > 0){
@@ -66,6 +66,7 @@ fsLauncher.readFile("./querysReconstruccion/_dataExp.txt", 'utf8', function(err,
 
 var bearishengulfingpattern = require('./technicalindicators.js').bearishengulfingpattern;
 var bullishengulfingpattern = require('./technicalindicators.js').bullishengulfingpattern;
+
 var BB = require('./technicalindicators.js').BollingerBands;
 
 var period = 14
@@ -117,7 +118,7 @@ var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, 
 var cuenta = 100;
 var ponderado = .1;
 var spread = 0.00020;
-var ajusteStop = 0.0008;
+var ajusteStop = 0.0004;
 var objCont = {N: 2, S: 2}
 
 var objFunciones = {};
@@ -256,145 +257,177 @@ function fnEvaluaVelas(dato, tipo, arrV){
 	return "N";
 }	
 
+
+function fnCierre(opt, origen, vela){
+	var arrFecha = vela.fecha.split('.');				
+	var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
+	var df = dias[dt.getUTCDay()];
+	velaOperativa.indexLabel = 'F';	
+	arrOrdenGraf.push(velaOperativa);
+				
+	
+	//exit();
+	orden.close = orden.stopLoss;
+	
+	orden.fin = vela.date;
+	orden.total = opt == 'C' ? (orden.close - orden.open - spread) * ajusteDecimal : (orden.open - orden.stopLoss - spread) * ajusteDecimal;//((vela.open - orden.open) * ajusteDecimal) - 16;	
+	orden.totalReal = orden.total * orden.lote;//((vela.open - orden.open) * ajusteDecimal) - 16;	
+	orden.prop = opt == 'C' ? -(orden.open - orden.min) * ajusteDecimal / orden.stopLossIni : -(orden.max - orden.open) * ajusteDecimal / orden.stopLossIni;
+	fnCalcCuenta(orden.totalReal);
+	orden.cta = cuenta;
+	
+	if(orden.total < -0.01){					
+		orden.tipo = 'L';
+		malas++;
+		objResult[df + 'M']++;
+		fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
+			if (err) throw err;
+				////console.log('The "data to append" was appended to file!');
+			});
+		fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/_logExpFGrafMala_' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
+			if (err) throw err;
+				////console.log('The "data to append" was appended to file!');
+			});
+		
+	} else {
+		if(orden.total > 0.01){
+			buenas++;
+			objResult[df + 'B']++;
+			fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
+			if (err) throw err;
+				////console.log('The "data to append" was appended to file!');
+			});
+			fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/_logExpFGrafBuena_' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
+			if (err) throw err;
+				////console.log('The "data to append" was appended to file!');
+			});
+		} else {
+			neutras++;
+			objResult[df + 'N']++;
+			fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/_logExpFGrafNeutra_' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
+			if (err) throw err;
+				////console.log('The "data to append" was appended to file!');
+			});
+			
+		}
+	}
+	arrOrdenGraf = [];
+	objResult[df + 'T'] += orden.total;
+	fs2.appendFileSync('./querysReconstruccion/_logExpF.txt', JSON.stringify(objResult) + "\n", (err) => {
+		if (err) throw err;
+			////console.log('The "data to append" was appended to file!');
+		});
+	fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(vela) + "\n", (err) => {
+	if (err) throw err;
+		////console.log('The "data to append" was appended to file!');
+	});
+	fnImprimirOperacion();
+	orden = null;
+	//return "X";
+	return "N";
+
+}
+
+
+
 function fnEvaluaCierre(origen, vela){
 	if(orden != null && origen == orden.origen){
 		//console.log(orden);
-		var arrFecha = vela.fecha.split('.');				
-		var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
-		var df = dias[dt.getUTCDay()];	
+		
 		if(orden.tipo == 'C'){
 			if(vela.low < orden.stopLoss || (evaluacion == 2 && orden.stopLoss - orden.open < 0)){
-				
-				fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
-					if (err) throw err;
-						////console.log('The "data to append" was appended to file!');
-					});
-				arrOrdenGraf = [];
-				exit();
-				orden.close = orden.stopLoss;
-				
-				orden.fin = vela.date;
-				orden.total = (orden.close - orden.open - spread) * ajusteDecimal;//((vela.open - orden.open) * ajusteDecimal) - 16;	
-				orden.totalReal = orden.total * orden.lote;//((vela.open - orden.open) * ajusteDecimal) - 16;	
-				orden.prop = -(orden.open - orden.min) * ajusteDecimal / orden.stopLossIni;
-				fnCalcCuenta(orden.totalReal);
-				orden.cta = cuenta;
-				
-				if(orden.total < -0.01){					
-					orden.tipo = 'L';
-					malas++;
-					objResult[df + 'M']++;
-					fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
-						if (err) throw err;
-							////console.log('The "data to append" was appended to file!');
-						});
-					
-				} else {
-					if(orden.total > 0.01){
-						buenas++;
-						objResult[df + 'B']++;
-						fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
-						if (err) throw err;
-							////console.log('The "data to append" was appended to file!');
-						});
-					} else {
-						neutras++;
-						objResult[df + 'N']++;
-					}
-				}
-				objResult[df + 'T'] += orden.total;
-				fs2.appendFileSync('./querysReconstruccion/_logExpF.txt', JSON.stringify(objResult) + "\n", (err) => {
-					if (err) throw err;
-						////console.log('The "data to append" was appended to file!');
-					});
-                fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(vela) + "\n", (err) => {
-                if (err) throw err;
-                    ////console.log('The "data to append" was appended to file!');
-                });
-				fnImprimirOperacion();
-				orden = null;
-				//return "X";
-				return "N";
+				return fnCierre("C", origen, vela);
 			} else {
-				if(vela.close > orden.open + ajusteStop/2 + spread){
-					if(orden.stopLoss < orden.open + spread){
-						orden.stopLoss = orden.open + spread + 0.00010;
-					} else {
-						if(vela.close > ajusteStop + orden.stopLoss){
-							orden.stopLoss = vela.close - ajusteStop;
+				 console.log(orden.stopLoss);
+				 if(vela.high > orden.takeProfit){
+					 return fnCierre("C", origen, vela);
+				 } else {
+					if(vela.high > orden.open + ajusteStop + spread){
+						if(orden.stopLoss < orden.open + spread){
+							if(vela.close < orden.stopLoss){
+								return fnCierre("C", origen, vela);
+							} else {
+								orden.stopLoss = orden.open + spread + 0.00010;
+								orden.takeProfit = vela.close + ajusteStop;
+							}
+							
+						} else {
+							if(vela.close > ajusteStop + orden.stopLoss){
+								orden.stopLoss = vela.close - ajusteStop;
+								orden.takeProfit = vela.close + ajusteStop;
+							}
+							
 						}
-						
 					}
-					fnImprimirOperacion();
-					return 'A'; 
-				}
+
+					if(vela.close > orden.open + ajusteStop + spread){
+						if(orden.stopLoss < orden.open + spread){
+							orden.stopLoss = orden.open + spread + 0.00010;
+							orden.takeProfit = vela.close + ajusteStop;
+						} else {
+							if(vela.close > ajusteStop + orden.stopLoss){
+								orden.stopLoss = vela.close - ajusteStop;
+								orden.takeProfit = vela.close + ajusteStop;
+							}
+							
+						}
+						fnImprimirOperacion();
+						console.log(orden.stopLoss);
+						return 'A'; 
+					}
+				 }
+
+					
 			}
 			
 		} else if(orden && orden.tipo == 'V'){
             //console.log('velaClose: ' + vela.close + ' < ' + (orden.open - (ajusteStop + spread)));
 			if(vela.high > orden.stopLoss || (evaluacion == 3 && orden.stopLoss - orden.open > 0)){
-				
-				fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
-					if (err) throw err;
-						////console.log('The "data to append" was appended to file!');
-					});
-				arrOrdenGraf = [];
-				exit();
-				orden.close = orden.stopLoss;
-				orden.fin = vela.date;
-				orden.total = (orden.open - orden.stopLoss - spread) * ajusteDecimal;//((vela.open - orden.open) * -ajusteDecimal) - 16;
-				orden.totalReal = orden.total * orden.lote;//((vela.open - orden.open) * -ajusteDecimal) - 16;
-				orden.prop = -(orden.max - orden.open) * ajusteDecimal / orden.stopLossIni;
-				fnCalcCuenta(orden.totalReal);
-				orden.cta = cuenta;
-				if(orden.total < -0.01){
-					orden.tipo = 'S';
-					malas++;
-					objResult[df + 'M']++;
-					fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
-						if (err) throw err;
-							////console.log('The "data to append" was appended to file!');
-						});
-				} else {
-					if(orden.total > 0.01){
-						buenas++;
-						objResult[df + 'B']++;
-						fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
-						if (err) throw err;
-							////console.log('The "data to append" was appended to file!');
-						});
-					} else {
-						neutras++;
-						objResult[df + 'N']++;
-					}
-				}
-				objResult[df + 'T'] += orden.total;
-				fs2.appendFileSync('./querysReconstruccion/_logExpF.txt', JSON.stringify(objResult) + "\n", (err) => {
-					if (err) throw err;
-						////console.log('The "data to append" was appended to file!');
-					});
-                fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(vela) + "\n", (err) => {
-                    if (err) throw err;
-                        ////console.log('The "data to append" was appended to file!');
-                    });
-				fnImprimirOperacion();
-				orden = null;
-				//return "X";
-				return "N";
+				return fnCierre("V", origen, vela);
 			} else {
-                
-				if(vela.close < orden.open - (ajusteStop/2 + spread)){
-					if(orden.stopLoss > orden.open - spread){
-						orden.stopLoss = orden.open - spread - 0.00010;
-					} else {
-						if(vela.close < orden.stopLoss - ajusteStop){
-							orden.stopLoss = vela.close + ajusteStop;
+                console.log(orden.stopLoss);
+
+				if(vela.low < orden.takeProfit){
+					return fnCierre("V", origen, vela);
+				} else {
+					if(vela.low < orden.open - (ajusteStop + spread)){
+						if(orden.stopLoss > orden.open - spread){
+							if(vela.close > orden.stopLoss){
+								return fnCierre("V", origen, vela);
+							} else {
+								orden.stopLoss = orden.open - spread - 0.00010;
+								orden.takeProfit = vela.close - ajusteStop;
+							}
+							
+						} else {
+							if(vela.close < orden.stopLoss - ajusteStop){
+								orden.stopLoss = vela.close + ajusteStop;
+								orden.takeProfit = vela.close - ajusteStop;
+							}
+							
 						}
-						
 					}
-					fnImprimirOperacion();
-					return 'A'; 
+
+
+					if(vela.close < orden.open - (ajusteStop + spread)){
+						if(orden.stopLoss > orden.open - spread){
+							orden.stopLoss = orden.open - spread - 0.00010;
+							orden.takeProfit = vela.close - ajusteStop;
+						} else {
+							if(vela.close < orden.stopLoss - ajusteStop){
+								orden.stopLoss = vela.close + ajusteStop;
+								orden.takeProfit = vela.close - ajusteStop;
+							}
+							
+						}
+						fnImprimirOperacion();
+						console.log(orden.stopLoss);
+						return 'A'; 
+					}	
 				}
+
+
+				
 			}
 		}
 		
@@ -439,6 +472,10 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 	dato[4] = Number(dato[4]);*/
 	vela.close = dato.close;
 	vela.vol += dato.vol;
+
+	
+
+
 	if(dato.high > vela.high){
 		vela.high = dato.high;
 		
@@ -448,6 +485,16 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 		vela.low = dato.low;		
 	}	
 	//console.log(evaluacion + '_' + cont);
+
+	//if(!velaOperativa){
+		velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
+	/*} else {
+
+	}*/
+	
+	
+
+
     if(orden){
 		if(dato.high > orden.max){
 			orden.max = dato.high;
@@ -457,7 +504,7 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 		if(dato.low < orden.min){
 			orden.min = dato.low;		
 		}	
-		//resp = fnEvaluaCierre(tipo, dato);
+		resp = fnEvaluaCierre(tipo, dato);
 		
 	}
 	if(resp == "N" && orden == null){
@@ -522,6 +569,7 @@ function fnCompra(vela, tipo, arrV, param){
                 //orden.stopLoss = arrV[arrV.length - 2 - pos].close - spread - 0.00010;
 				orden.stopLoss = vela[param] - 0.00450 + spread;
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
+				orden.takeProfit = vela[param] + 3 * atrGraf;
 				//orden.stopLoss = orden.open - (orden.stopLossIni * 3 / 4) / ajusteDecimal;
 				nStopLoss = 0;
 				orden.lote = ponderado;
@@ -530,7 +578,7 @@ function fnCompra(vela, tipo, arrV, param){
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(orden);
 				console.log("\n\n\n");	
-				
+				velaOperativa.indexLabel = 'I';
 				arrOrdenGraf.push(velaOperativa);
 				
 				/*fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind) + '.txt', "[\n", (err) => {
@@ -580,7 +628,8 @@ function fnVenta(vela, tipo, arrV, param){
                 //orden.stopLoss = arrV[arrV.length - 2 - pos].close + spread + 0.00010;
 				orden.stopLoss = vela[param] + 0.00450 - spread;
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
-				orden.stopLoss = orden.open + (orden.stopLossIni * 3 / 4) / ajusteDecimal;
+				orden.takeProfit = vela[param] - 3 * atrGraf;
+				//orden.stopLoss = orden.open + (orden.stopLossIni * 3 / 4) / ajusteDecimal;
 				orden.dia = dias[dt.getUTCDay()];
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(vela);
@@ -618,6 +667,7 @@ function fnVenta(vela, tipo, arrV, param){
 
 
 var atrGraf;
+var velaOperativa;
 function fnVelaNueva(dato, arrVel, tipo){
 	//console.log('fnVelaNueva');
 	//console.log(tipo);
@@ -664,6 +714,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	
 	
 	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: objCont[tipo]++, date: dato.date, origen: dato.opt, fecha: dato.fecha, vol: dato.vol});	
+	//velaOperativa = {x: objCont[tipo], y:[dato.open, dato.high, dato.low, dato.close], vo: arrVel[arrVel.length - 1]};
 	if(arrVel.length > 12){
 		arrVel.shift();
 	}
@@ -747,23 +798,7 @@ http.createServer(function onRequest(request, response) {
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					////console.log(reqObj);
-					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
-			
-						if(newVela == true){
-							newVela = false;
-							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
-							
-						} else {
-							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
-						}
-					 
-					} else {
-						newVela = true;
-						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
-					}*/
-
-					/************************************-  20 min -****************************************/
-					if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+					if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
 							newVela = false;
@@ -778,6 +813,22 @@ http.createServer(function onRequest(request, response) {
 						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
 					}
 
+					/************************************-  20 min -****************************************/
+					/*if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+			
+						if(newVela == true){
+							newVela = false;
+							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
+							
+						} else {
+							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
+						}
+					 
+					} else {
+						newVela = true;
+						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+					}
+*/
 					/************************************-  FIN 20 min -****************************************/
 					//arrVelasSombra.push(reqObj);
 					//respuesta = fnEvaluaVelas(reqObj.cierre, 'S', arrVelasSombra);
