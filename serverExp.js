@@ -721,6 +721,80 @@ function fnVelaNueva(dato, arrVel, tipo){
 	return resp;
 }
 
+
+		
+var period;
+	var arrData = [];
+	var high = 0;
+	var elim
+	var low = 10000;
+function genera(vela){
+	
+	//arrData.push(vela);
+	//yield arrData;
+	//console.log(arrData);
+	period = vela.period;
+	//console.log(period);
+	//for (;;) {
+		
+		//console.log(vela);
+		//console.log(arrData);
+		arrData.push(vela);
+		if(arrData.length < period){
+			//console.log(arrData);
+			
+			//console.log(arrData);
+			high = Math.max(high, vela.high);
+			low = Math.min(low, vela.low);
+			//console.log(high);
+			//console.log(low);
+			return undefined;
+		} else {
+			//arrData.push(vela);
+			//console.log(arrData);
+
+			elim = arrData.shift();
+			
+			//console.log(elim);
+			/*high = Math.max(high, vela.high);
+			low = Math.min(low, vela.low);*/
+			if(elim.low == low){
+				low = 100000;
+				//console.log("length: " + arrData.length);
+				for(var i = 0; i < arrData.length; i++){
+					//console.log(arrData[i]);
+					//console.log(i);
+					low = Math.min(low, arrData[i].low)
+					//console.log("low: " + low);
+				}
+			}
+			if(elim.high == high){
+				high = 0;
+				for(var i = 0; i < arrData.length; i++){
+					high = Math.max(high, arrData[i].high)
+				}
+			}
+		}
+		return /*{low: low, high: high};//*/low + (high - low) / 2;
+	//}	
+	
+
+
+}
+		
+
+
+//var gen = genera();
+
+//console.log(genera());
+console.log(genera({high: 10, low: 2, period: 2}));
+console.log(genera({high: 15, low: 5, period: 2}));
+console.log(genera({high: 11, low: 7, period: 2}));
+console.log(genera({high: 18, low: 2, period: 2}));
+console.log(genera({high: 15, low: 2, period: 2}));
+console.log(genera({high: 20, low: 2, period: 2}));
+console.log(genera({high: 21, low: 2, period: 2}));
+
 var newVela = true;
 var dias=["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
     
