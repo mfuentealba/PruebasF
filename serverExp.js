@@ -809,9 +809,9 @@ console.log(pruebaMediaJaponesa.genera({high: 21, low: 2, period: 2}));
 
 
 
-var Ichimoku = function (lento, rapido){
-	this.MJrapido = new MediasJaponesas(rapido);
-	this.MJlento = new MediasJaponesas(lento);
+var Ichimoku = function (rapido, lento, masLento){
+	this.tenkan = new MediasJaponesas(rapido);
+	this.kijun = new MediasJaponesas(lento);
 };
 
 
