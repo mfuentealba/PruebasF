@@ -551,7 +551,11 @@ function fnCalcCuenta(cierre){
 function fnCompra(vela, tipo, arrV, param){
 	
 		if(cuenta > 0){
-			//if(vela.close - arrV[arrV.length - 1].close > 0){
+			
+			var arr = ((arrV[arrV.length - 1].close +  atrGraf) + '').split('.');
+			nivel = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
+			console.log("NIVEL: " + nivel);
+			if(arrV[arrV.length - 1].close -  atrGraf > 0){
 				var pos;
 				var velaOp = arrV[arrV.length - 1];
 				if(param == 'open'){
@@ -599,7 +603,7 @@ function fnCompra(vela, tipo, arrV, param){
 						////console.log('The "data to append" was appended to file!');
 					});
 				return "C";	
-			//}
+			}
 					
 		}
 		return "N";
@@ -609,7 +613,7 @@ function fnCompra(vela, tipo, arrV, param){
 function fnVenta(vela, tipo, arrV, param){
 	
 		if(cuenta > 0){
-			//if(arrV[arrV.length - 1].close - vela.close > 0){
+			if(arrV[arrV.length - 1].close - vela.close > 0){
 				var velaOp = arrV[arrV.length - 1];
 				var pos;
 				if(param == 'open'){
@@ -657,7 +661,7 @@ function fnVenta(vela, tipo, arrV, param){
 						////console.log('The "data to append" was appended to file!');
 					});
 				return "V";
-			//}
+			}
 			
 			
 		}
@@ -668,12 +672,426 @@ function fnVenta(vela, tipo, arrV, param){
 
 var atrGraf;
 var velaOperativa;
+
+var objNiveles = {};
+var objMin = {};
+var objMax = {};
+var arrMin = [];
+var arrMax = [];
+var arrElim = [];
+var contadorNivel = 1;
+var arrTendencias = [];
+var proyeccionAlcista;
+var corteMinAlcista;
+
+
+function fnMaxMin(opt, velaAnt, vela){
+	if(opt == 'min'){
+		
+		var arr = String(vela.low).split('.');
+		var lowV = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
+		arr = String(velaAnt.low).split('.');
+		var lowVA= Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
+		console.log("*****************************************************");
+		console.log(lowVA);
+		console.log(lowV);
+		console.log(Math.min(lowVA, lowV));
+		console.log("*****************************************************");
+		
+		var objRes = {res : Math.min(lowVA, lowV), ptos: []};
+		
+		if(objRes.res == lowVA){
+			objRes.ptos.push(velaAnt.id);
+		}
+		if(objRes.res == lowV){
+			objRes.ptos.push(vela.id);
+		}
+		return objRes;
+	} else {
+		arr = String(vela.high).split('.');
+
+		 
+		var highV= Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
+		arr = String(velaAnt.high).split('.');
+		var highVA= Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
+		console.log("*****************************************************");
+		console.log(highVA);
+		console.log(highV);
+		console.log(Math.max(highVA, highV));
+		console.log("*****************************************************");
+		var objRes = {res : Math.max(highVA, highV), ptos: []};
+		
+		if(objRes.res == highVA){
+			objRes.ptos.push(velaAnt.id);
+		}
+		if(objRes.res == highV){
+			objRes.ptos.push(vela.id);
+		}
+		return objRes;
+
+	}
+	
+}
+
+
+
 function fnVelaNueva(dato, arrVel, tipo){
 	//console.log('fnVelaNueva');
 	//console.log(tipo);
 	atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
 	
 	var vela = arrVel[arrVel.length - 1];
+	var velaAnt = arrVel[arrVel.length - 2];
+	
+	
+	
+	/************************************- NIVELES -********************************************/
+	
+	if(velaAnt){
+		/*if(vela.id == 200){
+			exit();
+
+		}*/
+		if(velaAnt.close <= velaAnt.open && vela.close >= vela.open){
+			var val = fnMaxMin('min', velaAnt, vela);
+			//console.log("EL VAL = " + val);
+			if(objNiveles[val.res]){
+				if(objNiveles[val.res]['ptos'].indexOf(velaAnt.id) == -1){
+					objNiveles[val.res]['cont']++;
+					objNiveles[val.res]['ptos'] = objNiveles[val.res]['ptos'].concat(val.ptos);
+				}
+				
+			} else {
+				objNiveles[val.res] = {ini: vela.id, cont: 1, ptos: [vela.id]};
+			}
+			
+		} else if(velaAnt.close >= velaAnt.open && vela.close <= vela.open){
+			val = fnMaxMin('max', velaAnt, vela);
+			//console.log("EL VAL = " + val);
+			if(objNiveles[val.res]){
+				if(objNiveles[val.res]['ptos'].indexOf(velaAnt.id) == -1){
+					objNiveles[val.res]['cont']++;
+					objNiveles[val.res]['ptos'] = objNiveles[val.res]['ptos'].concat(val.ptos);
+				}
+			} else {
+				objNiveles[val.res] = {ini: vela.id, cont: 1, ptos: [vela.id]};
+			}
+		} else {
+			for(var num in objNiveles){
+				if(num < vela.high && num > vela.low){
+					objNiveles[num]['cont']--;
+					if(objNiveles[num]['cont'] < 1){
+						delete objNiveles[num];
+					}
+				}
+			}
+		}
+
+		var objNuevo;
+		var n;
+		var tendencia = fnEvaluaTendencia(velaAnt, vela);
+					
+		if(tendencia == TENDENCIA_ALCISTA){//verde-roja => PUNTA
+			n  = arrMax.length;
+			objNuevo = {num: vela['high'] < velaAnt['high'] ? vela.id : velaAnt.id,  valor: vela['high'] < velaAnt['high'] ? vela['high'] : velaAnt['high']};			
+			for(var j = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
+				a = arrMax[j];
+				console.log(objNuevo);
+				if(a.ptoInicial['valor'] > objNuevo['valor']){
+					ptoElim = arrMax.splice(j, 1)['ptoInicial'];
+					arrElim.push(ptoElim);
+					j--;
+					n--;
+				} 	
+			}
+			var nodo;
+			for(ptoElim of arrElim){//EN LAS PROYECCIONES DE CADA PUNTO SOBREVIVIENTE ELIMINO LOS PUNTOS ELIMINADOS
+				for(nodo of arrMax){
+					
+					for(var arrPuntos of nodo.arrayPosibles){
+						var ind = arrPuntos.indexOf(ptoElim);
+						if(ind > -1){
+							arrPuntos.splice(ind, 1);
+							if(arrPuntos.length == 0){
+								nodo.arrayPosibles.splice(nodo.arrayPosibles.indexOf(arrPuntos), 1);
+							}	
+						}	
+					}	
+				}	
+				
+			}
+			
+			n = arrMax.length;
+				for(var jj = 0; jj < n; jj++){//UNA VEZ ELIMINADO DE TODOS LOS ARRAY LOS VALORES MAYORES PROCEDO A INSERTAR EL VALOR NUEVO
+					nodo = arrMax[jj];
+					if(!nodo.arrayPosibles){
+						nodo.arrayPosibles = [];
+					}
+					
+					if(nodo.arrayPosibles.length > 0){
+						var m = nodo.arrayPosibles.length;
+						for(var s = 0; s < m; s++){
+							arrPuntos = nodo.arrayPosibles[s];
+							var arrMaximo = [nodo.ptoInicial];
+							try{
+								for(var gg of arrPuntos){
+									
+									arrMaximo.push(gg);		
+								}	
+							} catch(e){
+								//console.log(nodo);
+								//console.log(j);
+								//console.log(nodo.arrayPosibles[s]);
+								//console.log(arrPuntos);
+								//return 'X';
+							}
+							
+							
+							var swPerteneceTendencia = false;
+							for(var lin of arrTendencias){
+								var res = lin.pendiente * objNuevo['num'] + lin.coefCorte;
+								if(objNuevo['valor'] <= res && objNuevo['valor'] - .0001 >= res){
+									//lin.arrPtos.addItem(objNuevo);//COSUME RAM
+									swPerteneceTendencia = true;
+								}
+							}
+							
+							if(!swPerteneceTendencia){
+								
+								var valorAnterior = arrMaximo[arrMaximo.length - 1];
+								arrMaximo.push(objNuevo);
+								//Crea orden y saca proyeccion segun pendiente
+								var valorInicial = nodo.ptoInicial;
+								proyeccionAlcista = Number(valorInicial['valor'] - valorAnterior['valor']) / (valorInicial['num'] - valorAnterior['num']);
+								corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * proyeccionAlcista;
+	//											
+								var valorEsperado = proyeccionAlcista * objNuevo['num'] + corteMinAlcista;
+								console.log("/********************************************************************************/");
+								console.log(objNuevo['valor']);
+								console.log(valorEsperado);
+								console.log(objNuevo['valor']);
+								console.log(valorEsperado);
+								console.log("/********************************************************************************/");
+								
+								//console.log(arrMin);
+								//return 'X';
+								if(objNuevo['valor'] >= valorEsperado && objNuevo['valor'] - proyeccionAlcista <= valorEsperado){
+									
+										
+										
+										
+									fnGeneraLineaTendencia_y_orden(jj, valorInicial, objNuevo, arrMaximo);
+									/*console.log(arrTendencias);
+									return 'X';*/
+									
+									
+									nodo.arrayPosibles.splice(nodo.arrayPosibles.indexOf(arrPuntos));
+									m--;
+									s--;	
+									
+									
+									
+								} else {
+									if(objNuevo['valor'] < valorEsperado){
+										arrMax.splice(arrMax.indexOf(valorAnterior), 1);
+										arrPuntos.shift();
+										arrPuntos.push(objNuevo);
+										//nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
+									} else {
+										arrMax.pop();											
+										if(!objMax.hasOwnProperty(valorAnterior.num)){
+											a = {};
+											a.ptoInicial = valorAnterior;
+											a.arrayPosibles = [];
+											a.arrayPosibles[0] = []
+											a.arrayPosibles[0].push(objNuevo);
+											arrMax.push(a);
+											objMax[valorAnterior.num] = valorAnterior;
+										}
+										
+										
+									}
+								}									
+							}	
+						}		
+					} else {
+						nodo.arrayPosibles[0] = []
+						nodo.arrayPosibles[0].push(objNuevo);
+						
+					}
+				}	
+					
+			
+			
+			
+		} else if(tendencia == TENDENCIA_BAJISTA){//roja-verde => VALLE
+			objNuevo = {num: vela['low'] < velaAnt['low'] ? vela.id : velaAnt.id,  valor: vela['low'] < velaAnt['low'] ? vela['low'] : velaAnt['low']};
+			n  = arrMin.length;
+			for(var j = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
+				a = arrMin[j];
+				console.log(objNuevo);
+				if(a.ptoInicial['valor'] > objNuevo['valor']){
+					ptoElim = arrMin.splice(j, 1)['ptoInicial'];
+					arrElim.push(ptoElim);
+					j--;
+					n--;
+				} 	
+			}
+			var nodo;
+			for(ptoElim of arrElim){//EN LAS PROYECCIONES DE CADA PUNTO SOBREVIVIENTE ELIMINO LOS PUNTOS ELIMINADOS
+				for(nodo of arrMin){
+					
+					for(var arrPuntos of nodo.arrayPosibles){
+						var ind = arrPuntos.indexOf(ptoElim);
+						if(ind > -1){
+							arrPuntos.splice(ind, 1);
+							if(arrPuntos.length == 0){
+								nodo.arrayPosibles.splice(nodo.arrayPosibles.indexOf(arrPuntos), 1);
+							}	
+						}	
+					}	
+				}	
+				
+			}
+		
+			
+			objNuevo.vela = vela;
+			if(n == 0){
+				a = {};
+				a.ptoInicial = objNuevo;
+				a.arrayPosibles = [];
+				arrMin.push(a);
+				objMin[objNuevo.num] = a;
+			} else {
+				/*//console.log(a);
+				return 'X';*/
+				n = arrMin.length;
+				for(var jj = 0; jj < n; jj++){//UNA VEZ ELIMINADO DE TODOS LOS ARRAY LOS VALORES MAYORES PROCEDO A INSERTAR EL VALOR NUEVO
+					nodo = arrMin[jj];
+					if(!nodo.arrayPosibles){
+						nodo.arrayPosibles = [];
+					}
+					
+					if(nodo.arrayPosibles.length > 0){
+						var m = nodo.arrayPosibles.length;
+						for(var s = 0; s < m; s++){
+							arrPuntos = nodo.arrayPosibles[s];
+							var arrMinimo = [nodo.ptoInicial];
+							try{
+								for(var gg of arrPuntos){
+									
+									arrMinimo.push(gg);		
+								}	
+							} catch(e){
+								//console.log(nodo);
+								//console.log(j);
+								//console.log(nodo.arrayPosibles[s]);
+								//console.log(arrPuntos);
+								//return 'X';
+							}
+							
+							
+							var swPerteneceTendencia = false;
+							for(var lin of arrTendencias){
+								var res = lin.pendiente * objNuevo['num'] + lin.coefCorte;
+								if(objNuevo['valor'] >= res && objNuevo['valor'] - .0001 <= res){
+									//lin.arrPtos.addItem(objNuevo);//COSUME RAM
+									swPerteneceTendencia = true;
+								}
+							}
+							
+							if(!swPerteneceTendencia){
+								
+								var valorAnterior = arrMinimo[arrMinimo.length - 1];
+								arrMinimo.push(objNuevo);
+								//Crea orden y saca proyeccion segun pendiente
+								var valorInicial = nodo.ptoInicial;
+								proyeccionAlcista = Number(valorInicial['valor'] - valorAnterior['valor']) / (valorInicial['num'] - valorAnterior['num']);
+								corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * proyeccionAlcista;
+	//											
+								var valorEsperado = proyeccionAlcista * objNuevo['num'] + corteMinAlcista;
+								console.log("/********************************************************************************/");
+								console.log(objNuevo['valor']);
+								console.log(valorEsperado);
+								console.log(objNuevo['valor']);
+								console.log(valorEsperado);
+								console.log("/********************************************************************************/");
+								
+								//console.log(arrMin);
+								//return 'X';
+								if(objNuevo['valor'] >= valorEsperado && objNuevo['valor'] - proyeccionAlcista <= valorEsperado){
+									
+										
+										
+										
+									fnGeneraLineaTendencia_y_orden(jj, valorInicial, objNuevo, arrMinimo);
+									//console.log(arrTendencias);
+									//return 'X';
+									
+									
+									nodo.arrayPosibles.splice(nodo.arrayPosibles.indexOf(arrPuntos));
+									m--;
+									s--;	
+									
+									
+									
+								} else {
+									if(objNuevo['valor'] < valorEsperado){
+										arrMin.splice(arrMin.indexOf(valorAnterior), 1);
+										arrPuntos.shift();
+										arrPuntos.push(objNuevo);
+										//nodo.arrayPosibles.removeItemAt(nodo.arrayPosibles.getItemIndex(arrPuntos));
+									} else {
+										arrMin.pop();											
+										if(!objMin.hasOwnProperty(valorAnterior.num)){
+											a = {};
+											a.ptoInicial = valorAnterior;
+											a.arrayPosibles = [];
+											a.arrayPosibles[0] = []
+											a.arrayPosibles[0].push(objNuevo);
+											arrMin.push(a);
+											objMin[valorAnterior.num] = valorAnterior;
+										}
+										
+										
+									}
+								}									
+							}	
+						}		
+					} else {
+						nodo.arrayPosibles[0] = []
+						nodo.arrayPosibles[0].push(objNuevo);
+						
+					}
+				}	
+			}		
+			
+		}
+		
+		var velaAux = vela;
+		var ext = 1;
+		for(var ec in arrTendencias){					
+			velaAux[ec.id] = (vela.id) * ec.pendiente + ec.coefCorte;
+			if(velaAux[ec.id] > velaAux['close']){
+				
+				arrTendencias.splice(arrTendencias.indexOf(ec));
+		
+			} 
+			ext++;
+		}
+
+	}
+	
+	
+	
+	/***************************- FIN NIVELES -********************************/
+	
+	
+	
+	
+	
+	
+	
 	bbGraf = bb.nextValue(Number(vela.close));
 	//console.log(bbGraf);
 	velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
