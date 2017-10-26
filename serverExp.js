@@ -567,9 +567,9 @@ function fnCompra(vela, tipo, arrV, param){
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 3].close - spread - 0.00010;
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2 - pos].close - spread - 0.00010;
                 //orden.stopLoss = arrV[arrV.length - 2 - pos].close - spread - 0.00010;
-				orden.stopLoss = vela[param] - 0.00450 + spread;
+				orden.stopLoss = vela[param] - 0.00050 + spread;
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
-				orden.takeProfit = vela[param] + 3 * atrGraf;
+				orden.takeProfit = vela[param] * atrGraf;
 				//orden.stopLoss = orden.open - (orden.stopLossIni * 3 / 4) / ajusteDecimal;
 				nStopLoss = 0;
 				orden.lote = ponderado;
@@ -626,7 +626,7 @@ function fnVenta(vela, tipo, arrV, param){
 				//orden.stopLoss = -Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - spread - 26 - 0.00010 < -166 ? orden.open + 0.00166 : arrV[arrV.length - 3].close + spread + 0.00010;
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2 - pos].close + spread + 0.00010;
                 //orden.stopLoss = arrV[arrV.length - 2 - pos].close + spread + 0.00010;
-				orden.stopLoss = vela[param] + 0.00450 - spread;
+				orden.stopLoss = vela[param] + 0.00050 - spread;
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
 				orden.takeProfit = vela[param] - 3 * atrGraf;
 				//orden.stopLoss = orden.open + (orden.stopLossIni * 3 / 4) / ajusteDecimal;
@@ -722,6 +722,12 @@ function fnVelaNueva(dato, arrVel, tipo){
 }
 
 
+/*var SenkouSpanA = function(tenkan, kijun){
+	this.tenkan, this.kijun
+}*/
+
+
+
 var MediasJaponesas = function (period){
 	this.period = period;
 	this.arrData = [];
@@ -792,8 +798,32 @@ var period;
 	var elim;
 	var low = 10000;
 
-		
-var pruebaMediaJaponesa = new MediasJaponesas(2);
+var Ichimoku = function (rapido, lento, masLento){
+	this.cont = 0;
+	this.tenkan = new MediasJaponesas(rapido);
+	this.kijun = new MediasJaponesas(lento);
+	this.senkouSpanBCalc = new MediasJaponesas(masLento);
+	//this.senkouSpanA = new SenkouSpanA(this.tenkan, this.kijun);
+	this.senkouSpanA = [];
+	this.senkouSpanB = [];
+	for(var i = 0; i < lento; i++){
+		this.senkouSpanA.push(undefined);
+	}
+	for(var i = 0; i < lento; i++){
+		this.senkouSpanB.push(undefined);
+	}
+	//console.log(this.senkouSpanA);
+};
+
+
+Ichimoku.prototype.genera = function (vela){
+	var tk = this.tenkan.genera(vela);
+	var kj = this.kijun.genera(vela);
+	this.senkouSpanA.push(isNaN(Math.min(tk, kj) + (Math.abs(tk - kj) / 2)) ? undefined : Math.min(tk, kj) + (Math.abs(tk - kj) / 2));
+	this.senkouSpanB.push(this.senkouSpanBCalc.genera(vela));
+	return {tenkan: tk, kijun: kj, senkouSpanA: this.senkouSpanA[this.cont], senkouSpanB: this.senkouSpanB[this.cont++], color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
+};		
+var pruebaMediaJaponesa = new Ichimoku(2, 5, 10);
 
 //var gen = genera();
 
@@ -805,17 +835,27 @@ console.log(pruebaMediaJaponesa.genera({high: 18, low: 2, period: 2}));
 console.log(pruebaMediaJaponesa.genera({high: 15, low: 2, period: 2}));
 console.log(pruebaMediaJaponesa.genera({high: 20, low: 2, period: 2}));
 console.log(pruebaMediaJaponesa.genera({high: 21, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 10, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 15, low: 5, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 11, low: 7, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 18, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 15, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 20, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 21, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 10, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 15, low: 5, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 11, low: 7, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 18, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 15, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 20, low: 2, period: 2}));
+console.log(pruebaMediaJaponesa.genera({high: 21, low: 2, period: 2}));
 
 
 
 
-var Ichimoku = function (rapido, lento, masLento){
-	this.tenkan = new MediasJaponesas(rapido);
-	this.kijun = new MediasJaponesas(lento);
-};
 
 
-
+var ichimoku = new Ichimoku(7, 24, 48);
 
 var newVela = true;
 var dias=["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
