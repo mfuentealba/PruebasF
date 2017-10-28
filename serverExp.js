@@ -81,7 +81,7 @@ stdDev : 2
 var bb = new BB(ini);
 var bbGraf;
 var ATR = require('technicalindicators').ATR;
-ini = {low:[], high:[], close:[], period: 14};
+ini = {low:[], high:[], close:[], period: 30};
 var atr = new ATR(ini);
 var fs = require('fs');
 var fs2 = require('fs');
@@ -110,6 +110,9 @@ var buenas = 0;
 var malas = 0;
 var neutras = 0;
 
+const TENDENCIA_ALCISTA = 1;
+const TENDENCIA_BAJISTA = -1;
+
 var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, marT: 0, mieB: 0, mieM: 0, mieN: 0, mieT: 0, jueB: 0, jueM: 0, jueN: 0, jueT: 0, vieB: 0, vieM: 0, vieN: 0, vieT: 0}
 "lun", "mar", "mie", "jue", "vie"
 
@@ -118,7 +121,7 @@ var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, 
 var cuenta = 100;
 var ponderado = .1;
 var spread = 0.00020;
-var ajusteStop = 0.0004;
+var ajusteStop = 0.0008;
 var objCont = {N: 2, S: 2}
 
 var objFunciones = {};
@@ -263,13 +266,14 @@ function fnCierre(opt, origen, vela){
 	var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 	var df = dias[dt.getUTCDay()];
 	velaOperativa.indexLabel = 'F';	
-	arrOrdenGraf.push(velaOperativa);
+	//arrOrdenGraf.push(velaOperativa);
 				
+	orden.fin = velaOperativa;
 	
 	//exit();
 	orden.close = orden.stopLoss;
 	
-	orden.fin = vela.date;
+	//orden.fin = vela.date;
 	orden.total = opt == 'C' ? (orden.close - orden.open - spread) * ajusteDecimal : (orden.open - orden.stopLoss - spread) * ajusteDecimal;//((vela.open - orden.open) * ajusteDecimal) - 16;	
 	orden.totalReal = orden.total * orden.lote;//((vela.open - orden.open) * ajusteDecimal) - 16;	
 	orden.prop = opt == 'C' ? -(orden.open - orden.min) * ajusteDecimal / orden.stopLossIni : -(orden.max - orden.open) * ajusteDecimal / orden.stopLossIni;
@@ -277,10 +281,10 @@ function fnCierre(opt, origen, vela){
 	orden.cta = cuenta;
 	
 	if(orden.total < -0.01){					
-		orden.tipo = 'L';
+		orden.tipo = orden.tipo == 'V' ? 'S' : 'L';
 		malas++;
 		objResult[df + 'M']++;
-		fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
+		fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(velaOperativa) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
 			});
@@ -293,7 +297,7 @@ function fnCierre(opt, origen, vela){
 		if(orden.total > 0.01){
 			buenas++;
 			objResult[df + 'B']++;
-			fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(orden) + "\n", (err) => {
+			fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n"  + JSON.stringify(velaOperativa) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
 			});
@@ -329,6 +333,27 @@ function fnCierre(opt, origen, vela){
 }
 
 
+function fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMinimo){
+	var linea = {};
+	linea.pendiente = proyeccionAlcista;
+	linea.coefCorte = corteMinAlcista;
+	
+	linea.arrPtos = [];
+	linea.arrPtos.push(valorInicial);
+	linea.arrPtos.push(arrMinimo.pop());
+	linea.arrPtos.push(arrMinimo.pop());
+	
+	
+	
+	//Graf(FlexGlobals.topLevelApplication).removeEventListener(GeneraDataEvent.AUTOGENERACION, Graf(FlexGlobals.topLevelApplication).fnCicloGenerador);
+
+	arrTendencias.push(linea);
+	
+		
+		
+}
+
+
 
 function fnEvaluaCierre(origen, vela){
 	if(orden != null && origen == orden.origen){
@@ -336,10 +361,12 @@ function fnEvaluaCierre(origen, vela){
 		
 		if(orden.tipo == 'C'){
 			if(vela.low < orden.stopLoss || (evaluacion == 2 && orden.stopLoss - orden.open < 0)){
+				orden.stopLoss = vela.low < orden.stopLoss ? orden.stopLoss : vela.close;
 				return fnCierre("C", origen, vela);
 			} else {
-				 console.log(orden.stopLoss);
+				 //console.log(orden.stopLoss);
 				 if(vela.high > orden.takeProfit){
+					 orden.stopLoss = orden.takeProfit;
 					 return fnCierre("C", origen, vela);
 				 } else {
 					if(vela.high > orden.open + ajusteStop + spread){
@@ -372,7 +399,7 @@ function fnEvaluaCierre(origen, vela){
 							
 						}
 						fnImprimirOperacion();
-						console.log(orden.stopLoss);
+						//console.log(orden.stopLoss);
 						return 'A'; 
 					}
 				 }
@@ -383,11 +410,13 @@ function fnEvaluaCierre(origen, vela){
 		} else if(orden && orden.tipo == 'V'){
             //console.log('velaClose: ' + vela.close + ' < ' + (orden.open - (ajusteStop + spread)));
 			if(vela.high > orden.stopLoss || (evaluacion == 3 && orden.stopLoss - orden.open > 0)){
+				orden.stopLoss = vela.high > orden.stopLoss ? orden.stopLoss : vela.close;
 				return fnCierre("V", origen, vela);
 			} else {
-                console.log(orden.stopLoss);
+                //console.log(orden.stopLoss);
 
 				if(vela.low < orden.takeProfit){
+					orden.stopLoss = orden.takeProfit;
 					return fnCierre("V", origen, vela);
 				} else {
 					if(vela.low < orden.open - (ajusteStop + spread)){
@@ -421,7 +450,7 @@ function fnEvaluaCierre(origen, vela){
 							
 						}
 						fnImprimirOperacion();
-						console.log(orden.stopLoss);
+						//console.log(orden.stopLoss);
 						return 'A'; 
 					}	
 				}
@@ -507,10 +536,10 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 		resp = fnEvaluaCierre(tipo, dato);
 		
 	}
-	if(resp == "N" && orden == null){
+	/*if(resp == "N" && orden == null){
 		////console.log(orden);
 		resp = objFunciones[evaluacion + '_' + cont](vela, tipo, arrVel);
-	}
+	}*/
 	
 	return resp;
 	
@@ -553,9 +582,23 @@ function fnCompra(vela, tipo, arrV, param){
 		if(cuenta > 0){
 			
 			var arr = ((arrV[arrV.length - 1].close +  atrGraf) + '').split('.');
-			nivel = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
-			console.log("NIVEL: " + nivel);
-			if(arrV[arrV.length - 1].close -  atrGraf > 0){
+			var evaluando = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
+			console.log("/********************* - REVISION - *************************/");
+			console.log("NIVEL: " + evaluando);
+			var ev = false;
+			/*for(var nivel in objNiveles){
+				console.log((evaluando) + " >= " + nivel);
+				if(arrV[arrV.length - 1].close < Number(nivel) && evaluando >= Number(nivel)){
+					console.log("Orden Abortada");
+					ev = false;
+					break;
+				}
+			}*/
+			if(arrV[arrV.length - 1].close > ichi.senkouSpanA && arrV[arrV.length - 1].close > ichi.senkouSpanB){
+				ev = true;
+			}
+			console.log("/********************* - FIN REVISION - *************************/");
+			if(ev){
 				var pos;
 				var velaOp = arrV[arrV.length - 1];
 				if(param == 'open'){
@@ -563,7 +606,7 @@ function fnCompra(vela, tipo, arrV, param){
 				} else {
 					pos = 1;
 				}
-				orden = {ini: velaOp.id, origen: tipo, open: vela[param], tipo: 'C', fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf};
+				orden = {ini: velaOp.id, origen: tipo, tipo: 'C', cierrePost: '',fin: 0, open: vela[param], fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf};
 				////console.log(arrV);
 				var arrFecha = vela.fecha.split('.');				
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
@@ -571,9 +614,17 @@ function fnCompra(vela, tipo, arrV, param){
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - 26) < -166 ? orden.open - 0.00166 : arrV[arrV.length - 3].close - spread - 0.00010;
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open - 0.00166 : arrV[arrV.length - 2 - pos].close - spread - 0.00010;
                 //orden.stopLoss = arrV[arrV.length - 2 - pos].close - spread - 0.00010;
-				orden.stopLoss = vela[param] - 0.00050 + spread;
+				
+				/*if( orden.ini == 287){
+					console.log(3 * atrGraf);
+					console.log(vela[param] + 3 * atrGraf);
+					exit();
+				}*/
+
+				//orden.stopLoss = vela[param] - 0.00450 + spread;
+				orden.stopLoss = vela[param] - 2 * atrGraf - spread;
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
-				orden.takeProfit = vela[param] * atrGraf;
+				orden.takeProfit = vela[param] + 3 * atrGraf;
 				//orden.stopLoss = orden.open - (orden.stopLossIni * 3 / 4) / ajusteDecimal;
 				nStopLoss = 0;
 				orden.lote = ponderado;
@@ -613,7 +664,25 @@ function fnCompra(vela, tipo, arrV, param){
 function fnVenta(vela, tipo, arrV, param){
 	
 		if(cuenta > 0){
-			if(arrV[arrV.length - 1].close - vela.close > 0){
+			var arr = ((arrV[arrV.length - 1].close -  atrGraf) + '').split('.');
+			var evaluando = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
+			console.log("/********************* - REVISION - *************************/");
+			console.log("NIVEL: " + evaluando);
+			var ev = false;
+			/*for(var nivel in objNiveles){
+				console.log(arrV[arrV.length - 1].close + " > " + nivel);
+				console.log((evaluando) + " <= " + nivel);
+				if(arrV[arrV.length - 1].close > Number(nivel) && evaluando <= Number(nivel)){
+					console.log("Orden Abortada");
+					ev = false;
+					break;
+				}
+			}*/
+			if(arrV[arrV.length - 1].close < ichi.senkouSpanA && arrV[arrV.length - 1].close < ichi.senkouSpanB){
+				ev = true;
+			}
+			console.log("/********************* - FIN REVISION - *************************/");
+			if(ev){
 				var velaOp = arrV[arrV.length - 1];
 				var pos;
 				if(param == 'open'){
@@ -622,7 +691,7 @@ function fnVenta(vela, tipo, arrV, param){
 					pos = 1;
 				}
 				
-				orden = {ini: velaOp.id, origen: tipo, open: vela[param], tipo: 'V', fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf};
+				orden = {ini: velaOp.id, origen: tipo, tipo: 'V', cierrePost: '',fin: 0, open: vela[param], fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf};
 				var arrFecha = vela.fecha.split('.');
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				nStopLoss = 0;
@@ -630,7 +699,14 @@ function fnVenta(vela, tipo, arrV, param){
 				//orden.stopLoss = -Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - spread - 26 - 0.00010 < -166 ? orden.open + 0.00166 : arrV[arrV.length - 3].close + spread + 0.00010;
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2 - pos].close + spread + 0.00010;
                 //orden.stopLoss = arrV[arrV.length - 2 - pos].close + spread + 0.00010;
-				orden.stopLoss = vela[param] + 0.00050 - spread;
+				/*if( orden.ini == 370){
+					console.log(objNiveles);
+					console.log(3 * atrGraf);
+					console.log(vela[param] + 3 * atrGraf);
+					exit();
+				}*/
+				//orden.stopLoss = vela[param] + 0.00450 - spread;
+				orden.stopLoss = vela[param] + 2 * atrGraf + spread;
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
 				orden.takeProfit = vela[param] - 3 * atrGraf;
 				//orden.stopLoss = orden.open + (orden.stopLossIni * 3 / 4) / ajusteDecimal;
@@ -692,12 +768,12 @@ function fnMaxMin(opt, velaAnt, vela){
 		var lowV = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
 		arr = String(velaAnt.low).split('.');
 		var lowVA= Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
-		console.log("*****************************************************");
+		/*console.log("*********************** - MEDIDAS MAXIMOS Y MINIMOS - ******************************");
 		console.log(lowVA);
 		console.log(lowV);
 		console.log(Math.min(lowVA, lowV));
-		console.log("*****************************************************");
-		
+		console.log("*********************** - FIN MEDIDAS MAXIMOS Y MINIMOS - ******************************");
+		*/
 		var objRes = {res : Math.min(lowVA, lowV), ptos: []};
 		
 		if(objRes.res == lowVA){
@@ -714,11 +790,11 @@ function fnMaxMin(opt, velaAnt, vela){
 		var highV= Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
 		arr = String(velaAnt.high).split('.');
 		var highVA= Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
-		console.log("*****************************************************");
+		/*console.log("************************* - MEDIDAS MAXIMOS Y MINIMOS - ****************************");
 		console.log(highVA);
 		console.log(highV);
 		console.log(Math.max(highVA, highV));
-		console.log("*****************************************************");
+		console.log("************************* - FIN MEDIDAS MAXIMOS Y MINIMOS - ****************************");*/
 		var objRes = {res : Math.max(highVA, highV), ptos: []};
 		
 		if(objRes.res == highVA){
@@ -733,7 +809,7 @@ function fnMaxMin(opt, velaAnt, vela){
 	
 }
 
-
+var ichi;
 
 function fnVelaNueva(dato, arrVel, tipo){
 	//console.log('fnVelaNueva');
@@ -742,16 +818,13 @@ function fnVelaNueva(dato, arrVel, tipo){
 	
 	var vela = arrVel[arrVel.length - 1];
 	var velaAnt = arrVel[arrVel.length - 2];
-	
+	ichi = ichimoku.genera({high: vela.high, low: vela.low, period: 2})
 	
 	
 	/************************************- NIVELES -********************************************/
 	
 	if(velaAnt){
-		/*if(vela.id == 200){
-			exit();
-
-		}*/
+		
 		if(velaAnt.close <= velaAnt.open && vela.close >= vela.open){
 			var val = fnMaxMin('min', velaAnt, vela);
 			//console.log("EL VAL = " + val);
@@ -796,7 +869,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 			objNuevo = {num: vela['high'] < velaAnt['high'] ? vela.id : velaAnt.id,  valor: vela['high'] < velaAnt['high'] ? vela['high'] : velaAnt['high']};			
 			for(var j = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
 				a = arrMax[j];
-				console.log(objNuevo);
+				//console.log(objNuevo);
 				if(a.ptoInicial['valor'] > objNuevo['valor']){
 					ptoElim = arrMax.splice(j, 1)['ptoInicial'];
 					arrElim.push(ptoElim);
@@ -866,12 +939,12 @@ function fnVelaNueva(dato, arrVel, tipo){
 								corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * proyeccionAlcista;
 	//											
 								var valorEsperado = proyeccionAlcista * objNuevo['num'] + corteMinAlcista;
-								console.log("/********************************************************************************/");
+								console.log("/******************************** - MEDIDAS PENDIENTE - ************************************************/");
 								console.log(objNuevo['valor']);
 								console.log(valorEsperado);
 								console.log(objNuevo['valor']);
 								console.log(valorEsperado);
-								console.log("/********************************************************************************/");
+								console.log("/******************************** - FIN MEDIDAS PENDIENTE - ************************************************/");
 								
 								//console.log(arrMin);
 								//return 'X';
@@ -929,7 +1002,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 			n  = arrMin.length;
 			for(var j = 0; j < n; j++){//ELIMINO LOS PUNTOS BASE MENORES AL NUEVO
 				a = arrMin[j];
-				console.log(objNuevo);
+				//console.log(objNuevo);
 				if(a.ptoInicial['valor'] > objNuevo['valor']){
 					ptoElim = arrMin.splice(j, 1)['ptoInicial'];
 					arrElim.push(ptoElim);
@@ -1010,12 +1083,12 @@ function fnVelaNueva(dato, arrVel, tipo){
 								corteMinAlcista = valorAnterior['valor'] - valorAnterior['num'] * proyeccionAlcista;
 	//											
 								var valorEsperado = proyeccionAlcista * objNuevo['num'] + corteMinAlcista;
-								console.log("/********************************************************************************/");
+								console.log("/******************************* - MEDIDAS PENDIENTE - *************************************************/");
 								console.log(objNuevo['valor']);
 								console.log(valorEsperado);
 								console.log(objNuevo['valor']);
 								console.log(valorEsperado);
-								console.log("/********************************************************************************/");
+								console.log("/******************************* - FIN MEDIDAS PENDIENTE - *************************************************/");
 								
 								//console.log(arrMin);
 								//return 'X';
@@ -1112,8 +1185,34 @@ function fnVelaNueva(dato, arrVel, tipo){
 		resp = fnEvaluaVelas(dato, tipo, arrVel);
 	}*/
 	
-	console.log(orden);
+	//console.log(orden);
 	if(orden != null){	
+		//exit();
+		console.log(orden.ini + " == " + vela.id)
+		if(orden.ini <= vela.id && orden.cierrePost == ''){
+			//exit();
+			orden.entro = 'OK';	
+			orden.cierrePost = orden.tipo == 'C' ? (orden.open <= vela.close ? 'OK' : 'NOOK') : (orden.open >= vela.close ? 'OK' : 'NOOK');
+			if(orden.cierrePost == 'NOOK'){
+				if(orden.tipo == 'C'){
+					if(vela.close > velaAnt.open + (velaAnt.close - velaAnt.open) / 2){
+						orden.cierrePost == 'OK';
+					} else {
+						orden.stopLoss = vela.close;
+						fnCierre('close', 'S', vela);
+					}
+				} else {
+					if(vela.close < velaAnt.close + (velaAnt.open - velaAnt.close) / 2){
+						orden.cierrePost == 'OK';
+					} else {
+						orden.stopLoss = vela.close;
+						fnCierre('close', 'S', vela);
+					}
+				}
+				
+				
+			} 
+		}
 		console.log("////////////////////////////////////////");
 		console.log(velaOperativa);
 		console.log("////////////////////////////////////////");
@@ -1124,8 +1223,10 @@ function fnVelaNueva(dato, arrVel, tipo){
 			});*/
 		
 	}
+	if(arrVel.length > 30){
+		resp = fnEvaluaVelas(dato, tipo, arrVel);
+	}
 	
-	resp = fnEvaluaVelas(dato, tipo, arrVel);
 	
 	
 	
@@ -1133,12 +1234,21 @@ function fnVelaNueva(dato, arrVel, tipo){
 	
 	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: objCont[tipo]++, date: dato.date, origen: dato.opt, fecha: dato.fecha, vol: dato.vol});	
 	//velaOperativa = {x: objCont[tipo], y:[dato.open, dato.high, dato.low, dato.close], vo: arrVel[arrVel.length - 1]};
-	if(arrVel.length > 12){
+	if(arrVel.length > 31){
 		arrVel.shift();
 	}
 	return resp;
 }
 
+
+function fnEvaluaTendencia(velaAnt, vela){
+	if(velaAnt.open < velaAnt.close && vela.open > vela.close){
+		return TENDENCIA_ALCISTA;
+	} else if(velaAnt.open > velaAnt.close && vela.open < vela.close){
+		return TENDENCIA_BAJISTA;
+	}
+	return 0;
+}
 
 /*var SenkouSpanA = function(tenkan, kijun){
 	this.tenkan, this.kijun
@@ -1246,7 +1356,7 @@ var pruebaMediaJaponesa = new Ichimoku(2, 5, 10);
 //var gen = genera();
 
 //console.log(genera());
-console.log(pruebaMediaJaponesa.genera({high: 10, low: 2, period: 2}));
+/*console.log(pruebaMediaJaponesa.genera({high: 10, low: 2, period: 2}));
 console.log(pruebaMediaJaponesa.genera({high: 15, low: 5, period: 2}));
 console.log(pruebaMediaJaponesa.genera({high: 11, low: 7, period: 2}));
 console.log(pruebaMediaJaponesa.genera({high: 18, low: 2, period: 2}));
@@ -1266,14 +1376,14 @@ console.log(pruebaMediaJaponesa.genera({high: 11, low: 7, period: 2}));
 console.log(pruebaMediaJaponesa.genera({high: 18, low: 2, period: 2}));
 console.log(pruebaMediaJaponesa.genera({high: 15, low: 2, period: 2}));
 console.log(pruebaMediaJaponesa.genera({high: 20, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 21, low: 2, period: 2}));
+console.log(ichimoku.genera({high: 21, low: 2, period: 2}));
+*/
 
 
 
 
 
-
-var ichimoku = new Ichimoku(7, 24, 48);
+var ichimoku = new Ichimoku(12, 72, 144);
 
 var newVela = true;
 var dias=["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
@@ -1352,7 +1462,23 @@ http.createServer(function onRequest(request, response) {
 				//} else {
 					//objFunciones[reqObj.date[5] + ''](dato);					
 					////console.log(reqObj);
-					if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
+					/*if(reqObj.date[3] == '3' || reqObj.date[3] == '4' || reqObj.date[3] == '5'){
+			
+						if(newVela == true){
+							newVela = false;
+							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
+							
+						} else {
+							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
+						}
+					 
+					} else {
+						newVela = true;
+						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+					}*/
+
+					/************************************-  20 min -****************************************/
+					if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
 			
 						if(newVela == true){
 							newVela = false;
@@ -1367,22 +1493,6 @@ http.createServer(function onRequest(request, response) {
 						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
 					}
 
-					/************************************-  20 min -****************************************/
-					/*if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
-			
-						if(newVela == true){
-							newVela = false;
-							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
-							
-						} else {
-							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
-						}
-					 
-					} else {
-						newVela = true;
-						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
-					}
-*/
 					/************************************-  FIN 20 min -****************************************/
 					//arrVelasSombra.push(reqObj);
 					//respuesta = fnEvaluaVelas(reqObj.cierre, 'S', arrVelasSombra);
