@@ -77,8 +77,8 @@ var http = require("http");
 
 var _PORT = 9292; //Http port Node.js server will be listening on. Make sure that this is an open port and its the same as the one defined in MT4 indicator/EA.
 	
-var arrVelas = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];
-var arrVelasSombra = [{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];	
+var arrVelas = [];//[{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];
+var arrVelasSombra = [];//[{id: 1, date: 1, open: 0, close: 0, high: 0, low: 100}];	
 var arrTamVelas = [];
 var tamVelas = 0;	
 var orden;
@@ -160,7 +160,22 @@ function fnGenerarNiveles(x){
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
 			});
-		arrNube = [];
+	fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',JSON.stringify(arrKinjou) + ",\n", (err) => {
+			if (err) throw err;
+				////console.log('The "data to append" was appended to file!');
+			});
+	fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',JSON.stringify(arrTenkan) + ",\n", (err) => {
+			if (err) throw err;
+				////console.log('The "data to append" was appended to file!');
+			});
+	/*fs.appendFileSync('./querysReconstruccion/_logGraf_' + (ind) + '.txt',JSON.stringify(arrChinko) + ",\n", (err) => {
+			if (err) throw err;
+				////console.log('The "data to append" was appended to file!');
+			});	*/					
+	arrNube = [];
+	arrTenkan = [];
+	arrKinjou = [];
+	arrChinko = [];
 }
 	
 function fnEvaluaVelas(dato, tipo, arrV, resp, velaOperativa){
@@ -470,57 +485,35 @@ var MediasJaponesas = function (period){
 };
 
 MediasJaponesas.prototype.genera = function (vela){
-	
-	//arrData.push(vela);
-	//yield arrData;
-	//console.log(arrData);
-	//this.period = vela.period;
-	//console.log(period);
-	//for (;;) {
+	this.arrData.push(vela);
+	if(this.arrData.length < this.period){
+		this.high = Math.max(this.high, vela.high);
+		this.low = Math.min(this.low, vela.low);
+		return undefined;
+	} else if(this.arrData.length < this.period + 1){	
+		this.high = Math.max(this.high, vela.high);
+		this.low = Math.min(this.low, vela.low);
 		
-		//console.log(vela);
-		//console.log(arrData);
-		this.arrData.push(vela);
-		if(this.arrData.length < this.period){
-			//console.log(arrData);
-			
-			//console.log(arrData);
-			this.high = Math.max(this.high, vela.high);
-			this.low = Math.min(this.low, vela.low);
-			//console.log(high);
-			//console.log(low);
-			return undefined;
-		} else {
-			//arrData.push(vela);
-			//console.log(arrData);
-
-			this.elim = this.arrData.shift();
-			
-			//console.log(elim);
-			/*high = Math.max(high, vela.high);
-			low = Math.min(low, vela.low);*/
-			if(this.elim.low == this.low){
-				low = 100000;
-				//console.log("length: " + arrData.length);
-				for(var i = 0; i < this.arrData.length; i++){
-					//console.log(arrData[i]);
-					//console.log(i);
-					this.low = Math.min(this.low, this.arrData[i].low)
-					//console.log("low: " + low);
-				}
-			}
-			if(this.elim.high == this.high){
-				this.high = 0;
-				for(var i = 0; i < this.arrData.length; i++){
-					this.high = Math.max(this.high, this.arrData[i].high)
-				}
+	} else {
+		this.elim = this.arrData.shift();
+		if(this.elim.low == this.low){
+			//console.log("Se extrae objeto Low");
+			this.low = 100000;
+			for(var i = 0; i < this.arrData.length; i++){
+				//console.log(this.low + " " + this.arrData[i].low);
+				this.low = Math.min(this.low, this.arrData[i].low);				
 			}
 		}
-		return /*{low: low, high: high};//*/this.low + (this.high - this.low) / 2;
-	//}	
-	
-
-
+		if(this.elim.high == this.high){
+			//console.log("Se extrae objeto high");
+			this.high = 0;
+			for(var i = 0; i < this.arrData.length; i++){
+				//console.log(this.high + " " + this.arrData[i].high);
+				this.high = Math.max(this.high, this.arrData[i].high)
+			}
+		}
+	}
+	return /*{low: low, high: high};//*/this.low + (this.high - this.low) / 2;
 }
 
 
@@ -532,6 +525,10 @@ var period;
 	var low = 10000;
 
 var Ichimoku = function (rapido, lento, masLento){
+	this.rapido = rapido;
+	this.lento = lento;
+	this.lento = lento;
+
 	this.cont = 0;
 	this.tenkan = new MediasJaponesas(rapido);
 	this.kijun = new MediasJaponesas(lento);
@@ -539,10 +536,10 @@ var Ichimoku = function (rapido, lento, masLento){
 	//this.senkouSpanA = new SenkouSpanA(this.tenkan, this.kijun);
 	this.senkouSpanA = [];
 	this.senkouSpanB = [];
-	for(var i = 0; i < lento; i++){
+	for(var i = 0; i < lento - 1; i++){
 		this.senkouSpanA.push(undefined);
 	}
-	for(var i = 0; i < lento; i++){
+	for(var i = 0; i < lento - 1; i++){
 		this.senkouSpanB.push(undefined);
 	}
 	//console.log(this.senkouSpanA);
@@ -556,59 +553,95 @@ Ichimoku.prototype.genera = function (vela){
 	this.senkouSpanB.push(this.senkouSpanBCalc.genera(vela));
 	
 	
-	return {tenkan: tk, kijun: kj, senkouSpanA: this.senkouSpanA.shift(), senkouSpanB: this.senkouSpanB.shift(), color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
+	//return {tenkan: tk, kijun: kj, senkouSpanA: this.senkouSpanA.shift(), senkouSpanB: this.senkouSpanB.shift(), color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
+	//return {tenkan: tk, kijun: kj, senkouSpanA: {x: vela.id + this.lento, valor: isNaN(Math.min(tk, kj) + (Math.abs(tk - kj) / 2)) ? undefined : Math.min(tk, kj) + (Math.abs(tk - kj) / 2), senkouSpanB: {x: vela.id + this.lento, valor: this.senkouSpanBCalc.genera(vela)}, color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
+	return {tenkan: tk, kijun: kj, senkouSpanA: isNaN(Math.min(tk, kj) + (Math.abs(tk - kj) / 2)) ? undefined : Math.min(tk, kj) + (Math.abs(tk - kj) / 2), senkouSpanB: this.senkouSpanBCalc.genera(vela), color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
+
 };		
-var pruebaMediaJaponesa = new Ichimoku(2, 5, 10);
+var pruebaMediaJaponesa = new Ichimoku(3, 12, 24);
 
 //var gen = genera();
 
 //console.log(genera());
-/*console.log(pruebaMediaJaponesa.genera({high: 10, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 15, low: 5, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 11, low: 7, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 18, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 15, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 20, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 21, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 10, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 15, low: 5, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 11, low: 7, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 18, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 15, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 20, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 21, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 10, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 15, low: 5, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 11, low: 7, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 18, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 15, low: 2, period: 2}));
-console.log(pruebaMediaJaponesa.genera({high: 20, low: 2, period: 2}));
-console.log(ichimoku.genera({high: 21, low: 2, period: 2}));
-*/
+console.log('1');
+console.log(pruebaMediaJaponesa.genera({"open":1.37517,"close":1.37495,"low":1.37372,"high":1.37592,"id":1,"date":"23:10","origen":"S","fecha":"2014.01.01","vol":764}));
+console.log('2');
+console.log(pruebaMediaJaponesa.genera({"open":1.37495,"close":1.37536,"low":1.37493,"high":1.37569,"id":2,"date":"23:30","origen":"S","fecha":"2014.01.01","vol":858}));
+console.log('3');
+console.log(pruebaMediaJaponesa.genera({"open":1.37536,"close":1.37677,"low":1.37511,"high":1.37687,"id":3,"date":"23:50","origen":"S","fecha":"2014.01.01","vol":1265}));
+console.log('4');
+console.log(pruebaMediaJaponesa.genera({"open":1.37677,"close":1.3765,"low":1.37649,"high":1.3773,"id":4,"date":"00:10","origen":"S","fecha":"2014.01.02","vol":714}));
+console.log('5');
+console.log(pruebaMediaJaponesa.genera({"open":1.3765,"close":1.37636,"low":1.37626,"high":1.37708,"id":5,"date":"00:30","origen":"S","fecha":"2014.01.02","vol":1049}));
+console.log('6');
+console.log(pruebaMediaJaponesa.genera({"open":1.37636,"close":1.37662,"low":1.37614,"high":1.37699,"id":6,"date":"00:50","origen":"S","fecha":"2014.01.02","vol":970}));
+console.log('7');
+console.log(pruebaMediaJaponesa.genera({"open":1.37662,"close":1.37615,"low":1.37609,"high":1.37664,"id":7,"date":"01:10","origen":"S","fecha":"2014.01.02","vol":709}));
+console.log('8');
+console.log(pruebaMediaJaponesa.genera({"open":1.37611,"close":1.37623,"low":1.37582,"high":1.37623,"id":8,"date":"01:30","origen":"S","fecha":"2014.01.02","vol":527}));
+console.log('9');
+console.log(pruebaMediaJaponesa.genera({"open":1.3762,"close":1.37603,"low":1.37578,"high":1.37652,"id":9,"date":"01:50","origen":"S","fecha":"2014.01.02","vol":666}));
+console.log('10');
+console.log(pruebaMediaJaponesa.genera({"open":1.37602,"close":1.37514,"low":1.37508,"high":1.37602,"id":10,"date":"02:10","origen":"S","fecha":"2014.01.02","vol":552}));
+console.log('11');
+console.log(pruebaMediaJaponesa.genera({"open":1.37517,"close":1.3763,"low":1.37504,"high":1.37662,"id":11,"date":"02:30","origen":"S","fecha":"2014.01.02","vol":1338}));
+console.log('12');
+console.log(pruebaMediaJaponesa.genera({"open":1.37635,"close":1.37646,"low":1.37596,"high":1.3765,"id":12,"date":"02:50","origen":"S","fecha":"2014.01.02","vol":917}));
+console.log('13');
+console.log(pruebaMediaJaponesa.genera({"open":1.37644,"close":1.37644,"low":1.37625,"high":1.37676,"id":13,"date":"03:10","origen":"S","fecha":"2014.01.02","vol":681}));
+console.log('14');
+console.log(pruebaMediaJaponesa.genera({"open":1.37644,"close":1.3766,"low":1.37637,"high":1.3767,"id":14,"date":"03:30","origen":"S","fecha":"2014.01.02","vol":690}));
+console.log('15');
+console.log(pruebaMediaJaponesa.genera({"open":1.37664,"close":1.37676,"low":1.37642,"high":1.37677,"id":15,"date":"03:50","origen":"S","fecha":"2014.01.02","vol":676}));
+console.log('16');
+console.log(pruebaMediaJaponesa.genera({"open":1.37677,"close":1.3767,"low":1.37662,"high":1.37749,"id":16,"date":"04:10","origen":"S","fecha":"2014.01.02","vol":857}));
+console.log('17');
+console.log(pruebaMediaJaponesa.genera({"open":1.3767,"close":1.37636,"low":1.37633,"high":1.37678,"id":17,"date":"04:30","origen":"S","fecha":"2014.01.02","vol":461}));
+console.log('18');
+console.log(pruebaMediaJaponesa.genera({"open":1.37637,"close":1.37609,"low":1.376,"high":1.3767,"id":18,"date":"04:51","origen":"S","fecha":"2014.01.02","vol":481}));
+console.log('19');
+console.log(pruebaMediaJaponesa.genera({"open":1.3761,"close":1.37534,"low":1.37524,"high":1.37612,"id":19,"date":"05:10","origen":"S","fecha":"2014.01.02","vol":656}));
+console.log('20');
+console.log(pruebaMediaJaponesa.genera({"open":1.37532,"close":1.37474,"low":1.3747,"high":1.37551,"id":20,"date":"05:30","origen":"S","fecha":"2014.01.02","vol":981}));
+console.log('21');
+console.log(pruebaMediaJaponesa.genera({"open":1.3747,"close":1.37465,"low":1.37441,"high":1.37476,"id":21,"date":"05:50","origen":"S","fecha":"2014.01.02","vol":900}));
 
 
 
 
 
-var ichimoku = new Ichimoku(12, 72, 144);
+
+var ichimoku = new Ichimoku(3, 12, 24);
 
 var ichi;
 
+var arrTenkan = [];
+var arrKinjou = [];
+var arrChinko = [];
 
 function fnVelaNueva(dato, arrVel, tipo){
 	//console.log('fnVelaNueva');
 	//console.log(tipo);
-	atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
 	
+	//console.log(ichimoku);
 	var vela = arrVel[arrVel.length - 1];
 	var velaAnt = arrVel[arrVel.length - 2];
-	ichi = ichimoku.genera({high: vela.high, low: vela.low, period: 2})
-	arrNube.push({x: vela.id, y: [ichi.senkouSpanA, ichi.senkouSpanB]});
-	
+	var resp = 'N';
 	/**************************-NIVELES-*********************************/
 	//console.log(velaAnt);
 	//console.log(vela);
+
+	if(vela){
+		atrGraf = atr.nextValue({close: [vela.close], high: [vela.high], low: [vela.low]});
+		ichi = ichimoku.genera({high: vela.high, low: vela.low, period: 2})
+		arrNube.push({x: vela.id + ichimoku.lento, y: [ichi.senkouSpanA, ichi.senkouSpanB], tipo: 'Nube'});
+		arrTenkan.push({x: vela.id, y: ichi.tenkan, tipo: 'Tenkan'});
+		arrKinjou.push({x: vela.id, y: ichi.kijun, tipo: 'Kinjou'});
+		arrChinko.push({x: vela.id - ichimoku.lento, y: vela.close, tipo: 'Chinko'});
+	}
+
 	if(velaAnt){
+		
 		/*if(vela.id == 200){
 			exit();
 
@@ -940,27 +973,28 @@ function fnVelaNueva(dato, arrVel, tipo){
 			} 
 			ext++;
 		}
-
+		bbGraf = bb.nextValue(Number(vela.close));
+		velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
+	
+		
+		
+		resp = fnEvaluaSubVelas(dato, arrSubVela, tipo);
+		resp = fnEvaluaVelas(dato, tipo, arrVel, resp, velaOperativa);
+		
+		
+		
+		//console.log(atrGraf);
+		
+		arrSubVela = [];
+		j = 1;
+		arrSubVela.push(vela);
 	}
 	
 
 	
-	bbGraf = bb.nextValue(Number(vela.close));
+	
 	//console.log(bbGraf);
-	velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
 	
-	
-	var resp = 'N';
-	resp = fnEvaluaSubVelas(dato, arrSubVela, tipo);
-	resp = fnEvaluaVelas(dato, tipo, arrVel, resp, velaOperativa);
-	
-	
-	
-	//console.log(atrGraf);
-	
-	arrSubVela = [];
-	j = 1;
-	arrSubVela.push(vela);
 	
 	
 	arrVel.push({open: dato.open, close: dato.close, low: dato.low, high: dato.high, id: cont++, date: dato.date, origen: dato.opt, fecha: dato.fecha, vol: dato.vol});	
@@ -1071,8 +1105,13 @@ http.createServer(function onRequest(request, response) {
 						}
 					 
 					} else {
-						newVela = true;
-						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+						try{
+							newVela = true;
+							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+						} catch(e){
+							respuesta = 'N';
+						}
+						
 					}
 
 					/************************************-  FIN 20 min -****************************************/
