@@ -622,7 +622,8 @@ function fnCompra(vela, tipo, arrV, param){
 				}*/
 
 				//orden.stopLoss = vela[param] - 0.00450 + spread;
-				orden.stopLoss = vela[param] - 2 * atrGraf - spread;
+				//orden.stopLoss = vela[param] - atrGraf - spread;
+				orden.stopLoss = Math.min(ichi.senkouSpanA, ichi.senkouSpanB);
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
 				orden.takeProfit = vela[param] + 3 * atrGraf;
 				//orden.stopLoss = orden.open - (orden.stopLossIni * 3 / 4) / ajusteDecimal;
@@ -707,7 +708,8 @@ function fnVenta(vela, tipo, arrV, param){
 					exit();
 				}*/
 				//orden.stopLoss = vela[param] + 0.00450 - spread;
-				orden.stopLoss = vela[param] + 2 * atrGraf + spread;
+				//orden.stopLoss = vela[param] + 2 * atrGraf + spread;
+				orden.stopLoss = Math.max(ichi.senkouSpanA, ichi.senkouSpanB);
 				orden.stopLossIni = Math.round(Math.abs(orden.open - orden.stopLoss) * ajusteDecimal);
 				orden.takeProfit = vela[param] - 3 * atrGraf;
 				//orden.stopLoss = orden.open + (orden.stopLossIni * 3 / 4) / ajusteDecimal;
