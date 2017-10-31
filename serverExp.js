@@ -1236,17 +1236,17 @@ function fnVelaNueva(dato, arrVel, tipo){
 
 				if(orden.tipo == 'C'){
 					if(vela.close > velaAnt.open + (velaAnt.close - velaAnt.open) / 2){
-						orden.cierrePost == 'OK';
+						orden.cierrePost == 'OK2';
 					} else {
-						orden.stopLoss = vela.close;
-						fnCierre('close', 'S', vela);
+						/*orden.stopLoss = vela.close;
+						fnCierre('close', 'S', vela);*/
 					}
 				} else {
 					if(vela.close < velaAnt.close + (velaAnt.open - velaAnt.close) / 2){
-						orden.cierrePost == 'OK';
+						orden.cierrePost == 'OK2';
 					} else {
-						orden.stopLoss = vela.close;
-						fnCierre('close', 'S', vela);
+						/*orden.stopLoss = vela.close;
+						fnCierre('close', 'S', vela);*/
 					}
 				}
 				
@@ -1282,7 +1282,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	return resp;
 }
 
-var objEval = {OK:{cont: 0, buenas:0, malas:0, porcent:0}, NOOK: {cont: 0, buenas:0, malas:0, porcent:0}, '': {cont: 0, buenas:0, malas:0, porcent:0}};
+var objEval = {OK:{cont: 0, buenas:0, malas:0, porcent:0}, NOOK: {cont: 0, buenas:0, malas:0, porcent:0}, OK2:{cont: 0, buenas:0, malas:0, porcent:0}, NOOK: {cont: 0, buenas:0, malas:0, porcent:0},'': {cont: 0, buenas:0, malas:0, porcent:0}};
 function fnEvaluaTendencia(velaAnt, vela){
 	if(velaAnt.open < velaAnt.close && vela.open > vela.close){
 		return TENDENCIA_ALCISTA;
