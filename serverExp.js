@@ -121,7 +121,7 @@ var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, 
 var cuenta = 100;
 var ponderado = .1;
 var spread = 0.00020;
-var ajusteStop = 0.0008;
+var ajusteStop = 0.001;
 var objCont = {N: 2, S: 2}
 
 var objFunciones = {};
@@ -266,7 +266,7 @@ function fnCierre(opt, origen, vela){
 	var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 	var df = dias[dt.getUTCDay()];
 	velaOperativa.indexLabel = 'F';	
-	//arrOrdenGraf.push(velaOperativa);
+	arrOrdenGraf.push(velaOperativa);
 				
 	orden.fin = velaOperativa;
 	
@@ -284,11 +284,12 @@ function fnCierre(opt, origen, vela){
 		orden.tipo = orden.tipo == 'V' ? 'S' : 'L';
 		malas++;
 		objResult[df + 'M']++;
+		objEval[orden.cierrePost].malas++;
 		fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(velaOperativa) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
 			});
-		fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/_logExpFGrafMala_' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
+		fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/_logExpFGrafMala_' + (orden.ini) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n" + JSON.stringify(arrNube) + ",\n" + JSON.stringify(arrTenkan) + ",\n" + JSON.stringify(arrKinjou), (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
 			});
@@ -297,18 +298,19 @@ function fnCierre(opt, origen, vela){
 		if(orden.total > 0.01){
 			buenas++;
 			objResult[df + 'B']++;
+			objEval[orden.cierrePost].buenas++;
 			fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n"  + JSON.stringify(velaOperativa) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
 			});
-			fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/_logExpFGrafBuena_' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
+			fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/_logExpFGrafBuena_' + (orden.ini) + '.txt', JSON.stringify([]) + ",\n" + JSON.stringify(arrOrdenGraf) + ",\n" + JSON.stringify(arrNube) + ",\n" + JSON.stringify(arrTenkan) + ",\n" + JSON.stringify(arrKinjou), (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
 			});
 		} else {
 			neutras++;
 			objResult[df + 'N']++;
-			fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/_logExpFGrafNeutra_' + (ind++) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n", (err) => {
+			fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/_logExpFGrafNeutra_' + (orden.ini) + '.txt', JSON.stringify(arrOrdenGraf) + ",\n" + JSON.stringify(arrNube) + ",\n" + JSON.stringify(arrTenkan) + ",\n" + JSON.stringify(arrKinjou), (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
 			});
@@ -316,7 +318,11 @@ function fnCierre(opt, origen, vela){
 		}
 	}
 	arrOrdenGraf = [];
+	arrNube = [];
+	arrTenkan = [];
+	arrKinjou = [];
 	objResult[df + 'T'] += orden.total;
+	
 	fs2.appendFileSync('./querysReconstruccion/_logExpF.txt', JSON.stringify(objResult) + "\n", (err) => {
 		if (err) throw err;
 			////console.log('The "data to append" was appended to file!');
@@ -594,7 +600,11 @@ function fnCompra(vela, tipo, arrV, param){
 					break;
 				}
 			}*/
-			if(arrV[arrV.length - 1].close > ichi.senkouSpanA && arrV[arrV.length - 1].close > ichi.senkouSpanB && (arrV[arrV.length - 1].low < ichi.senkouSpanA || arrV[arrV.length - 1].low < ichi.senkouSpanB)){
+			if(arrV[arrV.length - 1].close > ichi.senkouSpanA 
+			&& arrV[arrV.length - 1].close > ichi.senkouSpanB 
+			//&& ichi.tenkan > ichi.kijun
+			&& arrV[arrV.length - 1].low > Math.min(ichi.senkouSpanA, ichi.senkouSpanB)
+			&& arrV[arrV.length - 1].low < Math.max(ichi.senkouSpanA, ichi.senkouSpanB)){
 				ev = true;
 			}
 			console.log("/********************* - FIN REVISION - *************************/");
@@ -635,8 +645,8 @@ function fnCompra(vela, tipo, arrV, param){
 				console.log(orden);
 				console.log("\n\n\n");	
 				velaOperativa.indexLabel = 'I';
-				arrOrdenGraf.push(velaOperativa);
-				arrOrdenGraf.push(ichi);
+				/*arrOrdenGraf.push(velaOperativa);
+				arrOrdenGraf.push(ichi);*/
 				
 				/*fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind) + '.txt', "[\n", (err) => {
 					if (err) throw err;
@@ -680,7 +690,11 @@ function fnVenta(vela, tipo, arrV, param){
 					break;
 				}
 			}*/
-			if(arrV[arrV.length - 1].close < ichi.senkouSpanA && arrV[arrV.length - 1].close < ichi.senkouSpanB && (arrV[arrV.length - 1].high > ichi.senkouSpanA || arrV[arrV.length - 1].high > ichi.senkouSpanB)/*|| (arrV[arrV.length - 1].close < Math.max(ichi.senkouSpanA, ichi.senkouSpanB) && (arrV[arrV.length - 1].close > Math.min(ichi.senkouSpanA, ichi.senkouSpanB)))*/){
+			if(arrV[arrV.length - 1].close < ichi.senkouSpanA 
+			&& arrV[arrV.length - 1].close < ichi.senkouSpanB
+			//&& ichi.tenkan < ichi.kijun
+			&& arrV[arrV.length - 1].high < Math.max(ichi.senkouSpanA, ichi.senkouSpanB) 
+			&& arrV[arrV.length - 1].high > Math.min(ichi.senkouSpanA, ichi.senkouSpanB)){
 				ev = true;
 			}
 			console.log("/********************* - FIN REVISION - *************************/");
@@ -720,8 +734,8 @@ function fnVenta(vela, tipo, arrV, param){
 				console.log("\n\n\n");
 				
 				
-				arrOrdenGraf.push(velaOperativa);
-				arrOrdenGraf.push(ichi);
+				/*arrOrdenGraf.push(velaOperativa);
+				arrOrdenGraf.push(ichi);*/
 				/*fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind) + '.txt', "[\n", (err) => {
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
@@ -763,8 +777,11 @@ var contadorNivel = 1;
 var arrTendencias = [];
 var proyeccionAlcista;
 var corteMinAlcista;
-
-
+var inicioOrden;
+var arrHistoriaOrden;
+var arrNube = [];
+var arrTenkan = [];
+var	arrKinjou = [];
 function fnMaxMin(opt, velaAnt, vela){
 	if(opt == 'min'){
 		
@@ -821,15 +838,17 @@ function fnVelaNueva(dato, arrVel, tipo){
 	var vela = arrVel[arrVel.length - 1];
 	var velaAnt = arrVel[arrVel.length - 2];
 	var resp = 'N';
+
+	console.log(objEval);
 	
 	/************************************- NIVELES -********************************************/
 	if(vela){
 		atrGraf = atr.nextValue({close: [vela.close], high: [vela.high], low: [vela.low]});
 		ichi = ichimoku.genera({high: vela.high, low: vela.low, period: 2})
-		/*arrNube.push({x: vela.id + ichimoku.lento, y: [ichi.senkouSpanA, ichi.senkouSpanB], tipo: 'Nube'});
+		arrNube.push({x: vela.id, y: [ichi.senkouSpanA, ichi.senkouSpanB], tipo: 'Nube'});
 		arrTenkan.push({x: vela.id, y: ichi.tenkan, tipo: 'Tenkan'});
 		arrKinjou.push({x: vela.id, y: ichi.kijun, tipo: 'Kinjou'});
-		arrChinko.push({x: vela.id - ichimoku.lento, y: vela.close, tipo: 'Chinko'});*/
+		//arrChinko.push({x: vela.id - ichimoku.lento, y: vela.close, tipo: 'Chinko'});
 		bbGraf = bb.nextValue(Number(vela.close));
 		//console.log(bbGraf);
 		velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
@@ -838,6 +857,13 @@ function fnVelaNueva(dato, arrVel, tipo){
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
 			});
+		
+	} else {
+		atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
+		ichi = ichimoku.genera({high: dato.high, low: dato.low, period: 2})
+		arrNube.push({x: 1, y: [ichi.senkouSpanA, ichi.senkouSpanB], tipo: 'Nube'});
+		arrTenkan.push({x: 1, y: ichi.tenkan, tipo: 'Tenkan'});
+		arrKinjou.push({x: 1, y: ichi.kijun, tipo: 'Kinjou'});
 		
 	}
 	if(velaAnt){
@@ -1203,7 +1229,11 @@ function fnVelaNueva(dato, arrVel, tipo){
 			//exit();
 			orden.entro = 'OK';	
 			orden.cierrePost = orden.tipo == 'C' ? (orden.open <= vela.close ? 'OK' : 'NOOK') : (orden.open >= vela.close ? 'OK' : 'NOOK');
+			
 			if(orden.cierrePost == 'NOOK'){
+				
+				
+
 				if(orden.tipo == 'C'){
 					if(vela.close > velaAnt.open + (velaAnt.close - velaAnt.open) / 2){
 						orden.cierrePost == 'OK';
@@ -1222,11 +1252,12 @@ function fnVelaNueva(dato, arrVel, tipo){
 				
 				
 			} 
+			objEval[orden.cierrePost]['cont']++;
 		}
 		console.log("////////////////////////////////////////");
 		console.log(velaOperativa);
 		console.log("////////////////////////////////////////");
-		arrOrdenGraf.push(velaOperativa);
+		
 		/*fsGrafOrden.appendFileSync('./querysReconstruccion/_logExpFGraf' + (ind) + '.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
@@ -1238,6 +1269,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	}
 	
 	
+	arrOrdenGraf.push(velaOperativa);
 	
 	
 	
@@ -1250,7 +1282,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	return resp;
 }
 
-
+var objEval = {OK:{cont: 0, buenas:0, malas:0, porcent:0}, NOOK: {cont: 0, buenas:0, malas:0, porcent:0}, '': {cont: 0, buenas:0, malas:0, porcent:0}};
 function fnEvaluaTendencia(velaAnt, vela){
 	if(velaAnt.open < velaAnt.close && vela.open > vela.close){
 		return TENDENCIA_ALCISTA;
@@ -1276,46 +1308,23 @@ var MediasJaponesas = function (period){
 
 MediasJaponesas.prototype.genera = function (vela){
 	
-	//arrData.push(vela);
-	//yield arrData;
-	//console.log(arrData);
-	//this.period = vela.period;
-	//console.log(period);
-	//for (;;) {
-		
-		//console.log(vela);
-		//console.log(arrData);
+	
 		this.arrData.push(vela);
 		if(this.arrData.length < this.period){
-			//console.log(arrData);
-			
-			//console.log(arrData);
 			this.high = Math.max(this.high, vela.high);
 			this.low = Math.min(this.low, vela.low);
-			//console.log(high);
-			//console.log(low);
 			return undefined;
 		}  else if(this.arrData.length < this.period + 1){	
 			this.high = Math.max(this.high, vela.high);
 			this.low = Math.min(this.low, vela.low);
 			
 		} else {
-			//arrData.push(vela);
-			//console.log(arrData);
-
 			this.elim = this.arrData.shift();
 			
-			//console.log(elim);
-			/*high = Math.max(high, vela.high);
-			low = Math.min(low, vela.low);*/
 			if(this.elim.low == this.low){
 				this.low = 100000;
-				//console.log("length: " + arrData.length);
 				for(var i = 0; i < this.arrData.length; i++){
-					//console.log(arrData[i]);
-					//console.log(i);
 					this.low = Math.min(this.low, this.arrData[i].low)
-					//console.log("low: " + low);
 				}
 			}
 			if(this.elim.high == this.high){
@@ -1352,10 +1361,10 @@ var Ichimoku = function (rapido, lento, masLento){
 	//this.senkouSpanA = new SenkouSpanA(this.tenkan, this.kijun);
 	this.senkouSpanA = [];
 	this.senkouSpanB = [];
-	for(var i = 0; i < lento - 1; i++){
+	for(var i = 0; i < lento; i++){
 		this.senkouSpanA.push(undefined);
 	}
-	for(var i = 0; i < lento - 1; i++){
+	for(var i = 0; i < lento; i++){
 		this.senkouSpanB.push(undefined);
 	}
 	//console.log(this.senkouSpanA);
@@ -1367,8 +1376,9 @@ Ichimoku.prototype.genera = function (vela){
 	var kj = this.kijun.genera(vela);
 	this.senkouSpanA.push(isNaN(Math.min(tk, kj) + (Math.abs(tk - kj) / 2)) ? undefined : Math.min(tk, kj) + (Math.abs(tk - kj) / 2));
 	this.senkouSpanB.push(this.senkouSpanBCalc.genera(vela));
-	return {tenkan: tk, kijun: kj, senkouSpanA: this.senkouSpanA[this.cont], senkouSpanB: this.senkouSpanB[this.cont++], color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
+	//return {tenkan: tk, kijun: kj, senkouSpanA: this.senkouSpanA[this.cont], senkouSpanB: this.senkouSpanB[this.cont++], color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
 	//return {tenkan: tk, kijun: kj, senkouSpanA: isNaN(Math.min(tk, kj) + (Math.abs(tk - kj) / 2)) ? undefined : Math.min(tk, kj) + (Math.abs(tk - kj) / 2), senkouSpanB: this.senkouSpanBCalc.genera(vela), color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
+	return {tenkan: tk, kijun: kj, senkouSpanA: this.senkouSpanA.shift(), senkouSpanB: this.senkouSpanB.shift(), color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
 };		
 var pruebaMediaJaponesa = new Ichimoku(2, 5, 10);
 
