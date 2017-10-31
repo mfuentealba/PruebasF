@@ -1252,7 +1252,12 @@ function fnVelaNueva(dato, arrVel, tipo){
 				
 				
 			} 
-			objEval[orden.cierrePost]['cont']++;
+			try{
+				objEval[orden.cierrePost]['cont']++;
+			} catch(e){
+				objEval['']['cont']++;
+			}
+			
 		}
 		console.log("////////////////////////////////////////");
 		console.log(velaOperativa);
