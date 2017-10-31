@@ -91,6 +91,7 @@ var fsOrdenes = require('fs');
 var fsOrdMalas = require('fs');
 var fsOrdBuenas = require('fs');
 var fsGrafOrden = require('fs');
+var fsEval = require('fs');
 var loteMin = 0.01;
 var loteMax = 100;
 var loteFijo = false;
@@ -285,6 +286,10 @@ function fnCierre(opt, origen, vela){
 		malas++;
 		objResult[df + 'M']++;
 		objEval[orden.cierrePost].malas++;
+		objEval[orden.cierrePost].total += orden.total;
+		objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['result'] = orden.total;
+		objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMin'] = opt == 'C' ? (orden.min - orden.open - spread) * ajusteDecimal : (orden.open - orden.max - spread) * ajusteDecimal;
+		objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMax'] = opt == 'C' ? (orden.max - orden.open - spread) * ajusteDecimal : (orden.open - orden.min - spread) * ajusteDecimal;
 		fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(velaOperativa) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
@@ -299,6 +304,12 @@ function fnCierre(opt, origen, vela){
 			buenas++;
 			objResult[df + 'B']++;
 			objEval[orden.cierrePost].buenas++;
+			objEval[orden.cierrePost].total += orden.total;
+			console.log("******** - " + orden.cierrePost);
+			console.log(objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]);
+			objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['result'] = orden.total;
+			objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMin'] = opt == 'C' ? (orden.min - orden.open - spread) * ajusteDecimal : (orden.open - orden.max - spread) * ajusteDecimal;
+			objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMax'] = opt == 'C' ? (orden.max - orden.open - spread) * ajusteDecimal : (orden.open - orden.min - spread) * ajusteDecimal;
 			fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n"  + JSON.stringify(velaOperativa) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
@@ -333,6 +344,10 @@ function fnCierre(opt, origen, vela){
 	});
 	fnImprimirOperacion();
 	orden = null;
+	fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/ResultadoEval.txt', JSON.stringify(objEval) + ",\n", (err) => {
+		if (err) throw err;
+			////console.log('The "data to append" was appended to file!');
+		});
 	//return "X";
 	return "N";
 
@@ -557,6 +572,10 @@ function fnCalcCuenta(cierre){
 		cuenta = cuenta + cierre;
 		if(cuenta < garantia){
 			cuenta = -1;
+			fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/ResultadoEval.txt', JSON.stringify(objEval) + ",\n", (err) => {
+				if (err) throw err;
+					////console.log('The "data to append" was appended to file!');
+				});
 		} else {
 			if(!loteFijo){
 				if(cuenta / 1000 > loteMax){
@@ -639,7 +658,8 @@ function fnCompra(vela, tipo, arrV, param){
 				//orden.stopLoss = orden.open - (orden.stopLossIni * 3 / 4) / ajusteDecimal;
 				nStopLoss = 0;
 				orden.lote = ponderado;
-				
+				orden.tam = Math.abs(velaOp.open - velaOp.close);
+				orden.tamTotal = Math.abs(velaOp.high - velaOp.low);
 				orden.dia = dias[dt.getUTCDay()];
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(orden);
@@ -712,6 +732,8 @@ function fnVenta(vela, tipo, arrV, param){
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				nStopLoss = 0;
 				orden.lote = ponderado;
+				orden.tam = Math.abs(velaOp.open - velaOp.close);
+				orden.tamTotal = Math.abs(velaOp.high - velaOp.low);
 				//orden.stopLoss = -Math.abs(arrV[arrV.length - 3].close - arrV[arrV.length - 2].close) - spread - 26 - 0.00010 < -166 ? orden.open + 0.00166 : arrV[arrV.length - 3].close + spread + 0.00010;
 				//orden.stopLoss = (-Math.abs(arrV[arrV.length - 2 - pos].close - arrV[arrV.length - 1 - pos].close) - 0.00010 - spread) * ajusteDecimal < -166 ? orden.open + 0.00166 : arrV[arrV.length - 2 - pos].close + spread + 0.00010;
                 //orden.stopLoss = arrV[arrV.length - 2 - pos].close + spread + 0.00010;
@@ -839,7 +861,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	var velaAnt = arrVel[arrVel.length - 2];
 	var resp = 'N';
 
-	console.log(objEval);
+	//console.log(objEval);
 	
 	/************************************- NIVELES -********************************************/
 	if(vela){
@@ -1254,6 +1276,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 			} 
 			try{
 				objEval[orden.cierrePost]['cont']++;
+				objEval[orden.cierrePost].arrVelas.push({ini: orden.ini, tam: orden.tam, tamTotal: orden.tamTotal, result: 0, resultMin: 0, resultMax: 0});
 			} catch(e){
 				objEval['']['cont']++;
 			}
@@ -1287,7 +1310,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 	return resp;
 }
 
-var objEval = {OK:{cont: 0, buenas:0, malas:0, porcent:0}, NOOK: {cont: 0, buenas:0, malas:0, porcent:0}, OK2:{cont: 0, buenas:0, malas:0, porcent:0}, NOOK: {cont: 0, buenas:0, malas:0, porcent:0},'': {cont: 0, buenas:0, malas:0, porcent:0}};
+var objEval = {OK:{cont: 0, buenas:0, malas:0, arrVelas:[], total: 0}, NOOK: {cont: 0, buenas:0, malas:0, arrVelas:[], total: 0}, OK2:{cont: 0, buenas:0, malas:0, arrVelas:[], total: 0}, '': {cont: 0, buenas:0, malas:0, arrVelas:[], total: 0}};
 function fnEvaluaTendencia(velaAnt, vela){
 	if(velaAnt.open < velaAnt.close && vela.open > vela.close){
 		return TENDENCIA_ALCISTA;
