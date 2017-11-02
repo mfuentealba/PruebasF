@@ -361,7 +361,14 @@ function fnCierre(opt, origen, vela){
 	if (err) throw err;
 		////console.log('The "data to append" was appended to file!');
 	});
-	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`) VALUES (2,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "')\n", (err) => {
+	
+	/*prueba--> 
+	1 cierre si vela siguiente es contraria al patron engulfinger, -->MEJOR
+	2 las contrarias que no llegan a la mitad son consideradas ok, 
+	3 es igual a la 1, pero se acota el stoploss a la linea mas cercana de la nube
+	4 parametros ichi 9, 26,52 con stoploss al cruzar nube
+	*/
+	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`) VALUES (3,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "');\n", (err) => {
 		if (err) throw err;
 			////console.log('The "data to append" was appended to file!');
 		});
@@ -538,7 +545,7 @@ function fnImprimirOperacion(){
 			totalVentas += orden['totalReal'];
 		}
 	} catch(e){
-		
+		console.log("ERROR fnImprimirOperacion");
 	}	
 }
 
@@ -1287,24 +1294,32 @@ function fnVelaNueva(dato, arrVel, tipo){
 			if(orden.cierrePost == 'NOOK'){
 				
 				
-
-				if(orden.tipo == 'C'){
+				console.log(orden.tipo);
+				orden.stopLoss = vela.close;
+				fnCierre('close', 'S', vela);
+				 
+				/*if(orden.tipo == 'C'){
+					
 					if(vela.close > velaAnt.open + (velaAnt.close - velaAnt.open) / 2){
-						orden.cierrePost == 'OK2';
+						console.log('OK2');
+						orden.cierrePost = 'OK2';
 					} else {
+						console.log('CERRAR');
 						orden.stopLoss = vela.close;
 						fnCierre('close', 'S', vela);
 					}
 				} else {
 					if(vela.close < velaAnt.close + (velaAnt.open - velaAnt.close) / 2){
-						orden.cierrePost == 'OK2';
+						console.log('OK2');
+						orden.cierrePost = 'OK2';
 					} else {
+						console.log('CERRAR');
 						orden.stopLoss = vela.close;
 						fnCierre('close', 'S', vela);
 					}
-				}
-				
-				
+				}*/
+				/*console.log(orden);
+				exit();				*/
 			} 
 			try{
 				objEval[orden.cierrePost]['cont']++;
@@ -1455,7 +1470,8 @@ Ichimoku.prototype.genera = function (vela){
 	//return {tenkan: tk, kijun: kj, senkouSpanA: isNaN(Math.min(tk, kj) + (Math.abs(tk - kj) / 2)) ? undefined : Math.min(tk, kj) + (Math.abs(tk - kj) / 2), senkouSpanB: this.senkouSpanBCalc.genera(vela), color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
 	return {tenkan: tk, kijun: kj, senkouSpanA: this.senkouSpanA.shift(), senkouSpanB: this.senkouSpanB.shift(), color: (this.senkouSpanA[this.cont - 1] > this.senkouSpanA[this.cont - 1] ? 'ALZA' : 'BAJA')};
 };		
-var pruebaMediaJaponesa = new Ichimoku(2, 5, 10);
+//var pruebaMediaJaponesa = new Ichimoku(2, 5, 10);
+var pruebaMediaJaponesa = new Ichimoku(9, 26, 52);
 
 //var gen = genera();
 
