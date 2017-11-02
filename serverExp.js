@@ -92,6 +92,7 @@ var fsOrdMalas = require('fs');
 var fsOrdBuenas = require('fs');
 var fsGrafOrden = require('fs');
 var fsEval = require('fs');
+var fsQuery = require('fs');
 var loteMin = 0.01;
 var loteMax = 100;
 var loteFijo = false;
@@ -286,10 +287,19 @@ function fnCierre(opt, origen, vela){
 		malas++;
 		objResult[df + 'M']++;
 		objEval[orden.cierrePost].malas++;
-		objEval[orden.cierrePost].total += orden.total;
-		objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['result'] = orden.total;
-		objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMin'] = opt == 'C' ? (orden.min - orden.open - spread) * ajusteDecimal : (orden.open - orden.max - spread) * ajusteDecimal;
-		objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMax'] = opt == 'C' ? (orden.max - orden.open - spread) * ajusteDecimal : (orden.open - orden.min - spread) * ajusteDecimal;
+		try{
+			objEval[orden.cierrePost].total += orden.total;
+			/*objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['result'] = orden.total;
+			objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMin'] = opt == 'C' ? (orden.min - orden.open - spread) * ajusteDecimal : (orden.open - orden.max - spread) * ajusteDecimal;
+			objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMax'] = opt == 'C' ? (orden.max - orden.open - spread) * ajusteDecimal : (orden.open - orden.min - spread) * ajusteDecimal;*/
+			/*if(orden.ini == 3171){
+				console.log(objEval[orden.cierrePost].arrVelas);
+				exit();
+			}*/
+		} catch(e){
+			exit();
+		}
+		
 		fsOrdMalas.appendFileSync('./querysReconstruccion/_logExpOrdMalas.txt', "**********************************\n" + JSON.stringify(vela) + "\n" + JSON.stringify(velaOperativa) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
@@ -304,12 +314,21 @@ function fnCierre(opt, origen, vela){
 			buenas++;
 			objResult[df + 'B']++;
 			objEval[orden.cierrePost].buenas++;
-			objEval[orden.cierrePost].total += orden.total;
-			console.log("******** - " + orden.cierrePost);
-			console.log(objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]);
-			objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['result'] = orden.total;
-			objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMin'] = opt == 'C' ? (orden.min - orden.open - spread) * ajusteDecimal : (orden.open - orden.max - spread) * ajusteDecimal;
-			objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMax'] = opt == 'C' ? (orden.max - orden.open - spread) * ajusteDecimal : (orden.open - orden.min - spread) * ajusteDecimal;
+			try{
+				objEval[orden.cierrePost].total += orden.total;			
+				
+				/*if(orden.ini == 3171){
+					console.log(objEval[orden.cierrePost].arrVelas);
+					exit();
+				}*/
+				/*
+				objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['result'] = orden.total;
+				objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMin'] = opt == 'C' ? (orden.min - orden.open - spread) * ajusteDecimal : (orden.open - orden.max - spread) * ajusteDecimal;
+				objEval[orden.cierrePost].arrVelas[objEval[orden.cierrePost].arrVelas.length - 1]['resultMax'] = opt == 'C' ? (orden.max - orden.open - spread) * ajusteDecimal : (orden.open - orden.min - spread) * ajusteDecimal;*/
+			} catch(e){
+				exit();
+			}
+			
 			fsOrdBuenas.appendFileSync('./querysReconstruccion/_logExpOrdBuenas.txt', "**********************************\n" + JSON.stringify(vela) + "\n"  + JSON.stringify(velaOperativa) + "\n" + JSON.stringify(orden) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
@@ -342,9 +361,13 @@ function fnCierre(opt, origen, vela){
 	if (err) throw err;
 		////console.log('The "data to append" was appended to file!');
 	});
+	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`) VALUES (2,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "')\n", (err) => {
+		if (err) throw err;
+			////console.log('The "data to append" was appended to file!');
+		});
 	fnImprimirOperacion();
 	orden = null;
-	fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/ResultadoEval.txt', JSON.stringify(objEval) + ",\n", (err) => {
+	fsEval.appendFileSync('./querysReconstruccion/ordenGraf/ResultadoEval.txt', JSON.stringify(objEval) + ",\n", (err) => {
 		if (err) throw err;
 			////console.log('The "data to append" was appended to file!');
 		});
@@ -485,11 +508,15 @@ function fnEvaluaCierre(origen, vela){
 	return 'N';
 }
 
+
+
 function fnImprimirOperacion(){
-	fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
+	/*fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
 		if (err) throw err;
 			////console.log('The "data to append" was appended to file!');
-		});
+		});*/
+
+	
 	fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(orden) + "\nBUENAS: " + buenas + ", MALAS: " + malas + ", NEUTRAS: " + neutras + "\n", (err) => {
 		if (err) throw err;
 			////console.log('The "data to append" was appended to file!');
@@ -572,7 +599,7 @@ function fnCalcCuenta(cierre){
 		cuenta = cuenta + cierre;
 		if(cuenta < garantia){
 			cuenta = -1;
-			fsGrafOrden.appendFileSync('./querysReconstruccion/ordenGraf/ResultadoEval.txt', JSON.stringify(objEval) + ",\n", (err) => {
+			fsEval.appendFileSync('./querysReconstruccion/ordenGraf/ResultadoEval.txt', JSON.stringify(objEval) + ",\n", (err) => {
 				if (err) throw err;
 					////console.log('The "data to append" was appended to file!');
 				});
@@ -635,7 +662,7 @@ function fnCompra(vela, tipo, arrV, param){
 				} else {
 					pos = 1;
 				}
-				orden = {ini: velaOp.id, origen: tipo, tipo: 'C', cierrePost: '',fin: 0, open: vela[param], fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf};
+				orden = {ini: velaOp.id, origen: tipo, tipo: 'C', cierrePost: '', fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf};
 				////console.log(arrV);
 				var arrFecha = vela.fecha.split('.');				
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
@@ -677,10 +704,10 @@ function fnCompra(vela, tipo, arrV, param){
 						////console.log('The "data to append" was appended to file!');
 					});*/
 				
-				fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + " ......\n", (err) => {
+				/*fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + " ......\n", (err) => {
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
-					});
+					});*/
 				fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
@@ -727,7 +754,7 @@ function fnVenta(vela, tipo, arrV, param){
 					pos = 1;
 				}
 				
-				orden = {ini: velaOp.id, origen: tipo, tipo: 'V', cierrePost: '',fin: 0, open: vela[param], fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf};
+				orden = {ini: velaOp.id, origen: tipo, tipo: 'V', cierrePost: '',fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
 				var arrFecha = vela.fecha.split('.');
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				nStopLoss = 0;
@@ -768,10 +795,10 @@ function fnVenta(vela, tipo, arrV, param){
 					});
 				*/
 				
-				fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + " .....\n", (err) => {
+				/*fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(orden) + " .....\n", (err) => {
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
-					});
+					});*/
 				fsOrdenes.appendFileSync('./querysReconstruccion/_logExpOrdenes.txt', JSON.stringify(orden) + "\n", (err) => {
 					if (err) throw err;
 						////console.log('The "data to append" was appended to file!');
@@ -874,11 +901,16 @@ function fnVelaNueva(dato, arrVel, tipo){
 		bbGraf = bb.nextValue(Number(vela.close));
 		//console.log(bbGraf);
 		velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
-		
-		fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
+		arrVol.push(vela.vol/5);
+		if(arrVol.length < 5){
+			volProm += vela.vol/5;
+		} else {
+			volProm += vela.vol/5 - arrVol.shift();
+		}
+		/*fs.appendFileSync('./querysReconstruccion/_logExp.txt', JSON.stringify(velaOperativa) + "\n", (err) => {
 			if (err) throw err;
 				////console.log('The "data to append" was appended to file!');
-			});
+			});*/
 		
 	} else {
 		atrGraf = atr.nextValue({close: [dato.close], high: [dato.high], low: [dato.low]});
@@ -1260,15 +1292,15 @@ function fnVelaNueva(dato, arrVel, tipo){
 					if(vela.close > velaAnt.open + (velaAnt.close - velaAnt.open) / 2){
 						orden.cierrePost == 'OK2';
 					} else {
-						/*orden.stopLoss = vela.close;
-						fnCierre('close', 'S', vela);*/
+						orden.stopLoss = vela.close;
+						fnCierre('close', 'S', vela);
 					}
 				} else {
 					if(vela.close < velaAnt.close + (velaAnt.open - velaAnt.close) / 2){
 						orden.cierrePost == 'OK2';
 					} else {
-						/*orden.stopLoss = vela.close;
-						fnCierre('close', 'S', vela);*/
+						orden.stopLoss = vela.close;
+						fnCierre('close', 'S', vela);
 					}
 				}
 				
@@ -1277,8 +1309,10 @@ function fnVelaNueva(dato, arrVel, tipo){
 			try{
 				objEval[orden.cierrePost]['cont']++;
 				objEval[orden.cierrePost].arrVelas.push({ini: orden.ini, tam: orden.tam, tamTotal: orden.tamTotal, result: 0, resultMin: 0, resultMax: 0});
+				
 			} catch(e){
 				objEval['']['cont']++;
+				console.log("[[[[[[[[[[[[[ - SE CAYO - ]]]]]]]]]]]]]");
 			}
 			
 		}
@@ -1292,7 +1326,11 @@ function fnVelaNueva(dato, arrVel, tipo){
 			});*/
 		
 	}
+
+	
+
 	if(arrVel.length > 30){
+		console.log("[[[[[[[[[[[[[ - CORRECTO - ]]]]]]]]]]]]]");
 		resp = fnEvaluaVelas(dato, tipo, arrVel);
 	}
 	
@@ -1307,10 +1345,19 @@ function fnVelaNueva(dato, arrVel, tipo){
 	if(arrVel.length > 31){
 		arrVel.shift();
 	}
+	
+
 	return resp;
+
 }
 
+
+var arrVol = [];
+var volProm = 0;
 var objEval = {OK:{cont: 0, buenas:0, malas:0, arrVelas:[], total: 0}, NOOK: {cont: 0, buenas:0, malas:0, arrVelas:[], total: 0}, OK2:{cont: 0, buenas:0, malas:0, arrVelas:[], total: 0}, '': {cont: 0, buenas:0, malas:0, arrVelas:[], total: 0}};
+
+
+
 function fnEvaluaTendencia(velaAnt, vela){
 	if(velaAnt.open < velaAnt.close && vela.open > vela.close){
 		return TENDENCIA_ALCISTA;
