@@ -363,12 +363,13 @@ function fnCierre(opt, origen, vela){
 	});
 	
 	/*prueba--> 
-	1 cierre si vela siguiente es contraria al patron engulfinger, -->MEJOR
+	1 cierre si vela siguiente es contraria al patron engulfinger, 
 	2 las contrarias que no llegan a la mitad son consideradas ok, 
 	3 es igual a la 1, pero se acota el stoploss a la linea mas cercana de la nube
-	4 parametros ichi 9, 26,52 con stoploss al cruzar nube
+	4 parametros ichi 9, 26,52 con stoploss al cruzar nube -->MEJOR
+	5 cuatro con linea mas cercana de la nube
 	*/
-	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`) VALUES (3,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "');\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`) VALUES (5,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "');\n", (err) => {
 		if (err) throw err;
 			////console.log('The "data to append" was appended to file!');
 		});
@@ -1503,7 +1504,7 @@ console.log(ichimoku.genera({high: 21, low: 2, period: 2}));
 
 
 
-var ichimoku = new Ichimoku(3, 12, 24);
+var ichimoku = new Ichimoku(9, 26, 52);
 
 var newVela = true;
 var dias=["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
