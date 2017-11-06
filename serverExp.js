@@ -123,7 +123,7 @@ var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, 
 var cuenta = 100;
 var ponderado = .1;
 var spread = 0.00020;
-var ajusteStop = 0.001;
+var ajusteStop = 0.0005;
 var objCont = {N: 2, S: 2}
 
 var objFunciones = {};
@@ -373,8 +373,9 @@ function fnCierre(opt, origen, vela){
 	5 cuatro con linea mas cercana de la nube
 	6 las contrarias que no llegan a la tercera parte son consideradas ok,
 	7 Como (6) agregando filtro que vela debe estar por lo menos 1/2 fuera de la nube
+	8 Como (8) agregando ajuste stop a 0.0005 y para las OK2 se reduce stop inicial
 	*/
-	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`, `close`, `volSig`) VALUES (7,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "','" + orden.close + "','" + orden.volSig + "');\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`, `close`, `volSig`) VALUES (8,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "','" + orden.close + "','" + orden.volSig + "');\n", (err) => {
 		if (err) throw err;
 			////console.log('The "data to append" was appended to file!');
 		});
@@ -645,7 +646,7 @@ function fnCalcCuenta(cierre){
 function fnCompra(vela, tipo, arrV, param){
 	
 		if(cuenta > 0){
-			
+			var velaOp = arrV[arrV.length - 1];
 			var arr = ((arrV[arrV.length - 1].close +  atrGraf) + '').split('.');
 			var evaluando = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
 			console.log("/********************* - REVISION - *************************/");
@@ -664,19 +665,20 @@ function fnCompra(vela, tipo, arrV, param){
 			//&& ichi.tenkan > ichi.kijun
 			&& arrV[arrV.length - 1].low > Math.min(ichi.senkouSpanA, ichi.senkouSpanB)
 			&& arrV[arrV.length - 1].low < Math.max(ichi.senkouSpanA, ichi.senkouSpanB)
-			&& ((Math.max(ichi.senkouSpanA, ichi.senkouSpanB) - arrV[arrV.length - 1].low) * 2 <= arrV[arrV.length - 1].high - Math.max(ichi.senkouSpanA, ichi.senkouSpanB))){
+			&& ((Math.max(ichi.senkouSpanA, ichi.senkouSpanB) - arrV[arrV.length - 1].low) <= arrV[arrV.length - 1].high - Math.max(ichi.senkouSpanA, ichi.senkouSpanB))
+			&& 0.00050 < Math.abs(velaOp.open - velaOp.close)){
 				ev = true;
 			}
 			console.log("/********************* - FIN REVISION - *************************/");
 			if(ev){
 				var pos;
-				var velaOp = arrV[arrV.length - 1];
+				
 				if(param == 'open'){
 					pos = 0;
 				} else {
 					pos = 1;
 				}
-				orden = {ini: velaOp.id, origen: tipo, tipo: 'C', cierrePost: '', fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf};
+				orden = {ini: velaOp.id, origen: tipo, tipo: 'C', cierrePost: '', fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
 				////console.log(arrV);
 				var arrFecha = vela.fecha.split('.');				
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
@@ -737,6 +739,7 @@ function fnCompra(vela, tipo, arrV, param){
 function fnVenta(vela, tipo, arrV, param){
 	
 		if(cuenta > 0){
+			var velaOp = arrV[arrV.length - 1];
 			var arr = ((arrV[arrV.length - 1].close -  atrGraf) + '').split('.');
 			var evaluando = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
 			console.log("/********************* - REVISION - *************************/");
@@ -756,12 +759,13 @@ function fnVenta(vela, tipo, arrV, param){
 			//&& ichi.tenkan < ichi.kijun
 			&& arrV[arrV.length - 1].high < Math.max(ichi.senkouSpanA, ichi.senkouSpanB) 
 			&& arrV[arrV.length - 1].high > Math.min(ichi.senkouSpanA, ichi.senkouSpanB)
-			&& (arrV[arrV.length - 1].high - Math.min(ichi.senkouSpanA, ichi.senkouSpanB)) * 2 <= Math.min(ichi.senkouSpanA, ichi.senkouSpanB) - arrV[arrV.length - 1].low){
+			&& (arrV[arrV.length - 1].high - Math.min(ichi.senkouSpanA, ichi.senkouSpanB)) <= Math.min(ichi.senkouSpanA, ichi.senkouSpanB) - arrV[arrV.length - 1].low
+			&& 0.00050 < Math.abs(velaOp.open - velaOp.close)){
 				ev = true;
 			}
 			console.log("/********************* - FIN REVISION - *************************/");
 			if(ev){
-				var velaOp = arrV[arrV.length - 1];
+				
 				var pos;
 				if(param == 'open'){
 					pos = 0;
@@ -1311,6 +1315,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 					if(vela.close > velaAnt.open + (velaAnt.close - velaAnt.open) / 3){
 						console.log('OK2');
 						orden.cierrePost = 'OK2';
+						orden.stopLoss = orden.stopLoss + orden.stopLossIni/200000;
 					} else {
 						console.log('CERRAR');
 						orden.stopLoss = vela.close;
@@ -1320,6 +1325,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 					if(vela.close < velaAnt.close + (velaAnt.open - velaAnt.close) / 3){
 						console.log('OK2');
 						orden.cierrePost = 'OK2';
+						orden.stopLoss = orden.stopLoss - orden.stopLossIni/200000;
 					} else {
 						console.log('CERRAR');
 						orden.stopLoss = vela.close;
