@@ -123,7 +123,7 @@ var objResult = {lunB: 0, lunM: 0, lunN: 0, lunT: 0, marB: 0, marM: 0, marN: 0, 
 var cuenta = 100;
 var ponderado = .1;
 var spread = 0.00020;
-var ajusteStop = 0.0005;
+var ajusteStop = 0.001;
 var objCont = {N: 2, S: 2}
 
 var objFunciones = {};
@@ -373,7 +373,8 @@ function fnCierre(opt, origen, vela){
 	5 cuatro con linea mas cercana de la nube
 	6 las contrarias que no llegan a la tercera parte son consideradas ok,
 	7 Como (6) agregando filtro que vela debe estar por lo menos 1/2 fuera de la nube
-	8 Como (8) agregando ajuste stop a 0.0005 y para las OK2 se reduce stop inicial
+	8 Como (7) agregando ajuste stop a 0.0005 y para las OK2 se reduce stop inicial
+	9 Como (8) agregando ajuste stop inicial a 0.0005 y luego a 100
 	*/
 	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`, `close`, `volSig`) VALUES (8,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "','" + orden.close + "','" + orden.volSig + "');\n", (err) => {
 		if (err) throw err;
@@ -427,7 +428,7 @@ function fnEvaluaCierre(origen, vela){
 					 orden.stopLoss = orden.takeProfit;
 					 return fnCierre("C", origen, vela);
 				 } else {
-					if(vela.high > orden.open + ajusteStop + spread){
+					if(vela.high > orden.open + ajusteStop / 2 + spread){
 						if(orden.stopLoss < orden.open + spread){
 							if(vela.close < orden.stopLoss){
 								return fnCierre("C", origen, vela);
@@ -445,7 +446,7 @@ function fnEvaluaCierre(origen, vela){
 						}
 					}
 
-					if(vela.close > orden.open + ajusteStop + spread){
+					if(vela.close > orden.open + ajusteStop / 2 + spread){
 						if(orden.stopLoss < orden.open + spread){
 							orden.stopLoss = orden.open + spread + 0.00010;
 							orden.takeProfit = vela.close + ajusteStop;
@@ -477,7 +478,7 @@ function fnEvaluaCierre(origen, vela){
 					orden.stopLoss = orden.takeProfit;
 					return fnCierre("V", origen, vela);
 				} else {
-					if(vela.low < orden.open - (ajusteStop + spread)){
+					if(vela.low < orden.open - (ajusteStop / 2 + spread)){
 						if(orden.stopLoss > orden.open - spread){
 							if(vela.close > orden.stopLoss){
 								return fnCierre("V", origen, vela);
@@ -496,7 +497,7 @@ function fnEvaluaCierre(origen, vela){
 					}
 
 
-					if(vela.close < orden.open - (ajusteStop + spread)){
+					if(vela.close < orden.open - (ajusteStop / 2 + spread)){
 						if(orden.stopLoss > orden.open - spread){
 							orden.stopLoss = orden.open - spread - 0.00010;
 							orden.takeProfit = vela.close - ajusteStop;
