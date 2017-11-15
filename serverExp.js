@@ -66,6 +66,8 @@ fsLauncher.readFile("./querysReconstruccion/_dataExp.txt", 'utf8', function(err,
 
 var bearishengulfingpattern = require('./technicalindicators.js').bearishengulfingpattern;
 var bullishengulfingpattern = require('./technicalindicators.js').bullishengulfingpattern;
+var bearishharamipattern = require('./technicalindicators.js').bearishharami;
+var bullishharamipattern = require('./technicalindicators.js').bullishharami;
 
 var BB = require('./technicalindicators.js').BollingerBands;
 
@@ -203,6 +205,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		sw = false;
 	}
 	var opt = 0;
+	var origen;
 	if(arrV.length > 2 && sw){
 		
 		var input = {
@@ -218,9 +221,11 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		if(bearishengulfingpattern(input)){
 			sw = true;
 			evaluacion = 2;
+			origen = 'bearishengulfingpattern';
 			//console.log('bearishengulfingpattern');
 			
 		}
+
 		input = {
 			open: [arrV[arrV.length - 3].open * ajusteDecimal, arrV[arrV.length - 2].open * ajusteDecimal, arrV[arrV.length - 1].open * ajusteDecimal],
 			high: [arrV[arrV.length - 3].high * ajusteDecimal, arrV[arrV.length - 2].high * ajusteDecimal, arrV[arrV.length - 1].high * ajusteDecimal],
@@ -232,12 +237,68 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		//if(threeoutsideup(input)){
 			sw = true;
 			evaluacion = 3;
+			origen = 'bullishengulfingpattern';
+			//console.log('bullishengulfingpattern');
+			
+		}
+
+		input = {
+			open: [arrV[arrV.length - 3].open * ajusteDecimal, arrV[arrV.length - 2].open * ajusteDecimal, arrV[arrV.length - 1].open * ajusteDecimal],
+			high: [arrV[arrV.length - 3].high * ajusteDecimal, arrV[arrV.length - 2].high * ajusteDecimal, arrV[arrV.length - 1].high * ajusteDecimal],
+			close: [arrV[arrV.length - 3].close * ajusteDecimal, arrV[arrV.length - 2].close * ajusteDecimal, arrV[arrV.length - 1].close * ajusteDecimal],
+			low: [arrV[arrV.length - 3].low * ajusteDecimal, arrV[arrV.length - 2].low * ajusteDecimal, arrV[arrV.length - 1].low * ajusteDecimal],
+			tamVelas: tamVelas * ajusteDecimal
+		  };
+		if(bullishharamipattern(input)){
+		//if(threeoutsideup(input)){
+			sw = true;
+			evaluacion = 3;
+			origen = 'bullishharamipattern';
+			//console.log('bullishengulfingpattern');
+			
+		}
+
+		input = {
+			open: [arrV[arrV.length - 3].open * ajusteDecimal, arrV[arrV.length - 2].open * ajusteDecimal, arrV[arrV.length - 1].open * ajusteDecimal],
+			high: [arrV[arrV.length - 3].high * ajusteDecimal, arrV[arrV.length - 2].high * ajusteDecimal, arrV[arrV.length - 1].high * ajusteDecimal],
+			close: [arrV[arrV.length - 3].close * ajusteDecimal, arrV[arrV.length - 2].close * ajusteDecimal, arrV[arrV.length - 1].close * ajusteDecimal],
+			low: [arrV[arrV.length - 3].low * ajusteDecimal, arrV[arrV.length - 2].low * ajusteDecimal, arrV[arrV.length - 1].low * ajusteDecimal],
+			tamVelas: tamVelas * ajusteDecimal
+		  };
+		if(bearishharamipattern(input)){
+		//if(threeoutsideup(input)){
+			sw = true;
+			evaluacion = 2;
+			origen = 'bearishharamipattern';
 			//console.log('bullishengulfingpattern');
 			
 		}
 	
 		resp = fnEvaluaCierre(tipo, dato);
-		if(orden == null && sw){
+		if(orden == null){
+			if(vela.open < ichi.tenkan 
+				&& vela.close > ichi.tenkan
+				&& ichi.kijun < ichi.tenkan
+				&& ichi.senkouSpanA < ichi.tenkan				
+				&& ichi.senkouSpanB < ichi.tenkan				
+			){
+				return fnCompra(dato, tipo, arrV, 'close', 'rompeTenkan');
+			}
+	
+			
+			if(vela.open > ichi.tenkan 
+				&& vela.close < ichi.tenkan
+				&& ichi.kijun > ichi.tenkan
+				&& ichi.senkouSpanA > ichi.tenkan				
+				&& ichi.senkouSpanB > ichi.tenkan				
+			){
+				return fnVenta(dato, tipo, arrV, 'close', 'rompeTenkan');
+			}
+		
+		}
+		
+
+		/*if(orden == null && sw){
 			var arrFecha = dato.fecha.split('.');
 			var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				
@@ -246,17 +307,19 @@ function fnEvaluaVelas(dato, tipo, arrV){
 				switch(evaluacion){
 					case 2:
 						evaluacion = 0;
-						return fnVenta(dato, tipo, arrV, 'open');
+						return fnVenta(dato, tipo, arrV, 'close', origen);
 					
 					case 3:
 						evaluacion = 0;
-						return fnCompra(dato, tipo, arrV, 'open');
+						return fnCompra(dato, tipo, arrV, 'close', origen);
 					
 				}
 				
 			//}
+
 			
-		}
+			
+		}*/
 		
 	}
 	return "N";
@@ -415,9 +478,38 @@ function fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMinimo){
 
 
 function fnEvaluaCierre(origen, vela){
-	if(orden != null && origen == orden.origen){
-		//console.log(orden);
-		
+	if(orden != null && orden.trigger == 'rompeTenkan'){
+		//exit
+		if(orden.tipo == 'C'
+			&& (
+				(
+					vela.open > Number(ichi.tenkan) 
+					&& vela.close < Number(ichi.tenkan)
+					//&& ichi.kijun > Number(ichi.tenkan)
+					&& Math.abs(vela.close - vela.open) > vela.high - vela.low
+				) 
+			)	
+			|| (
+				(
+					vela.open < Number(ichi.tenkan) 
+					&& vela.close < Number(ichi.tenkan)
+				)
+			)
+		){
+			orden.stopLoss = orden.close;
+			return fnCierre("C", origen, vela);
+		} else if(
+			vela.open <  Number(ichi.tenkan) 
+			&& vela.close >  Number(ichi.tenkan)
+			//&& ichi.kijun < ichi.tenkan
+			&& Math.abs(vela.close - vela.open) > vela.high - vela.low
+		){
+			orden.stopLoss = orden.close;
+			return fnCierre("V", origen, vela);
+		}
+	} else	if(orden != null && origen == orden.origen){
+		console.log(orden);
+		//exit
 		if(orden.tipo == 'C'){
 			if(vela.low < orden.stopLoss || (evaluacion == 2 && orden.stopLoss - orden.open < 0)){
 				orden.stopLoss = vela.low < orden.stopLoss ? orden.stopLoss : vela.close;
@@ -562,47 +654,53 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 	/*dato[2] = Number(dato[2]);
 	dato[3] = Number(dato[3]);
 	dato[4] = Number(dato[4]);*/
-	vela.close = dato.close;
-	vela.vol += dato.vol;
-
-	
-
-
-	if(dato.high > vela.high){
-		vela.high = dato.high;
-		
-	}
 	var resp = 'N';
-	if(dato.low < vela.low){
-		vela.low = dato.low;		
-	}	
-	//console.log(evaluacion + '_' + cont);
-
-	//if(!velaOperativa){
-		velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
-	/*} else {
-
-	}*/
+	try {
+		vela.close = dato.close;
+		vela.vol += dato.vol;
+	
+		
 	
 	
-
-
-    if(orden){
-		if(dato.high > orden.max){
-			orden.max = dato.high;
+		if(dato.high > vela.high){
+			vela.high = dato.high;
 			
 		}
-
-		if(dato.low < orden.min){
-			orden.min = dato.low;		
+		
+		if(dato.low < vela.low){
+			vela.low = dato.low;		
 		}	
-		resp = fnEvaluaCierre(tipo, dato);
+		//console.log(evaluacion + '_' + cont);
+	
+		//if(!velaOperativa){
+			velaOperativa = {x: vela.id, y:[vela.open, vela.high, vela.low, vela.close], vo: vela};
+		/*} else {
+	
+		}*/
+		
+		
+	
+	
+		if(orden){
+			if(dato.high > orden.max){
+				orden.max = dato.high;
+				
+			}
+	
+			if(dato.low < orden.min){
+				orden.min = dato.low;		
+			}	
+			resp = fnEvaluaCierre(tipo, dato);
+			
+		}
+		/*if(resp == "N" && orden == null){
+			////console.log(orden);
+			resp = objFunciones[evaluacion + '_' + cont](vela, tipo, arrVel);
+		}*/
+			
+	} catch (error) {
 		
 	}
-	/*if(resp == "N" && orden == null){
-		////console.log(orden);
-		resp = objFunciones[evaluacion + '_' + cont](vela, tipo, arrVel);
-	}*/
 	
 	return resp;
 	
@@ -644,7 +742,8 @@ function fnCalcCuenta(cierre){
 	}
 }
 
-function fnCompra(vela, tipo, arrV, param){
+
+function fnCompra(vela, tipo, arrV, param, origen){
 	
 		if(cuenta > 0){
 			var velaOp = arrV[arrV.length - 1];
@@ -679,7 +778,7 @@ function fnCompra(vela, tipo, arrV, param){
 				} else {
 					pos = 1;
 				}
-				orden = {ini: velaOp.id, origen: tipo, tipo: 'C', cierrePost: '', fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
+				orden = {ini: velaOp.id, trigger: origen, origen: tipo, tipo: 'C', cierrePost: '', fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
 				////console.log(arrV);
 				var arrFecha = vela.fecha.split('.');				
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
@@ -737,33 +836,39 @@ function fnCompra(vela, tipo, arrV, param){
 	
 }
 
-function fnVenta(vela, tipo, arrV, param){
-	
+function fnVenta(vela, tipo, arrV, param, origen){
+	var ev = false;
+	var velaOp = arrV[arrV.length - 1];
+	var arr = ((arrV[arrV.length - 1].close -  atrGraf) + '').split('.');
+	var evaluando = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
 		if(cuenta > 0){
-			var velaOp = arrV[arrV.length - 1];
-			var arr = ((arrV[arrV.length - 1].close -  atrGraf) + '').split('.');
-			var evaluando = Number(arr[0] + '.' + (Math.round(Number(arr[1]) * Math.pow(10, 4 - arr[1].length))));
-			console.log("/********************* - REVISION - *************************/");
-			console.log("NIVEL: " + evaluando);
-			var ev = false;
-			/*for(var nivel in objNiveles){
-				console.log(arrV[arrV.length - 1].close + " > " + nivel);
-				console.log((evaluando) + " <= " + nivel);
-				if(arrV[arrV.length - 1].close > Number(nivel) && evaluando <= Number(nivel)){
-					console.log("Orden Abortada");
-					ev = false;
-					break;
-				}
-			}*/
-			if(arrV[arrV.length - 1].close < ichi.senkouSpanA 
-			&& arrV[arrV.length - 1].close < ichi.senkouSpanB
-			//&& ichi.tenkan < ichi.kijun
-			&& arrV[arrV.length - 1].high < Math.max(ichi.senkouSpanA, ichi.senkouSpanB) 
-			&& arrV[arrV.length - 1].high > Math.min(ichi.senkouSpanA, ichi.senkouSpanB)
-			&& (arrV[arrV.length - 1].high - Math.min(ichi.senkouSpanA, ichi.senkouSpanB)) <= Math.min(ichi.senkouSpanA, ichi.senkouSpanB) - arrV[arrV.length - 1].low
-			&& 0.00050 < Math.abs(velaOp.open - velaOp.close)){
+			if(origen == 'rompeTenkan'){
 				ev = true;
+			} else {
+				
+				console.log("/********************* - REVISION - *************************/");
+				console.log("NIVEL: " + evaluando);
+				
+				/*for(var nivel in objNiveles){
+					console.log(arrV[arrV.length - 1].close + " > " + nivel);
+					console.log((evaluando) + " <= " + nivel);
+					if(arrV[arrV.length - 1].close > Number(nivel) && evaluando <= Number(nivel)){
+						console.log("Orden Abortada");
+						ev = false;
+						break;
+					}
+				}*/
+				if(arrV[arrV.length - 1].close < ichi.senkouSpanA 
+				&& arrV[arrV.length - 1].close < ichi.senkouSpanB
+				//&& ichi.tenkan < ichi.kijun
+				&& arrV[arrV.length - 1].high < Math.max(ichi.senkouSpanA, ichi.senkouSpanB) 
+				&& arrV[arrV.length - 1].high > Math.min(ichi.senkouSpanA, ichi.senkouSpanB)
+				&& (arrV[arrV.length - 1].high - Math.min(ichi.senkouSpanA, ichi.senkouSpanB)) <= Math.min(ichi.senkouSpanA, ichi.senkouSpanB) - arrV[arrV.length - 1].low
+				&& 0.00050 < Math.abs(velaOp.open - velaOp.close)){
+					ev = true;
+				}
 			}
+			
 			console.log("/********************* - FIN REVISION - *************************/");
 			if(ev){
 				
@@ -774,7 +879,7 @@ function fnVenta(vela, tipo, arrV, param){
 					pos = 1;
 				}
 				
-				orden = {ini: velaOp.id, origen: tipo, tipo: 'V', cierrePost: '',fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
+				orden = {ini: velaOp.id, trigger: origen,  origen: tipo, tipo: 'V', cierrePost: '',fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
 				var arrFecha = vela.fecha.split('.');
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				nStopLoss = 0;
@@ -831,6 +936,7 @@ function fnVenta(vela, tipo, arrV, param){
 	
 		return "N";
 }
+
 
 
 var atrGraf;
