@@ -195,8 +195,16 @@ var cont = 1;
 	
 function fnEvaluaVelas(dato, tipo, arrV){
 	var vela = arrV[arrV.length - 1];
+	var vela2;
+	var vela3;
+	var vela4;
+	vela2 = arrV[arrV.length - 2];
+	vela3 = arrV[arrV.length - 3];
+	vela4 = arrV[arrV.length - 4];
+	
 	arrTamVelas.push((vela.high - vela.low) / 10);
 	if(arrTamVelas.length > 10){
+		
 		tamVelas += ((vela.high - vela.low) / 10) - arrTamVelas.shift();
 		
 		sw = true;
@@ -204,6 +212,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		tamVelas += (vela.high - vela.low) / 10;
 		sw = false;
 	}
+	sw = true;
 	var opt = 0;
 	var origen;
 	if(arrV.length > 2 && sw){
@@ -273,30 +282,46 @@ function fnEvaluaVelas(dato, tipo, arrV){
 			//console.log('bullishengulfingpattern');
 			
 		}
-	
-		resp = fnEvaluaCierre(tipo, dato);
+		
+		
+		
+		
+		resp = fnEvaluaCierre(tipo, dato, arrV);
+		
+		if(vela.id == 40){
+			console.log(vela.close + ' ' + Math.min(vela2.open, vela2.close, vela3.open, vela3.close, vela4.open, vela4.close));
+			console.log(ichi.kijun + ' ' + ichi.tenkan);
+			console.log(ichi.senkouSpanA + ' ' + ichi.senkouSpanB);
+			
+		}
+		
 		if(orden == null){
 			if(vela.open < ichi.tenkan 
 				&& vela.close > ichi.tenkan
 				&& ichi.kijun < ichi.tenkan
 				&& ichi.senkouSpanA < ichi.tenkan				
-				&& ichi.senkouSpanB < ichi.tenkan		
-				&& Math.abs(vela.high - vela.low) > tamVelas
-				&& vela.vol > volProm		
+				&& ichi.senkouSpanB < ichi.tenkan	
+				&& vela.close > Math.max(vela2.open, vela2.close, vela3.open, vela3.close, vela4.open, vela4.close)
+				/*&& Math.abs(vela.high - vela.low) > tamVelas
+				&& vela.vol > volProm
+				&& Math.abs(ichi.tenkan - ichi.kijun) > Math.abs(vela.high - vela.low)*/
 			){
-				return fnCompra(dato, tipo, arrV, 'close', 'rompeTenkan');
+				return fnCompra(dato, tipo, arrV, 'open', 'rompeTenkan');
 			}
 	
+			console.log(velaOperativa);
 			
 			if(vela.open > ichi.tenkan 
 				&& vela.close < ichi.tenkan
 				&& ichi.kijun > ichi.tenkan
 				&& ichi.senkouSpanA > ichi.tenkan				
 				&& ichi.senkouSpanB > ichi.tenkan			
-				&& Math.abs(vela.high - vela.low) > tamVelas
+				&& vela.close < Math.min(vela2.high, vela2.low, vela3.high, vela3.low, vela4.high, vela4.low)
+				/*&& Math.abs(vela.high - vela.low) > tamVelas
 				&& vela.vol > volProm		
+				&& Math.abs(ichi.tenkan - ichi.kijun) > Math.abs(vela.high - vela.low)*/
 			){
-				return fnVenta(dato, tipo, arrV, 'close', 'rompeTenkan');
+				return fnVenta(dato, tipo, arrV, 'open', 'rompeTenkan');
 			}
 		
 		}
@@ -481,9 +506,10 @@ function fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMinimo){
 
 
 
-function fnEvaluaCierre(origen, vela){
-	/*if(orden != null && orden.trigger == 'rompeTenkan'){
+function fnEvaluaCierre(origen, vela, arrV){
+	if(orden != null && orden.trigger == 'rompeTenkan'){
 		//exit
+		vela = arrV[arrV.length - 1];
 		if(orden.tipo == 'C'
 			&& (
 				(
@@ -502,7 +528,9 @@ function fnEvaluaCierre(origen, vela){
 			)	
 			
 		){
-			orden.stopLoss = vela.close;
+			orden.stopLoss = vela.open;
+			console.log(vela);
+			
 			return fnCierre("C", origen, vela);
 		} else if(
 			(
@@ -519,10 +547,12 @@ function fnEvaluaCierre(origen, vela){
 				
 			)
 		){
-			orden.stopLoss = vela.close;
+			orden.stopLoss = vela.open;
+			console.log(vela);
+			
 			return fnCierre("V", origen, vela);
 		}
-	} else	*/if(orden != null && origen == orden.origen/* && orden.trigger != 'rompeTenkan'*/){
+	} else	if(orden != null && origen == orden.origen && orden.trigger != 'rompeTenkan'){
 		console.log(orden);
 		//exit
 		if(orden.tipo == 'C'){
@@ -920,6 +950,7 @@ function fnVenta(vela, tipo, arrV, param, origen){
 				console.log("************************** INICIO ORDEN ****************************");
 				console.log(vela);
 				console.log(orden);
+				velaOperativa.indexLabel = 'I';
 				console.log("\n\n\n");
 				
 				
@@ -1441,7 +1472,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 					} else {
 						console.log('CERRAR');
 						orden.stopLoss = vela.close;
-						fnCierre(orden.tipo, 'S', vela);
+						//fnCierre(orden.tipo, 'S', vela);
 					}
 				} else {
 					if(vela.close < velaAnt.close + (velaAnt.open - velaAnt.close) / 3){
@@ -1451,7 +1482,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 					} else {
 						console.log('CERRAR');
 						orden.stopLoss = vela.close;
-						fnCierre(orden.tipo, 'S', vela);
+						//fnCierre(orden.tipo, 'S', vela);
 					}
 				}
 				/*console.log(orden);
