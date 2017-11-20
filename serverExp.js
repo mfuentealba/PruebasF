@@ -532,6 +532,9 @@ function fnEvaluaCierre(origen, vela, arrV){
 		){
 
 			//orden.stopLoss = orden.stopLoss > orden.open ? orden.stopLoss : vela.open;
+			if(orden.stopLoss > orden.open){
+				orden.ind++;
+			}
 			orden.stopLoss = vela.open;
 			console.log(vela);
 			
@@ -552,6 +555,9 @@ function fnEvaluaCierre(origen, vela, arrV){
 			)
 		){
 			//orden.stopLoss = orden.stopLoss < orden.open ? orden.stopLoss : vela.open;
+			if(orden.stopLoss < orden.open){
+				orden.ind++;
+			}
 			console.log(vela);
 			orden.stopLoss = vela.open;
 			return fnCierre("V", origen, vela);
@@ -755,13 +761,15 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 			if(dato.low < orden.min){
 				orden.min = dato.low;		
 			}	
-			/*if(orden.tipo == "C" && orden.open < orden.stopLoss && vela.low < orden.stopLoss){
-				return fnCierre("C", "S", vela);
+			if(orden.tipo == "C" && orden.open < orden.stopLoss && vela.low < orden.stopLoss){
+				orden.ind++;
+				//return fnCierre("C", "S", vela);
 			}
 
 			if(orden.tipo == "V" && orden.open > orden.stopLoss && vela.low > orden.stopLoss){
-				return fnCierre("V", "S", vela);
-			}*/
+				orden.ind++;
+				//return fnCierre("V", "S", vela);
+			}
 			//resp = fnEvaluaCierre(tipo, dato);//------->HABILITAR SI ES NECESARIO TESTEAR LAS ORDENES A CADA MOMENTO
 			
 		}
@@ -850,7 +858,7 @@ function fnCompra(vela, tipo, arrV, param, origen){
 				} else {
 					pos = 1;
 				}
-				orden = {ini: velaOp.id, trigger: origen, origen: tipo, tipo: 'C', cierrePost: '', fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
+				orden = {ini: velaOp.id, ind: 0, trigger: origen, origen: tipo, tipo: 'C', cierrePost: '', fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha, /*atr: atrGraf, */min: vela.low, max: vela.high, prop: 0, bb: bbGraf.upper, res: vela[param] - bbGraf.upper, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
 				////console.log(arrV);
 				var arrFecha = vela.fecha.split('.');				
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
@@ -951,7 +959,7 @@ function fnVenta(vela, tipo, arrV, param, origen){
 					pos = 1;
 				}
 				
-				orden = {ini: velaOp.id, trigger: origen,  origen: tipo, tipo: 'V', cierrePost: '',fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
+				orden = {ini: velaOp.id, ind: 0, trigger: origen,  origen: tipo, tipo: 'V', cierrePost: '',fin: 0, date: velaOp.date, vol: velaOp.vol, open: vela[param], fecha: vela.fecha/*, atr: atrGraf*/, min: vela.low, max: vela.high, prop: 0, bb: bbGraf.lower, res: vela[param] - bbGraf.lower, atr: atrGraf, volProm: volProm, tamProm: tamVelas};
 				var arrFecha = vela.fecha.split('.');
 				var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				nStopLoss = 0;
