@@ -317,7 +317,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 				&& ichi.kijun > ichi.tenkan
 				&& ichi.senkouSpanA > ichi.tenkan				
 				&& ichi.senkouSpanB > ichi.tenkan			
-				&& vela.close < Math.min(vela2.high, vela2.low, vela3.high, vela3.low/*, vela4.high, vela4.low)
+				&& vela.close < Math.min(vela2.high, vela2.low, vela3.high, vela3.low/*, vela4.high, vela4.low*/)
 				&& Math.abs(vela.open - vela.close) > 0.00070
 				/*&& Math.abs(vela.high - vela.low) > tamVelas
 				&& vela.vol > volProm		
