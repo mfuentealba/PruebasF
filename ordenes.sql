@@ -1,26 +1,28 @@
 -- phpMyAdmin SQL Dump
--- version 4.2.11
--- http://www.phpmyadmin.net
+-- version 4.7.4
+-- https://www.phpmyadmin.net/
 --
--- Servidor: 127.0.0.1
--- Tiempo de generación: 02-11-2017 a las 05:21:22
--- Versión del servidor: 5.6.21
--- Versión de PHP: 5.6.3
+-- Host: 127.0.0.1
+-- Generation Time: Nov 18, 2017 at 01:26 AM
+-- Server version: 10.1.28-MariaDB
+-- PHP Version: 5.6.32
 
 SET SQL_MODE = "NO_AUTO_VALUE_ON_ZERO";
+SET AUTOCOMMIT = 0;
+START TRANSACTION;
 SET time_zone = "+00:00";
 
 --
--- Base de datos: `analisis`
+-- Database: `testcfd`
 --
 
 -- --------------------------------------------------------
 
 --
--- Estructura de tabla para la tabla `ordenes`
+-- Table structure for table `ordenes`
 --
 
-CREATE TABLE IF NOT EXISTS `ordenes` (
+CREATE TABLE `ordenes` (
   `nro_prueba` int(11) NOT NULL,
   `ini` int(11) NOT NULL,
   `origen` varchar(1) COLLATE utf8_spanish2_ci NOT NULL,
@@ -42,5 +44,8 @@ CREATE TABLE IF NOT EXISTS `ordenes` (
   `tamReal` decimal(10,5) NOT NULL,
   `tamProm` decimal(10,5) NOT NULL,
   `volProm` decimal(10,5) NOT NULL,
-  `hora` varchar(10) COLLATE utf8_spanish2_ci NOT NULL
+  `hora` varchar(10) COLLATE utf8_spanish2_ci NOT NULL,
+  `close` decimal(10,5) NOT NULL,
+  `volSig` int(11) NOT NULL
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_spanish2_ci;
+COMMIT;

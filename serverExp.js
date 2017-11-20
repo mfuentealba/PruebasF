@@ -302,6 +302,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 				&& ichi.senkouSpanA < ichi.tenkan				
 				&& ichi.senkouSpanB < ichi.tenkan	
 				&& vela.close > Math.max(vela2.open, vela2.close, vela3.open, vela3.close, vela4.open, vela4.close)
+				&& Math.abs(vela.open - vela.close) > 0.00070
 				/*&& Math.abs(vela.high - vela.low) > tamVelas
 				&& vela.vol > volProm
 				&& Math.abs(ichi.tenkan - ichi.kijun) > Math.abs(vela.high - vela.low)*/
@@ -317,6 +318,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 				&& ichi.senkouSpanA > ichi.tenkan				
 				&& ichi.senkouSpanB > ichi.tenkan			
 				&& vela.close < Math.min(vela2.high, vela2.low, vela3.high, vela3.low, vela4.high, vela4.low)
+				&& Math.abs(vela.open - vela.close) > 0.00070
 				/*&& Math.abs(vela.high - vela.low) > tamVelas
 				&& vela.vol > volProm		
 				&& Math.abs(ichi.tenkan - ichi.kijun) > Math.abs(vela.high - vela.low)*/
@@ -468,7 +470,7 @@ function fnCierre(opt, origen, vela){
 	8 Como (7) agregando ajuste stop a 0.0005 y para las OK2 se reduce stop inicial
 	9 Como (8) agregando ajuste stop inicial a 0.0005 y luego a 100
 	*/
-	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`, `close`, `volSig`) VALUES (8,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "','" + orden.close + "','" + orden.volSig + "');\n", (err) => {
+	fs.appendFileSync('./querysReconstruccion/ordenGraf/_queryExp.txt', "INSERT INTO `ordenes`(`nro_prueba`, `ini`, `origen`, `tipo`, `cierrePost`, `open`, `fecha`, `min`, `max`, `prop`, `bb`, `distanciaBB`, `atr`, `stopLossIni`, `dia`, `total`, `volumen`, `tam`, `tamReal`, `tamProm`, `volProm`, `hora`, `close`, `volSig`) VALUES (10,'" + orden.ini + "','" + orden.origen + "','" + orden.tipo + "','" + orden.cierrePost + "','" + orden.open + "','" + orden.fecha + "','" + orden.min + "','" + orden.max + "','" + orden.prop + "','" + orden.bb + "','" + orden.res + "','" + orden.atr + "','" + orden.stopLossIni + "','" + orden.dia + "','" + orden.total + "','" + orden.vol + "','" + orden.tam + "','" + orden.tamTotal + "','" + orden.tamProm + "','" + orden.volProm + "','" + orden.date + "','" + orden.close + "','" + orden.volSig + "');\n", (err) => {
 		if (err) throw err;
 			////console.log('The "data to append" was appended to file!');
 		});
@@ -528,6 +530,8 @@ function fnEvaluaCierre(origen, vela, arrV){
 			)	
 			
 		){
+
+			//orden.stopLoss = orden.stopLoss > orden.open ? orden.stopLoss : vela.open;
 			orden.stopLoss = vela.open;
 			console.log(vela);
 			
@@ -547,10 +551,26 @@ function fnEvaluaCierre(origen, vela, arrV){
 				
 			)
 		){
-			orden.stopLoss = vela.open;
+			//orden.stopLoss = orden.stopLoss < orden.open ? orden.stopLoss : vela.open;
 			console.log(vela);
-			
+			orden.stopLoss = vela.open;
 			return fnCierre("V", origen, vela);
+		} else {
+			if(orden.tipo == 'C' && vela.close > orden.open + ajusteStop / 2 + spread){
+				if(orden.stopLoss < orden.open + spread){
+					orden.stopLoss = orden.open + spread + 0.00010;
+					orden.takeProfit = vela.close + ajusteStop;
+				}				
+				return 'A'; 
+			}
+
+			if(orden.tipo == 'V' && vela.close < orden.open - (ajusteStop / 2 + spread)){
+				if(orden.stopLoss > orden.open - spread){
+					orden.stopLoss = orden.open - spread - 0.00010;
+					orden.takeProfit = vela.close - ajusteStop;
+				} 
+				return 'A'; 
+			}	
 		}
 	} else	if(orden != null && origen == orden.origen && orden.trigger != 'rompeTenkan'){
 		console.log(orden);
@@ -735,7 +755,14 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 			if(dato.low < orden.min){
 				orden.min = dato.low;		
 			}	
-			//resp = fnEvaluaCierre(tipo, dato);------->HABILITAR SI ES NECESARIO TESTEAR LAS ORDENES A CADA MOMENTO
+			/*if(orden.tipo == "C" && orden.open < orden.stopLoss && vela.low < orden.stopLoss){
+				return fnCierre("C", "S", vela);
+			}
+
+			if(orden.tipo == "V" && orden.open > orden.stopLoss && vela.low > orden.stopLoss){
+				return fnCierre("V", "S", vela);
+			}*/
+			//resp = fnEvaluaCierre(tipo, dato);//------->HABILITAR SI ES NECESARIO TESTEAR LAS ORDENES A CADA MOMENTO
 			
 		}
 		/*if(resp == "N" && orden == null){
@@ -1460,8 +1487,8 @@ function fnVelaNueva(dato, arrVel, tipo){
 				
 				
 				console.log(orden.tipo);
-				/*orden.stopLoss = vela.close;
-				fnCierre(orden.tipo, 'S', vela);*/
+				orden.stopLoss = vela.close;
+				//fnCierre(orden.tipo, 'S', vela);
 				 
 				if(orden.tipo == 'C'){
 					
@@ -1472,7 +1499,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 					} else {
 						console.log('CERRAR');
 						orden.stopLoss = vela.close;
-						//fnCierre(orden.tipo, 'S', vela);
+						fnCierre(orden.tipo, 'S', vela);
 					}
 				} else {
 					if(vela.close < velaAnt.close + (velaAnt.open - velaAnt.close) / 3){
@@ -1482,7 +1509,7 @@ function fnVelaNueva(dato, arrVel, tipo){
 					} else {
 						console.log('CERRAR');
 						orden.stopLoss = vela.close;
-						//fnCierre(orden.tipo, 'S', vela);
+						fnCierre(orden.tipo, 'S', vela);
 					}
 				}
 				/*console.log(orden);
