@@ -286,10 +286,10 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		
 		
 		
-		resp = fnEvaluaCierre(tipo, dato, arrV);
+		resp = fnEvaluaCierre(tipo, dato, arrV, 'N');
 		
 		if(vela.id == 40){
-			console.log(vela.close + ' ' + Math.min(vela2.open, vela2.close, vela3.open, vela3.close, vela4.open, vela4.close));
+			console.log(vela.close + ' ' + Math.min(vela2.open, vela2.close, vela3.open, vela3.close/*, vela4.open, vela4.close*/));
 			console.log(ichi.kijun + ' ' + ichi.tenkan);
 			console.log(ichi.senkouSpanA + ' ' + ichi.senkouSpanB);
 			
@@ -301,7 +301,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 				&& ichi.kijun < ichi.tenkan
 				&& ichi.senkouSpanA < ichi.tenkan				
 				&& ichi.senkouSpanB < ichi.tenkan	
-				&& vela.close > Math.max(vela2.open, vela2.close, vela3.open, vela3.close, vela4.open, vela4.close)
+				&& vela.close > Math.max(vela2.open, vela2.close, vela3.open, vela3.close/*, vela4.open, vela4.close*/)
 				&& Math.abs(vela.open - vela.close) > 0.00070
 				/*&& Math.abs(vela.high - vela.low) > tamVelas
 				&& vela.vol > volProm
@@ -317,7 +317,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 				&& ichi.kijun > ichi.tenkan
 				&& ichi.senkouSpanA > ichi.tenkan				
 				&& ichi.senkouSpanB > ichi.tenkan			
-				&& vela.close < Math.min(vela2.high, vela2.low, vela3.high, vela3.low, vela4.high, vela4.low)
+				&& vela.close < Math.min(vela2.high, vela2.low, vela3.high, vela3.low/*, vela4.high, vela4.low)
 				&& Math.abs(vela.open - vela.close) > 0.00070
 				/*&& Math.abs(vela.high - vela.low) > tamVelas
 				&& vela.vol > volProm		
@@ -508,10 +508,14 @@ function fnGeneraLineaTendencia_y_orden(j, valorInicial, objNuevo, arrMinimo){
 
 
 
-function fnEvaluaCierre(origen, vela, arrV){
+function fnEvaluaCierre(origen, vela, arrV, opt){
 	if(orden != null && orden.trigger == 'rompeTenkan'){
 		//exit
-		vela = arrV[arrV.length - 1];
+		if(opt == 'N'){
+			vela = arrV[arrV.length - 1];	
+		}
+		
+		
 		if(orden.tipo == 'C'
 			&& (
 				(
@@ -533,10 +537,15 @@ function fnEvaluaCierre(origen, vela, arrV){
 
 			//orden.stopLoss = orden.stopLoss > orden.open ? orden.stopLoss : vela.open;
 			if(orden.stopLoss > orden.open){
+				if(Math.abs(vela.open - vela.close) > Math.abs(vela.high - vela.low) * 2){
+					return "N";
+				}
 				orden.ind++;
 			}
 			orden.stopLoss = vela.open;
-			console.log(vela);
+			console.log(vela);	
+			
+			
 			
 			return fnCierre("C", origen, vela);
 		} else if(
@@ -556,10 +565,14 @@ function fnEvaluaCierre(origen, vela, arrV){
 		){
 			//orden.stopLoss = orden.stopLoss < orden.open ? orden.stopLoss : vela.open;
 			if(orden.stopLoss < orden.open){
+				if(Math.abs(vela.open - vela.close) > Math.abs(vela.high - vela.low) * 2){
+					return "N";
+				}
 				orden.ind++;
 			}
 			console.log(vela);
-			orden.stopLoss = vela.open;
+			orden.stopLoss = vela.open;	
+						
 			return fnCierre("V", origen, vela);
 		} else {
 			if(orden.tipo == 'C' && vela.close > orden.open + ajusteStop / 2 + spread){
@@ -770,7 +783,7 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 				orden.ind++;
 				//return fnCierre("V", "S", vela);
 			}
-			//resp = fnEvaluaCierre(tipo, dato);//------->HABILITAR SI ES NECESARIO TESTEAR LAS ORDENES A CADA MOMENTO
+			resp = fnEvaluaCierre(tipo, dato, arrVel, 'M');//------->HABILITAR SI ES NECESARIO TESTEAR LAS ORDENES A CADA MOMENTO
 			
 		}
 		/*if(resp == "N" && orden == null){
