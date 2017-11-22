@@ -7,7 +7,7 @@ var request = require('request');
 var EventEmitter = require('events').EventEmitter;
 var arrOrdenGraf = [];
 var ee = new EventEmitter();
-ee.on("exec", fnProcesa);
+
 
 for(var i = 0; i < 10; i++){	
 	secNum.push("0" + i);
@@ -18,48 +18,6 @@ for(var i = 10; i < 60; i++){
 	secNum.push("" + i);
 	objSec["" + i] = i - 1;
 }
-
-function fnRecepcion(err,httpResponse,body){
-	
-	console.log(body);
-	body = JSON.parse(body)
-	contador++;
-	if(Number(body.cta) > 0){
-		ee.emit('exec', contador);
-	}
-	
-}
-
-function fnProcesa(i){
-	if(contador == arr.length){
-		return;
-	}
-	var dato = arr[i - 1].split(',');
-	var cierre = arr[i].split(',')[2];
-	//var arrFecha = dato[0].split(".");	
-	var sw = true;
-	var objReq = '{"open": "' + dato[2] + '", "close": "' + dato[5] + '", "high": "' + dato[3] + '", "low": "' + dato[4] + '", "spread": "' + dato[7] + '", "opt": "S", "date": "' + (/*dato[0] + ',' + */dato[1]) + '", "fecha": "' + (dato[0]) + '", "vol": "' + Number(dato[6]) + '"}';
-	
-	request.post({url: 'http://localhost:9191', form: objReq}, fnRecepcion);
-	
-}
-
-//fs.readFile("./marketdata/USDJPY1_2000_2005.csv", 'utf8', function(err, data) {
-fsLauncher.readFile("./querysReconstruccion/_dataExp.txt", 'utf8', function(err, data) {
-//fs.readFile("./marketdata/DAT_MT_GBPUSD_M1_2016.csv", 'utf8', function(err, data) {
-	if(err){
-		//console.log(err);
-		return;
-	}
-	
-	arr = data.split("\n");
-	
-	
-	ee.emit('exec', contador);
-});		
-
-
-
 
 
 
@@ -370,13 +328,16 @@ function fnCierre(opt, origen, vela){
 	orden.close = orden.stopLoss;
 	
 	//orden.fin = vela.date;
+	//spread = 0.0002
 	orden.total = opt == 'C' ? (orden.close - orden.open - spread) * ajusteDecimal : (orden.open - orden.stopLoss - spread) * ajusteDecimal;//((vela.open - orden.open) * ajusteDecimal) - 16;	
 	orden.totalReal = orden.total * orden.lote;//((vela.open - orden.open) * ajusteDecimal) - 16;	
 	orden.prop = opt == 'C' ? -(orden.open - orden.min) * ajusteDecimal / orden.stopLossIni : -(orden.max - orden.open) * ajusteDecimal / orden.stopLossIni;
+	console.log(spread);
 	console.log(opt + ' ' + orden.close + ' ' + orden.open + ' ' + spread + ' ' + ajusteDecimal);
 	console.log(orden.totalReal); 
 	
 	fnCalcCuenta(orden.totalReal);
+	//exit
 	orden.cta = cuenta;
 	
 	if(orden.total < -0.01){					
@@ -802,7 +763,9 @@ function fnVelaNormal(vela, dato, arrVel, tipo){
 function fnCalcCuenta(cierre){
 	if(cuenta > 0){
 		let garantia = cuenta / 10;
-		cuenta = cuenta + cierre;
+		cuenta = cuenta + Number(cierre);
+		console.log(cuenta + " " + cierre)
+		//exit
 		if(cuenta < garantia){
 			cuenta = -1;
 			fsEval.appendFileSync('./querysReconstruccion/ordenGraf/ResultadoEval.txt', JSON.stringify(objEval) + ",\n", (err) => {
@@ -1731,31 +1694,22 @@ var dias=["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
 //var arrSec = ['0', '1', '2', '3', '4', '5'];
 var sec = -1;
 var reqObj;
-http.createServer(function onRequest(request, response) {
-	request.setEncoding("utf8");
-	var content = [];
 
-	request.addListener("data", function(data) {
-		content.push(data); //Collect the incoming data
-	});
+	
 	
 
 	//At the end of request call
-	request.addListener("end", function() {
+	function fnProcesando(reqObj) {
 		//setup the response
-		response.writeHead( 200, {"Content-Type": "text/plain"} );
+		
 		//try{
-			ms = content[0];
+			
 			////console.log(ms);
-			if(ms.toString() != "")
+			if(reqObj != null)
 			{
 				
 				
-				var msg = ms.toString();	//Parse the ms into string		
 				
-				////console.log(msg); // Prints the message in the console
-				
-				reqObj = JSON.parse(msg);	// If the incoming message is in JSON format, you can parse it as JSON.
 				
 				var respuesta = "N";
 				
@@ -1869,8 +1823,8 @@ http.createServer(function onRequest(request, response) {
 				}
 					
 				
-				response.write(JSON.stringify(outObj));	//Write the response
-				response.end(); //Close the response
+				
+				return outObj;
 
 			}
 		/*} catch(e) {
@@ -1878,20 +1832,20 @@ http.createServer(function onRequest(request, response) {
 		}*/
 		
 
-	});
+	}
 
 	
-	
-}).listen(_PORT);
+
 
 //console.log("Node.js server listening on port "+ _PORT);
 
-var arrFile = ["./marketdata/EURUSD-2016-01.csv"/*, "./marketdata/EURUSD-2016-02.csv", "./marketdata/EURUSD-2016-03.csv", "./marketdata/EURUSD-2016-04_1.csv", "./marketdata/EURUSD-2016-04_2.csv"/*, "./marketdata/EURUSD-2016-05.csv", "./marketdata/EURUSD-2016-06.csv", "./marketdata/EURUSD-2016-07.csv", "./marketdata/EURUSD-2016-08.csv", "./marketdata/EURUSD-2016-09.csv", "./marketdata/EURUSD-2016-10.csv", "./marketdata/EURUSD-2016-11.csv"*/];
+var arrFile = ["./marketdata/EURUSD1.csv"/*, "./marketdata/EURUSD-2016-02.csv", "./marketdata/EURUSD-2016-03.csv", "./marketdata/EURUSD-2016-04_1.csv", "./marketdata/EURUSD-2016-04_2.csv"/*, "./marketdata/EURUSD-2016-05.csv", "./marketdata/EURUSD-2016-06.csv", "./marketdata/EURUSD-2016-07.csv", "./marketdata/EURUSD-2016-08.csv", "./marketdata/EURUSD-2016-09.csv", "./marketdata/EURUSD-2016-10.csv", "./marketdata/EURUSD-2016-11.csv"*/];
 
 var cnt = 0;
 
 function fnLecturaArchivo(err, data){
 	console.log(err);
+	var arr = [];
 	if(arrFile.length == cnt){
 		//console.log(data);
 		try{
@@ -1901,182 +1855,43 @@ function fnLecturaArchivo(err, data){
 		}
 		
 		
-		console.log(arr.length);
-		console.log(arr[0]);
-		console.log(arr[arr.length - 2]);
-		console.log("FIN");
-		arrVelaFuerza = [];
-		arrVelaFuerza2 = [];
-		arrVelaOperativa = [];
-		arrVelaOperativa2 = [];
-		arrVelaReferencia = [];
-		arrVelaReferencia2 = [];
-		var cont = 0;
-		ee.emit('ini', arr[0].split(','));
+		
+		
+		
+		
 		//for(let i in arr){
 		for(let i = 1; i < arr.length/1 - 1; i++){	
-			var dato = arr[i].split(',');
-			if(orden != null){
-				if(orden.tipo == 'C'){
-					if(((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 10000 < -3){
-						orden.close = dato[3];
-						orden.vo.indexLabel = 'c';
-						//orden.fecFin = dato[1];
-						orden.fin = vela.date;
-						orden.obs = ((dato[3] - orden.open) * 100000) - 16 < orden.stopLoss ? "stopLoss" : 'señal';
-						orden.total = ((dato[3] - orden.open) * 100000) - 16;	
-						if(orden.total < 0){
-							orden.vo.indexLabel = 'L';
-						}
-						ee.on('orden', fnAbrirOrden);
-						orden = null;
-					} else {
-						/*if(((dato[3] - orden.open) * 100000) - 16 > takeProfit){
-							orden.close = dato[3];
-							orden.fecFin = dato[1];
-							orden.fin = vela.date;
-							orden.obs = "takeProfit";
-							orden.total = ((dato[3] - orden.open) * 100000) - 16;	
-							ee.on('orden', fnAbrirOrden);
-							orden = null;
-						} else {*/
-							//if(((dato[3] - orden.open) * 100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * 100000) - 316 + nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * 100000) - 16 >= 50 ? (((dato[3] - orden.open) * 100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * 100000) - 316 + (nStopLoss+=5);
-								}
-							//}
-						//}
-					}
-				} else {
-					if(((dato[3] - orden.open) * -100000) - 16 < orden.stopLoss || (vela2.close - vela2.open) * 100000 > 3){
-						orden.close = dato[3];
-						//orden.fecFin = dato[1];
-						orden.vo.indexLabel = 'v';
-						orden.fin = vela2.date;
-						orden.obs = "stopLoss";
-						orden.total = ((dato[3] - orden.open) * -100000) - 16;
-						if(orden.total < 0){
-							orden.vo.indexLabel = 'S';
-						}
-						ee.on('orden', fnAbrirOrden);
-						orden = null;
-					} else {
-						/*if(((dato[3] - orden.open) * -100000) - 16 > takeProfit){
-							orden.close = dato[3];
-							orden.fecFin = dato[1];
-							orden.fin = vela2.date;
-							orden.obs = "takeProfit";
-							orden.total = ((dato[3] - orden.open) * -100000) - 16;
-							ee.on('orden', fnAbrirOrden);
-							orden = null;
-						} else {*/
-							//if(((dato[3] - orden.open) * -100000) - 16 >= 150){
-								if(orden.stopLoss < ((dato[3] - orden.open) * -100000) - 316 + nStopLoss){
-									orden.stopLoss = ((dato[3] - orden.open) * -100000) - 16 >= 50 ? (((dato[3] - orden.open) * -100000) - 316 + (nStopLoss) > 0 ? ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5) : 0) : ((dato[3] - orden.open) * -100000) - 316 + (nStopLoss+=5);
-								}
-							//}
-						//}
-					}
-				}
-					
+			var dato = arr[i - 1].split(',');
+			var cierre = arr[i].split(',')[2];
+			//var arrFecha = dato[0].split(".");	
+			var sw = true;
+			var objReq = {"open": dato[2], "close": dato[5], "high": dato[3], "low": dato[4], "spread": 0.00015, "opt": "S", "date": dato[1], "fecha": (dato[0]), "vol": Number(dato[6])};
+			
+			//request.post({url: 'http://localhost:9191', form: objReq}, fnRecepcion);
+			var resp = fnProcesando(objReq);
+			if(resp.cta == -1){
+				break;
 			}
-
-			
-			try{
-				/*if(){
-					ee.emit('0', dato);
-				}*/
-				//ee.emit(dato[1][13] % 5, dato);
-				ee.emit(dato[1][12], dato);
-			} catch(e){
-				//console.log(JSON.stringify(arr[i].split(',')));
-				//break;
-			}
-			//break;
-						
-		}
-		var total = 0;
-		var totalPos = 0;
-		var totalNeg = 0;
-		var totalCompras = 0;
-		var totalVentas = 0;
-		if(arrOrdenes.length > 0 && arrOrdenes[arrOrdenes.length - 1]['close'] == null){
-			//arrOrdenes.pop();
-			orden.close = dato[3];
-			orden.fecFin = dato[1];
-			orden.fin = vela2.date;
-			orden.obs = "stopLoss";
-			orden.total = ((dato[3] - orden.open) * -100000) - 16;
-			
-			ee.on('orden', fnAbrirOrden);
-			orden = null;
+			//console.log();
+									
 		}
 		
-		
-		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "******************************************************************\nMEDIA = " + mediaUsada + "      Take Profit=" + takeProfit + "\n", (err) => {
-				if (err) throw err;
-					console.log('The "data to append" was appended to file!');
-				});
-		
-		
-		//
-		for(let i in arrOrdenes){//8624190
-			fs2.appendFileSync('./querysReconstruccion/ordenes.txt', JSON.stringify(arrOrdenes[i]) + "\n", (err) => {
-				if (err) throw err;
-					console.log('The "data to append" was appended to file!');
-				});
-			try{
-				//total += Math.abs(arrOrdenes[i]['total']) > 1 ? arrOrdenes[i]['total'] : 0;
-				total += arrOrdenes[i]['total'];//arrOrdenes[i]['total'] < -30 ? -30 : arrOrdenes[i]['total'];
-				if(arrOrdenes[i]['total'] > 0){
-					totalPos += arrOrdenes[i]['total'];
-				} else {
-					totalNeg += arrOrdenes[i]['total'];
-				}
-				if(arrOrdenes[i]['tipo'] == 'C'){
-					totalCompras += arrOrdenes[i]['total'];
-				} else {
-					totalVentas += arrOrdenes[i]['total'];
-				}
-			} catch(e){
-				
-			}	
-			
-		}
-		fs2.appendFileSync('./querysReconstruccion/ordenes.txt', "TOTAL GRAL:: " + total +  "\n" +  "TOTAL BUENAS: " + totalPos +  "\n" +  "TOTAL MALAS: " + totalNeg +  "\nTOTAL COMPRAS: " + totalCompras +  "\n" +  "TOTAL VENTAS: " + totalVentas + "\n", (err) => {
-				if (err) throw err;
-					console.log('The "data to append" was appended to file!');
-				});
-		
-		process.send({ cmd: 'fin proceso', data: process.pid });
-		process.send({ cmd: 'enviarMkdt', data: [arrVelaFuerza2, arrVelaOperativa2, arrVelaReferencia, arrMedia14] });
-	} else {
-		if(arr.length > 0){
-			console.log(cnt)
-			arr = [arr, ...data.split("\n")];	
-		} else {
-			arr = data.split("\n");	
-		}
-		fs.readFile(arrFile[cnt++], 'utf8', fnLecturaArchivo);	
 	}
-	
 }
 
-process.on('message', (msg) => {
-	console.log('inicio Proceso');
-	process.send({ cmd: 'inicio Proceso', data: process.pid });
-	console.log(msg + ' ' + process.pid);
+
+console.log('inicio Proceso');
+
+
+//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
+fs.readFile(arrFile[cnt++], 'utf8', function(err, data) {
 	
-	//fs.readFile("FIX.4.4-TOMADOR_DE_ORDENES-ORDERROUTER.messages_20170809.log", 'utf8', function(err, data) {
-	fs.readFile(arrFile[cnt++], 'utf8', function(err, data) {
 		
-			
-		
-		fnLecturaArchivo(err, data);
-	});
 	
-	//console.log("FIN");
-	
+	fnLecturaArchivo(err, data);
 });
-process.send({ cmd: process.pid });
+
+//console.log("FIN");
+	
+
 
