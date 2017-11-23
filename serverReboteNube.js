@@ -203,7 +203,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 			
 		}
 
-		/*input = {
+		input = {
 			open: [arrV[arrV.length - 3].open * ajusteDecimal, arrV[arrV.length - 2].open * ajusteDecimal, arrV[arrV.length - 1].open * ajusteDecimal],
 			high: [arrV[arrV.length - 3].high * ajusteDecimal, arrV[arrV.length - 2].high * ajusteDecimal, arrV[arrV.length - 1].high * ajusteDecimal],
 			close: [arrV[arrV.length - 3].close * ajusteDecimal, arrV[arrV.length - 2].close * ajusteDecimal, arrV[arrV.length - 1].close * ajusteDecimal],
@@ -233,10 +233,13 @@ function fnEvaluaVelas(dato, tipo, arrV){
 			origen = 'bearishharamipattern';
 			//console.log('bullishengulfingpattern');
 			
-		}*/
+		}
 	
 		resp = fnEvaluaCierre(tipo, dato);
-		if(orden == null && sw){
+		if(orden == null 
+			&& sw
+			
+		){
 			var arrFecha = dato.fecha.split('.');
 			var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				
@@ -244,12 +247,18 @@ function fnEvaluaVelas(dato, tipo, arrV){
 								
 				switch(evaluacion){
 					case 2:
-						evaluacion = 0;
-						return fnVenta(dato, tipo, arrV, 'open', origen);
+						if(vela.close > Math.max(vela2.high, vela2.high, vela3.high, vela3.high, vela4.high, vela4.high)){
+							evaluacion = 0;
+							return fnVenta(dato, tipo, arrV, 'open', origen);
+						}
+						
 					
 					case 3:
-						evaluacion = 0;
-						return fnCompra(dato, tipo, arrV, 'open', origen);
+						if(vela.close < Math.min(vela2.low, vela2.low, vela3.low, vela3.low, vela4.low, vela4.low)){
+							evaluacion = 0;
+							return fnCompra(dato, tipo, arrV, 'open', origen);	
+						}
+						
 					
 				}
 				
