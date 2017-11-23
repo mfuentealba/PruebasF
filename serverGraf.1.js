@@ -137,10 +137,7 @@ function fnSi(dato){
 	return 'N';
 }
 
-var http = require("http");
 
-var _PORT = 9191; //Http port Node.js server will be listening on. Make sure that this is an open port and its the same as the one defined in MT4 indicator/EA.
-	
 var arrVelas = [];
 var arrVelasSombra = [];	
 var arrTamVelas = [];
@@ -252,7 +249,11 @@ function fnEvaluaVelas(dato, tipo, arrV){
 			console.log(ichi.senkouSpanA + ' ' + ichi.senkouSpanB);
 			
 		}
-		
+		var arrFecha = vela.fecha.split('.');
+		var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
+		var df = dias[dt.getUTCDay()];	
+
+
 		if(orden == null){
 			if(vela.open < ichi.tenkan 
 				&& vela.close > ichi.tenkan
@@ -261,6 +262,8 @@ function fnEvaluaVelas(dato, tipo, arrV){
 				&& ichi.senkouSpanB < ichi.tenkan	
 				&& vela.close > Math.max(vela2.open, vela2.close, vela3.open, vela3.close/*, vela4.open, vela4.close*/)
 				&& Math.abs(vela.open - vela.close) > 0.00070
+				//&& evaluacion == 3
+				//&& df == 'jue'
 				/*&& Math.abs(vela.high - vela.low) > tamVelas
 				&& vela.vol > volProm
 				&& Math.abs(ichi.tenkan - ichi.kijun) > Math.abs(vela.high - vela.low)*/
@@ -277,6 +280,8 @@ function fnEvaluaVelas(dato, tipo, arrV){
 				&& ichi.senkouSpanB > ichi.tenkan			
 				&& vela.close < Math.min(vela2.high, vela2.low, vela3.high, vela3.low/*, vela4.high, vela4.low*/)
 				&& Math.abs(vela.open - vela.close) > 0.00070
+				//&& evaluacion == 2
+				//&& df == 'jue'
 				/*&& Math.abs(vela.high - vela.low) > tamVelas
 				&& vela.vol > volProm		
 				&& Math.abs(ichi.tenkan - ichi.kijun) > Math.abs(vela.high - vela.low)*/
@@ -287,7 +292,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		}
 		
 
-		/*if(orden == null && sw){
+		if(orden == null && sw){
 			var arrFecha = dato.fecha.split('.');
 			var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 				
@@ -308,7 +313,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 
 			
 			
-		}*/
+		}
 		
 	}
 	return "N";
