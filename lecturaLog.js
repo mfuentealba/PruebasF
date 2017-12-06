@@ -1,5 +1,6 @@
 var fs = require('fs');
 var fs2 = require('fs');
+var fs3 = require('fs');
 const cluster = require('cluster');
 var arr;
 const tagsFixs = require('./resources/fixtagnums.js');
@@ -15,6 +16,7 @@ function fnExecRpt(data){
 			
 	var campos = [];
 	var valores = [];	
+	var todos = [];	
 	for(var str in data){
 		switch(tagsFixs['keyvals'][str]) { 
 			case "BodyLength":				
@@ -37,7 +39,8 @@ function fnExecRpt(data){
 			break;
 			case "Broker":
 				campos.push(tagsFixs['keyvals'][str]);
-				valores.push('LVPOOL');
+				valores.push('LVIAL');
+				todos.push('broker="LVIAL"');
 			break;
 			case "":				
 			break;
@@ -52,12 +55,15 @@ function fnExecRpt(data){
 				arrHora[0] = arrHora[0] > 9 ? arrHora[0] : '0' + arrHora[0];
 				hora = arrHora.join(":");
 				h[tagsFixs['keyvals']["TransactTime"]] = dia + " " + hora;
-				
+				todos.push('transactTime="' + hora + '"');
 			break;
 			default:
 				if(h[str] != 'FIX.4.4' && str != ''){
 					campos.push(tagsFixs['keyvals'][str]);
 					valores.push(h[str]);
+					var string = tagsFixs['keyvals'][str];
+					string = string.substr(0,1).toLowerCase()+string.substr(1,string.length);
+					todos.push(string + '="' + h[str] + '"');
 					
 				}
 				
@@ -76,6 +82,11 @@ function fnExecRpt(data){
 	  console.log('The "data to append" was appended to file!');
 	});
 	
+	fs3.appendFileSync('./querysReconstruccion/queryXML.txt', "EXEC [dbo].[SP_I_InsertarExecRpt] N'<ExecRpt " + todos.join(' ') + " />'\n", (err) => {
+	  if (err) throw err;
+	  console.log('The "data to append" was appended to file!');
+	});
+	
 	//process.send({ cmd: 'fix', data: data });
 }
 
@@ -84,8 +95,8 @@ function fnExecRpt(data){
 var ee = new EventEmitter();
 
 ee.on('8', fnExecRpt);
-ee.on('3', fnExecRpt);
-ee.on('9', fnExecRpt);
+/*ee.on('3', fnExecRpt);
+ee.on('9', fnExecRpt);*/
 
 
 
