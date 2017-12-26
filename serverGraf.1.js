@@ -7,7 +7,7 @@ var request = require('request');
 var EventEmitter = require('events').EventEmitter;
 var arrOrdenGraf = [];
 var ee = new EventEmitter();
-
+var init;
 
 for(var i = 0; i < 10; i++){	
 	secNum.push("0" + i);
@@ -1773,8 +1773,42 @@ var reqObj;
 					}*/
 
 					/************************************-  20 min -****************************************/
-					if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
-			
+					var d = new Date(reqObj.fecha + ':' + reqObj.date);
+					d = d.getTime();
+					if(init != d){
+						while(init != d / 1000){
+							init++;
+						}	
+						
+						if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+							
+							if(newVela == true){
+								newVela = false;
+								respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
+								
+							} else {
+								respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
+							}
+							
+						} else {
+							try{
+								newVela = true;
+								respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+							} catch(e){
+								respuesta = 'N';
+							}
+						}
+					}
+					
+					
+
+					/************************************-  FIN 20 min -****************************************/
+
+
+
+
+					if(reqObj.date[3] == '5' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+						
 						if(newVela == true){
 							newVela = false;
 							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
@@ -1782,7 +1816,7 @@ var reqObj;
 						} else {
 							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
 						}
-					 
+						
 					} else {
 						try{
 							newVela = true;
@@ -1792,7 +1826,9 @@ var reqObj;
 						}
 					}
 
-					/************************************-  FIN 20 min -****************************************/
+
+
+
 					//arrVelasSombra.push(reqObj);
 					//respuesta = fnEvaluaVelas(reqObj.cierre, 'S', arrVelasSombra);
 				//}
@@ -1860,9 +1896,9 @@ function fnLecturaArchivo(err, data){
 		}
 		
 		
-		
-		
-		
+		init = arr[0].split(',');
+		init = new Date(init[0] + ':' + init[1]);
+		init = init.getTime();
 		
 		//for(let i in arr){
 		for(let i = 1; i < arr.length/1 - 1; i++){	

@@ -3,6 +3,10 @@ var express = require('express');
 const shared_object = new Shared.Create('filename');*/
 
 
+
+var d = new Date("2014.01.01:23:06");
+console.log(d);
+console.log(d.getTime());
 var app = express();  
 var server = require('http').Server(app);  
 var io = require('socket.io')(server);

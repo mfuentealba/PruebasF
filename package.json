@@ -11,6 +11,7 @@
   "dependencies": {
     "g": "^2.0.1",
     "lifecycle": "^1.0.4",
+    "nvm": "0.0.4",
     "pipe": "0.0.2",
     "underscore": "1.1.6",
     "underscore.string": "1.1.4"
