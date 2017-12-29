@@ -172,75 +172,7 @@ function fnEvaluaVelas(dato, tipo, arrV){
 	var origen;
 	if(arrV.length > 2 && sw){
 		
-		var input = {
-			open: [arrV[arrV.length - 3].open * ajusteDecimal, arrV[arrV.length - 2].open * ajusteDecimal, arrV[arrV.length - 1].open * ajusteDecimal],
-			high: [arrV[arrV.length - 3].high * ajusteDecimal, arrV[arrV.length - 2].high * ajusteDecimal, arrV[arrV.length - 1].high * ajusteDecimal],
-			close: [arrV[arrV.length - 3].close * ajusteDecimal, arrV[arrV.length - 2].close * ajusteDecimal, arrV[arrV.length - 1].close * ajusteDecimal],
-			low: [arrV[arrV.length - 3].low * ajusteDecimal, arrV[arrV.length - 2].low * ajusteDecimal, arrV[arrV.length - 1].low * ajusteDecimal],
-			tamVelas: tamVelas * ajusteDecimal
-		  };
-		
-		sw = false;
-		
-		if(bearishengulfingpattern(input)){
-			sw = true;
-			evaluacion = 2;
-			origen = 'bearishengulfingpattern';
-			//console.log('bearishengulfingpattern');
 			
-		}
-
-		input = {
-			open: [arrV[arrV.length - 3].open * ajusteDecimal, arrV[arrV.length - 2].open * ajusteDecimal, arrV[arrV.length - 1].open * ajusteDecimal],
-			high: [arrV[arrV.length - 3].high * ajusteDecimal, arrV[arrV.length - 2].high * ajusteDecimal, arrV[arrV.length - 1].high * ajusteDecimal],
-			close: [arrV[arrV.length - 3].close * ajusteDecimal, arrV[arrV.length - 2].close * ajusteDecimal, arrV[arrV.length - 1].close * ajusteDecimal],
-			low: [arrV[arrV.length - 3].low * ajusteDecimal, arrV[arrV.length - 2].low * ajusteDecimal, arrV[arrV.length - 1].low * ajusteDecimal],
-			tamVelas: tamVelas * ajusteDecimal
-		  };
-		if(bullishengulfingpattern(input)){
-		//if(threeoutsideup(input)){
-			sw = true;
-			evaluacion = 3;
-			origen = 'bullishengulfingpattern';
-			//console.log('bullishengulfingpattern');
-			
-		}
-
-		input = {
-			open: [arrV[arrV.length - 3].open * ajusteDecimal, arrV[arrV.length - 2].open * ajusteDecimal, arrV[arrV.length - 1].open * ajusteDecimal],
-			high: [arrV[arrV.length - 3].high * ajusteDecimal, arrV[arrV.length - 2].high * ajusteDecimal, arrV[arrV.length - 1].high * ajusteDecimal],
-			close: [arrV[arrV.length - 3].close * ajusteDecimal, arrV[arrV.length - 2].close * ajusteDecimal, arrV[arrV.length - 1].close * ajusteDecimal],
-			low: [arrV[arrV.length - 3].low * ajusteDecimal, arrV[arrV.length - 2].low * ajusteDecimal, arrV[arrV.length - 1].low * ajusteDecimal],
-			tamVelas: tamVelas * ajusteDecimal
-		  };
-		if(bullishharamipattern(input)){
-		//if(threeoutsideup(input)){
-			sw = true;
-			evaluacion = 3;
-			origen = 'bullishharamipattern';
-			//console.log('bullishengulfingpattern');
-			
-		}
-
-		input = {
-			open: [arrV[arrV.length - 3].open * ajusteDecimal, arrV[arrV.length - 2].open * ajusteDecimal, arrV[arrV.length - 1].open * ajusteDecimal],
-			high: [arrV[arrV.length - 3].high * ajusteDecimal, arrV[arrV.length - 2].high * ajusteDecimal, arrV[arrV.length - 1].high * ajusteDecimal],
-			close: [arrV[arrV.length - 3].close * ajusteDecimal, arrV[arrV.length - 2].close * ajusteDecimal, arrV[arrV.length - 1].close * ajusteDecimal],
-			low: [arrV[arrV.length - 3].low * ajusteDecimal, arrV[arrV.length - 2].low * ajusteDecimal, arrV[arrV.length - 1].low * ajusteDecimal],
-			tamVelas: tamVelas * ajusteDecimal
-		  };
-		if(bearishharamipattern(input)){
-		//if(threeoutsideup(input)){
-			sw = true;
-			evaluacion = 2;
-			origen = 'bearishharamipattern';
-			//console.log('bullishengulfingpattern');
-			
-		}
-		
-		
-		
-		
 		resp = fnEvaluaCierre(tipo, dato, arrV, 'N');
 		
 		if(vela.id == 40){
@@ -253,7 +185,35 @@ function fnEvaluaVelas(dato, tipo, arrV){
 		var dt = new Date(Number(arrFecha[0]), Number(arrFecha[1]) - 1, Number(arrFecha[2]), 0, 0, 0, 0);
 		var df = dias[dt.getUTCDay()];	
 
-
+		
+		
+		if(Math.min(ichi.senkouSpanA, ichi.senkouSpanB) < vela.close && Math.max(ichi.senkouSpanA, ichi.senkouSpanB) > vela.close){
+			if(ordenC == null){
+				if(ordenC.pendiente == false){
+					ordenC = {};
+					ordenC.pendiente == true;	
+					ordenC.trigger == Math.max(ichi.senkouSpanA, ichi.senkouSpanB) + 0.00010;
+					ordenC.sl = Math.min(ichi.senkouSpanA, ichi.senkouSpanB);
+					if(Math.max(ichi2.kijun, ordenC.trigger, ichi2.tenkan) != ordenC.trigger){
+						ordenC.tp = ichi2.kijun > spread ? ichi2.kijun ? ichi2.kijun + spread;	
+					} else {
+						
+					}
+					
+				}
+				
+			}
+			
+			if(ordenV == null){
+				if(ordenV.pendiente == false){
+					ordenV = {};
+					ordenV.pendiente == true;	
+				}
+				
+			}
+			
+		}
+		
 		if(orden == null){
 			if(vela.open < ichi.tenkan 
 				&& vela.close > ichi.tenkan
@@ -1068,6 +1028,7 @@ function fnMaxMin(opt, velaAnt, vela){
 }
 
 var ichi;
+var ichi2;
 
 function fnVelaNueva(dato, arrVel, tipo){
 	//console.log('fnVelaNueva');
@@ -1081,7 +1042,8 @@ function fnVelaNueva(dato, arrVel, tipo){
 	/************************************- NIVELES -********************************************/
 	if(vela){
 		atrGraf = atr.nextValue({close: [vela.close], high: [vela.high], low: [vela.low]});
-		ichi = ichimoku.genera({high: vela.high, low: vela.low, period: 2})
+		ichi = ichimoku.genera({high: vela.high, low: vela.low, period: 2});
+		ichi2 = ichimokuLento.genera({high: vela.high, low: vela.low, period: 2});
 		arrNube.push({x: vela.id, y: [ichi.senkouSpanA, ichi.senkouSpanB], tipo: 'Nube'});
 		arrTenkan.push({x: vela.id, y: ichi.tenkan, tipo: 'Tenkan'});
 		arrKinjou.push({x: vela.id, y: ichi.kijun, tipo: 'Kinjou'});
@@ -1687,7 +1649,10 @@ console.log(ichimoku.genera({high: 21, low: 2, period: 2}));
 
 
 //var ichimoku = new Ichimoku(9, 26, 52);
-var ichimoku = new Ichimoku(3, 12, 24);
+var ichimoku = new Ichimoku(6, 12, 24);
+var ichimokuLento = new Ichimoku(72, 144, 288);
+
+
 
 var newVela = true;
 var dias=["dom", "lun", "mar", "mie", "jue", "vie", "sab"];
@@ -1772,23 +1737,12 @@ var reqObj;
 						respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
 					}*/
 
-					/************************************-  20 min -****************************************/
+					/************************************-  5 min -****************************************/
 					var d = new Date(reqObj.fecha + ':' + reqObj.date);
 					d = d.getTime();
-					if(init != d){
-						while(init != d / 1000){
-							init++;
-						}	
-						
-						if(reqObj.date[3] == '1' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
-							
-							if(newVela == true){
-								newVela = false;
-								respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
-								
-							} else {
-								respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       
-							}
+					while(d != init++){					
+						if((init / 1000) % 5 == 0){
+							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
 							
 						} else {
 							try{
@@ -1798,16 +1752,28 @@ var reqObj;
 								respuesta = 'N';
 							}
 						}
+						
+						
+					}
+					if((init / 1000) % 5 == 0){
+							respuesta = fnVelaNueva(reqObj, arrVelasSombra, reqObj.opt);
+							
+					} else {
+						try{
+							newVela = true;
+							respuesta = fnVelaNormal(arrVelasSombra[arrVelasSombra.length - 1], reqObj, arrVelasSombra, reqObj.opt);       				 
+						} catch(e){
+							respuesta = 'N';
+						}
 					}
 					
-					
 
-					/************************************-  FIN 20 min -****************************************/
-
+					/************************************-  FIN 5 min -****************************************/
 
 
 
-					if(reqObj.date[3] == '5' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
+
+					/*if(reqObj.date[3] == '5' || reqObj.date[3] == '3' || reqObj.date[3] == '5'){
 						
 						if(newVela == true){
 							newVela = false;
@@ -1826,7 +1792,7 @@ var reqObj;
 						}
 					}
 
-
+*/
 
 
 					//arrVelasSombra.push(reqObj);
