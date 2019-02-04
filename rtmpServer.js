@@ -8,9 +8,9 @@ rtmpServer.on('error', err => {
 });
 
 rtmpServer.on('client', client => {
-  //client.on('command', command => {
-  //  console.log(command.cmd, command);
-  //});
+  client.on('command', command => {
+    console.log(command.cmd, command);
+  });
 
   client.on('connect', () => {
      console.log('connect', client.app);
